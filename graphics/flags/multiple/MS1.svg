@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='ASCII' standalone='yes'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+  <svg width="600" height="600">
+<rect fill="#00f" width="600" height="600"/>
+<g stroke="#fff" stroke-width="105px">
+<path d="M 0,0 L 600,600 z"/>
+<path d="M 0,600 L 600,0 z"/>
+<rect fill="none" width="600" height="600" stroke="#000" stroke-width="2px"/>
+</g>
+</svg>
+  <g transform="translate(620, 0) scale(1 1) ">
+    <svg version="1.0" width="600" height="600" viewBox="0 0 3 3">
+<path d="M0,0h3v3h-3z" fill="#fff" stroke="#000" stroke-width=".0125"/>
+<path d="M1,1h1v1h-1z" fill="#00f"/>
+</svg>
+  </g>
+  <g transform="translate(1240, 150) scale(1 1) ">
+    <svg width="540" height="300" version="1.0">
+<path d="M1.25,1.25l537.5,75v147.5l-537.5,75z" fill="#fff" stroke="#000" stroke-width="2.5"/>
+<circle cx="150" cy="150" r="75.3" fill="#f00"/>
+</svg>
+  </g>
+</svg>

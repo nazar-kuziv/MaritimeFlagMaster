@@ -1,8 +1,8 @@
-from PIL import Image
+import tksvg
 
 
 class Flag:
-    def __init__(self, letter: str, img: Image, meaning: str, mnemonics: str, morse_code: Image):
+    def __init__(self, letter: str, img: tksvg.SvgImage, meaning: str, mnemonics: str, morse_code: str):
         self.letter = letter
         self.img = img
         self.meaning = meaning
@@ -11,6 +11,6 @@ class Flag:
 
 
 class FlagMultiple:
-    def __init__(self, img: Image, meaning: str):
+    def __init__(self, img: tksvg.SvgImage, meaning: str):
         self.img = img
         self.meaning = meaning

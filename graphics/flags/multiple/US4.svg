@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='ASCII' standalone='yes'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+  <svg version="1.0" width="600" height="600" viewBox="0 0 2 2">
+<path d="M0,0h2v2h-2z" fill="#f00"/>
+<path d="M0,1h2v-1h-1v2h-1z" fill="#fff"/>
+</svg>
+  <g transform="translate(620, 0) scale(1 1) ">
+    <svg version="1.0" width="600" height="600" viewBox="0 0 3 3">
+<path d="M0,0h3v3h-3z" fill="#fff" stroke="#000" stroke-width=".0125"/>
+<path d="M1,1h1v1h-1z" fill="#00f"/>
+</svg>
+  </g>
+  <g transform="translate(1240, 150) scale(1 1) ">
+    <svg version="1.0" width="540" height="300">
+<path d="M1.25,1.25l537.5,75v147.5l-537.5,75z" fill="#f00"/>
+<path d="M1.25,112.5h111.5v-96l75,10.4v85.6h351v75h-351v85.6l-75,10.4v-96h-111.5" fill="#fff"/>
+<path d="M1.25,1.25l537.5,75v147.5l-537.5,75z" fill="none" stroke="#000" stroke-width="2.5"/>
+</svg>
+  </g>
+</svg>

@@ -3,12 +3,12 @@ import tksvg
 
 # TEMP FLAG CLASS...
 class TEMPFlag():
-    # img: tksvg.SvgImage
+    # img: str
     # code: str
     # meaning: str
     # mnemonic: str
     # morse: str
-    def __init__(self, img: tksvg.SvgImage, code="", meaning="", mnemonic="", morse=""):
+    def __init__(self, img="letters/Alfa.svg", code="", meaning="", mnemonic="", morse=""):
         self.img = img
         self.code = code
         self.meaning = meaning

@@ -16,6 +16,13 @@ class TEMPFlag():
         self.morse = morse
 
 testFlag = TEMPFlag()
+
+class TEMPFlagMultiple():
+    # flags: list[str]
+    # meaning: str
+    def __init__(self, flags=["letters/Alfa.svg"], meaning=""):
+        self.flags = flags
+        self.meaning = meaning
 # ...TEMP FLAG CLASS
 
 class Flashcards(ctk.CTkFrame):
@@ -31,9 +38,14 @@ class Flashcards(ctk.CTkFrame):
         self.button_flashcard = ctk.CTkButton(self, text='Flashcard', width=180, height=140, command=self.button_callback)
         self.button_flashcard.grid()
     
-    def create_flashcard(self, flag: TEMPFlag):
-        self.button_flashcard = ctk.CTkButton(self, image=flag.img, width=180, height=140, command=self.button_callback)
-        self.button_flashcard.grid()
+    def create_flashcard(self, flag: TEMPFlag | TEMPFlagMultiple):
+        if (isinstance(flag, TEMPFlag)):
+            flags = [flag.img]
+        else:
+            flags = flag.flags
+        self.flashcard = ctk.CTkFrame(self, width=180, height=140)
+        # self.button_flashcard = ctk.CTkButton(self, image=flag.img, width=180, height=140, command=self.button_callback)
+        self.flashcard.grid()
         
     def button_callback(self):
         print("button pressed")

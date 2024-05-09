@@ -1,16 +1,16 @@
-import tksvg
+from typing import List
 
 
 class Flag:
-    def __init__(self, letter: str, img: tksvg.SvgImage, meaning: str, mnemonics: str, morse_code: str):
+    def __init__(self, letter: str, img_path: str, meaning: str, mnemonics: str, morse_code: str):
         self.letter = letter
-        self.img = img
+        self.img_path = img_path
         self.meaning = meaning
         self.mnemonics = mnemonics
         self.morse_code = morse_code
 
 
 class FlagMultiple:
-    def __init__(self, img: tksvg.SvgImage, meaning: str):
-        self.img = img
+    def __init__(self, flags: List[Flag], meaning: str):
+        self.flags = flags
         self.meaning = meaning

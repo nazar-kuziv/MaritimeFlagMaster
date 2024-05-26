@@ -35,17 +35,47 @@ class Flashcards(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.button_flashcard = ctk.CTkButton(self, text='Flashcard', width=180, height=140, command=self.button_callback)
+        self.button_flashcard = ctk.CTkLabel(self, text='Flashcard', width=180, height=140, cursor="hand2")
         self.button_flashcard.grid()
     
     def create_flashcard(self, flag: TEMPFlag | TEMPFlagMultiple):
+        """Creates a flashcard widget with the FLAG
+        """
         if (isinstance(flag, TEMPFlag)):
-            flags = [flag.img]
+            self.flags = [flag.img]
         else:
-            flags = flag.flags
-        self.flashcard = ctk.CTkFrame(self, width=180, height=140)
+            self.flags = flag.flags
+        self.flashcard.bind("<Button-1>")
+        self.flashcard.images = []
+        for flag, i in enumerate(self.flags):
+            self.flashcard.grid_columnconfigure(i, weight=1)
+            img = tksvg.SvgImage(file=flag)
+            label = ctk.CTkLabel(self.flashcard, image=img)
+            label.grid(row=0, column=i, padx=2, pady=20)
+
+            self.flashcard.images.append(label)
         # self.button_flashcard = ctk.CTkButton(self, image=flag.img, width=180, height=140, command=self.button_callback)
+    
+    def show_flashcard_base(self):
+        self.flashcard = ctk.CTkFrame(self, width=180, height=140, cursor="hand2")
         self.flashcard.grid()
-        
+        self.flashcard.grid_rowconfigure(0, weight=1)
+    
+    def show_flashcard_front(self):
+        self.show_flashcard_base()
+        self.flashcard.bind("<Button-1>")
+        self.flashcard.images = []
+        for flag, i in enumerate(self.flags):
+            self.flashcard.grid_columnconfigure(i, weight=1)
+            img = tksvg.SvgImage(file=flag)
+            label = ctk.CTkLabel(self.flashcard, image=img)
+            label.grid(row=0, column=i, padx=2, pady=20)
+
+            self.flashcard.images.append(label)
+    
+    def show_flashcard_back(self):
+        self.show_flashcard_base()
+        self.flashcard.bind("<Button-1>")
+
     def button_callback(self):
         print("button pressed")

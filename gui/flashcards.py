@@ -66,25 +66,31 @@ class Flashcards(ctk.CTkFrame):
         # self.button_flashcard = ctk.CTkButton(self, image=flag.img, width=180, height=140, command=self.button_callback)
     
     def show_flashcard_base(self):
+        try:
+            self.flashcard.destroy()
+        except AttributeError: pass
         self.flashcard = ctk.CTkFrame(self, width=180, height=140, cursor="hand2")
         self.flashcard.grid()
         self.flashcard.grid_rowconfigure(0, weight=1)
     
-    def show_flashcard_front(self):
+    def show_flashcard_front(self, event=None):
         self.show_flashcard_base()
-        self.flashcard.bind("<Button-1>", lambda event: self.flashcard_callback(side="front"))
+        #self.flashcard.bind("<Button-1>", lambda event: self.flashcard_callback(side="front"))
+        self.flashcard.bind("<Button-1>", self.show_flashcard_back)
         self.flashcard.images = []
         for i, flag in enumerate(self.flags):
             self.flashcard.grid_columnconfigure(i, weight=1)
             img = tksvg.SvgImage(file=f"graphics/{flag.img_path}")
-            label = ctk.CTkLabel(self.flashcard, image=img)
+            label = ctk.CTkLabel(self.flashcard, image=img, text="")
             label.grid(row=0, column=i, padx=2, pady=20)
+            label.bind("<Button-1>", self.show_flashcard_back)
 
             self.flashcard.images.append(label)
     
-    def show_flashcard_back(self):
+    def show_flashcard_back(self, event=None):
         self.show_flashcard_base()
-        self.flashcard.bind("<Button-1>", lambda event: self.flashcard_callback(side="back"))
+        #self.flashcard.bind("<Button-1>", lambda event: self.flashcard_callback(side="back"))
+        self.flashcard.bind("<Button-1>", self.show_flashcard_front)
     
     def flashcard_callback(self, side: str):
         """Callback function for clicking on the flashcard
@@ -93,6 +99,7 @@ class Flashcards(ctk.CTkFrame):
         :type side: str
         """
         print("button pressed")
+
 
     # def flashcard_front_callback(self):
     #     self.flashcard_callback("front")

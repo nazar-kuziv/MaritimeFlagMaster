@@ -34,6 +34,7 @@ class Flashcards(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         print("Initializing flaschards frame")
+        self.master = master
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -56,18 +57,21 @@ class Flashcards(ctk.CTkFrame):
         try:
             self.flashcard.destroy()
         except AttributeError: pass
-        self.flashcard = ctk.CTkFrame(self, width=180, height=140, cursor="hand2")
+        print(self.master.winfo_width())
+        self.flashcard = ctk.CTkFrame(self, width=self.master.winfo_width()*0.5, height=self.master.winfo_height()*0.5, cursor="hand2")
         self.flashcard.grid()
+        self.flashcard.grid_columnconfigure(0, weight=1)
         self.flashcard.grid_rowconfigure(0, weight=1)
     
     def show_flashcard_front(self, event=None):
         self.show_flashcard_base()
-        #self.flashcard.bind("<Button-1>", lambda event: self.flashcard_callback(side="front"))
         self.flashcard.bind("<Button-1>", self.show_flashcard_back)
         self.flashcard.images = []
         for i, flag in enumerate(self.flags):
             self.flashcard.grid_columnconfigure(i, weight=1)
-            img = tksvg.SvgImage(file=f"graphics/{flag.img_path}")
+            print(f"Flashcard height={self.flashcard.cget("height")} width={self.flashcard.cget("width")}")
+            # img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=500)
+            img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", height=int(self.flashcard.cget("height")))
             label = ctk.CTkLabel(self.flashcard, image=img, text="")
             label.grid(row=0, column=i, padx=2, pady=20)
             label.bind("<Button-1>", self.show_flashcard_back)

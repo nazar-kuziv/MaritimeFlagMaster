@@ -17,7 +17,7 @@ class MainWindow(ctk.CTk):
         self.button_frame.grid_rowconfigure(0, weight=1)
 
         buttonNames = ["Fiszki", "Słowo kodowe", "Znaczenie", "Zdanie"]
-        self.button = [ctk.CTkButton] * 4
+        self.button = [None] * 4
         for x in range(4):
             self.button_frame.grid_columnconfigure(x, weight=1)
             self.button[x] = ctk.CTkButton(self.button_frame, text=buttonNames[x], command=self.button_flashcards)

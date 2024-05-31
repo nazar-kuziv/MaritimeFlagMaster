@@ -31,4 +31,4 @@ class MainWindow(ctk.CTk):
         # self.grid_columnconfigure(0, weight=1)
         # self.grid_rowconfigure(0, weight=1)
         self.flashcards_frame = Flashcards(self, fg_color="transparent")
-        self.flashcards_frame.grid(row=0, column=0, padx=10, pady=10)
+        self.flashcards_frame.grid(row=0, column=0)

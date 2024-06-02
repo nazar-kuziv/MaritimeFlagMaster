@@ -58,34 +58,29 @@ class Flashcards(ctk.CTkFrame):
             self.flashcard.destroy()
         except AttributeError: pass
         print(self.master.winfo_width())
-        #self.flashcard = ctk.CTkFrame(self, width=self.master.winfo_width()*0.5, height=self.master.winfo_height()*0.5, cursor="hand2")
-        self.flashcard = ctk.CTkFrame(self, cursor="hand2")
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=2, minsize=int(self.master.winfo_height()*0.5))
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=2, minsize=int(self.master.winfo_width()*0.5))
-        self.grid_columnconfigure(2, weight=1)
-        self.flashcard.grid(row=1, column=1, sticky='nsew')
+        self.flashcard = ctk.CTkFrame(self, fg_color="transparent")
+        #self.flashcard = ctk.CTkFrame(self, cursor="hand2")
+        self.flashcard.place(relx=0.5, rely=0.5, anchor="center", relheight=0.9, relwidth=0.9)
 
     def show_flashcard_front(self, event=None):
         self.show_flashcard_base()
+        
         self.flashcard.bind("<Button-1>", self.show_flashcard_back)
         self.flashcard.grid_rowconfigure(0, weight=0)
         self.flashcard.images = []
         for i, flag in enumerate(self.flags):
             self.flashcard.grid_columnconfigure(i, weight=1)
             # img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=500)
-            if (self.flashcard.cget("height") > self.flashcard.cget("width")):
-                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.flashcard.cget("height")))
+            if (self.winfo_height() < self.winfo_width()):
+                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.winfo_height()))
             else:
-                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=int(self.flashcard.cget("width")))
+                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=int(self.winfo_height()))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
             label.grid(row=0, column=i, padx=2, pady=20)
             label.bind("<Button-1>", self.show_flashcard_back)
 
             self.flashcard.images.append(label)
-        print(f"Flashcard height={self.flashcard.cget("height")} width={self.flashcard.cget("width")}")
+        print(f"Flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
     
     def show_flashcard_back(self, event=None):
         self.show_flashcard_base()
@@ -99,7 +94,7 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.letter = ctk.CTkLabel(self.flashcard, text=self.flag_list[0].letter)
         self.flashcard.letter.grid(row=0, column=0, sticky='w')
         self.flashcard.letter.bind("<Button-1>", self.show_flashcard_front)
-        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag_list[0].meaning, wraplength=int(self.master.winfo_width()*0.5), justify="left")
+        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag_list[0].meaning, wraplength=int(self.master.winfo_width()*0.3), justify="left")
         self.flashcard.meaning.grid(row=1, column=0, sticky='w')
         self.flashcard.meaning.bind("<Button-1>", self.show_flashcard_front)
         self.flashcard.morse_code = ctk.CTkLabel(self.flashcard, text=self.flag_list[0].morse_code)

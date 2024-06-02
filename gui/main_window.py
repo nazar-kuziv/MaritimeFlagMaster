@@ -30,5 +30,5 @@ class MainWindow(ctk.CTk):
         self.button_frame.destroy()
         # self.grid_columnconfigure(0, weight=1)
         # self.grid_rowconfigure(0, weight=1)
-        self.flashcards_frame = Flashcards(self, fg_color="transparent")
-        self.flashcards_frame.grid(row=0, column=0)
+        self.flashcards_frame = Flashcards(self, cursor="hand2")
+        self.flashcards_frame.place(relx=0.5, rely=0.5, anchor="center", relheight=0.5, relwidth=0.5)

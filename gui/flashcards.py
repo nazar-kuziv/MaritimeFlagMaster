@@ -29,61 +29,76 @@ testFlag = Alphabet._characters['A']
 # ...TEMP FLAG CLASS
 
 class Flashcards(ctk.CTkFrame):
-    """Class for initializing flashcards
-    """
     def __init__(self, master, **kwargs):
+        """Class for initializing flashcards
+
+        To draw the flashcard, call show_flashcard_front or show_flashcard_back AFTER making this frame visible with the place/pack/grid functions
+        """
         super().__init__(master, **kwargs)
-        print("Initializing flaschards frame")
+        print("Initializing flashcards frame")
         self.master = master
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        self.flag_list = [random.choice(list(Alphabet._characters.values()))] # randomly choose a flag, change later
+        # self.flag_list = [random.choice(list(Alphabet._characters.values()))] # randomly choose a flag, change later
+        self.flag_list = [Alphabet._characters['6']] # randomly choose a flag, change later
 
         self.create_flashcard(self.flag_list[0])
+        # self.create_flashcard(self.flag_list)
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
-        """Creates a flashcard widget with the FLAG
+        """Creates a flashcard object with the FLAG
         """
         print(flag)
         if (isinstance(flag, Flag)):
             self.flags = [flag]
         else:
             self.flags = flag.flags
-        self.show_flashcard_front()
+        # self.show_flashcard_front()
     
     def show_flashcard_base(self):
+        self.unbind("<Button-1>")
         try:
             self.flashcard.destroy()
         except AttributeError: pass
-        print(self.master.winfo_width())
-        self.flashcard = ctk.CTkFrame(self, fg_color="transparent")
-        #self.flashcard = ctk.CTkFrame(self, cursor="hand2")
-        self.flashcard.place(relx=0.5, rely=0.5, anchor="center", relheight=0.9, relwidth=0.9)
+        
+        self.flashcard = ctk.CTkFrame(self, fg_color="transparent") # not the main frame but required for calculations
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        # self.flashcard = ctk.CTkFrame(self, cursor="hand2")
+        # self.flashcard.place(relx=0.5, rely=0.5, anchor="center")#, relheight=0.9, relwidth=0.9)
+        self.flashcard.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
+        print(self.winfo_width())
 
     def show_flashcard_front(self, event=None):
+        """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions (and possibly update the main CTk window)
+        """
         self.show_flashcard_base()
         
+        self.bind("<Button-1>", self.show_flashcard_back)
         self.flashcard.bind("<Button-1>", self.show_flashcard_back)
-        self.flashcard.grid_rowconfigure(0, weight=0)
-        self.flashcard.images = []
+        self.flashcard.grid_rowconfigure(0, weight=1, pad=0)
+        self.images = []
         for i, flag in enumerate(self.flags):
-            self.flashcard.grid_columnconfigure(i, weight=1)
+            self.flashcard.grid_columnconfigure(i, weight=1, pad=0)
             # img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=500)
             if (self.winfo_height() < self.winfo_width()):
-                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.winfo_height()))
+                print("height smaller than width")
+                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.winfo_height()*0.9))
             else:
-                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=int(self.winfo_height()))
+                print("height bigger than width")
+                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=int(self.winfo_width()*0.9))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
-            label.grid(row=0, column=i, padx=2, pady=20)
+            label.grid(row=0, column=i, pady=20, sticky="nsew")
+            # label.place(relx=0.5, rely=0.5, anchor="center")
             label.bind("<Button-1>", self.show_flashcard_back)
 
-            self.flashcard.images.append(label)
-        print(f"Flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
+            self.images.append(label)
+        print(f"Front flashcard height={self.winfo_height()} width={self.winfo_width()}")
     
     def show_flashcard_back(self, event=None):
+        """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions (and possibly update the main CTk window)
+        """
         self.show_flashcard_base()
+        self.bind("<Button-1>", self.show_flashcard_front)
         self.flashcard.bind("<Button-1>", self.show_flashcard_front)
 
         self.flashcard.rowconfigure(0, weight=1)
@@ -105,7 +120,7 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.info_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
         self.flashcard.info_mnemonic.grid(row=0, column=0, sticky='e')
         self.flashcard.info_mnemonic.bind("<Button-1>", self.show_flashcard_front)
-        print(f"Flashcard height={self.flashcard.cget("height")} width={self.flashcard.cget("width")}")
+        print(f"Back flashcard height={self.winfo_height()} width={self.winfo_width()}")
 
     # def flashcard_front_callback(self):
     #     self.flashcard_callback("front")

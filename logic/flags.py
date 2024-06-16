@@ -39,6 +39,16 @@ class Flag:
         user_letter = user_letter.strip().upper()
         return user_letter == self._letter.strip().upper()
 
+    def check_meaning(self, user_meaning: str) -> bool:
+        """Checks if the meaning provided by the user represents this flag
+
+        :param user_meaning: Meaning from user.
+        :rtype: bool
+        :return: True if the answer is correct, False otherwise.
+        """
+        user_meaning = user_meaning.strip().upper()
+        return user_meaning == self._meaning.strip().upper()
+
 
 class FlagMultiple:
     def __init__(self, flags: List[Flag], meaning: str):

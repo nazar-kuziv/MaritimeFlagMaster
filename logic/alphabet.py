@@ -146,13 +146,22 @@ class Alphabet(metaclass=AlphabetMeta):
                  FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values())
 
     @staticmethod
-    def get_flags_for_flashcards():
-        """Returns a list of flags for flashcards.
+    def get_all_flags():
+        """Returns a list of all posible flags. It is used for flashcards and meaning to flag mode.
 
         :rtype: List[Flag, FlagMultiple]
-        :return: List of flags for flashcards
         """
         flags = copy.deepcopy(Alphabet._allFlags)
+        random.shuffle(flags)
+        return flags
+
+    @staticmethod
+    def get_flags_for_flag2letter_mode():
+        """Returns a list of Flag objects for flag to letter mode.
+
+        :rtype: List[Flag]
+        """
+        flags = list(Alphabet._characters.values())
         random.shuffle(flags)
         return flags
 
@@ -161,7 +170,6 @@ class Alphabet(metaclass=AlphabetMeta):
         """Returns random sentence created from flags.
 
         :rtype: FlagSentence
-        :return: Random sentence created from flags
         """
         sentence = Alphabet._get_random_quote()
         if not sentence:

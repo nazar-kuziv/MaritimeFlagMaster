@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import tksvg
+from custom_hovertip import CustomTooltipLabel
 import random
 from logic.flags import *
 from logic.alphabet import Alphabet
@@ -38,15 +39,16 @@ class Flashcards(ctk.CTkFrame):
         print("Initializing flashcards frame")
         self.master = master
 
-        # self.flag_list = [random.choice(list(Alphabet._characters.values()))] # randomly choose a flag, change later
-        self.flag_list = [Alphabet._characters['6']] # randomly choose a flag, change later
+        # flag_list = [random.choice(list(Alphabet._characters.values()))] # randomly choose a flag, change later
+        flag_list = [Alphabet._characters['6']]
+        # flag_list = [Alphabet._allFlags[0]]
 
-        self.create_flashcard(self.flag_list[0])
-        # self.create_flashcard(self.flag_list)
+        self.create_flashcard(flag_list[0])
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard object with the FLAG
         """
+        self.flag = flag
         print(flag)
         if (isinstance(flag, Flag)):
             self.flags = [flag]
@@ -65,7 +67,7 @@ class Flashcards(ctk.CTkFrame):
         self.grid_rowconfigure(0, weight=1)
         # self.flashcard = ctk.CTkFrame(self, cursor="hand2")
         # self.flashcard.place(relx=0.5, rely=0.5, anchor="center")#, relheight=0.9, relwidth=0.9)
-        self.flashcard.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
+        self.flashcard.grid(row=0, column=0, sticky="nsew", padx=10)
         print(self.winfo_width())
 
     def show_flashcard_front(self, event=None):
@@ -75,19 +77,19 @@ class Flashcards(ctk.CTkFrame):
         
         self.bind("<Button-1>", self.show_flashcard_back)
         self.flashcard.bind("<Button-1>", self.show_flashcard_back)
-        self.flashcard.grid_rowconfigure(0, weight=1, pad=0)
+        self.flashcard.grid_rowconfigure(0, weight=1)
         self.images = []
         for i, flag in enumerate(self.flags):
             self.flashcard.grid_columnconfigure(i, weight=1, pad=0)
             # img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=500)
-            if (self.winfo_height() < self.winfo_width()):
+            if (self.winfo_height() < self.winfo_width() * len(self.flags)):
                 print("height smaller than width")
-                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.winfo_height()*0.9))
+                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.winfo_height()*0.9/len(self.flags)))
             else:
                 print("height bigger than width")
                 img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=int(self.winfo_width()*0.9))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
-            label.grid(row=0, column=i, pady=20, sticky="nsew")
+            label.grid(row=0, column=i, sticky="nsew")
             # label.place(relx=0.5, rely=0.5, anchor="center")
             label.bind("<Button-1>", self.show_flashcard_back)
 
@@ -105,22 +107,30 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.rowconfigure(1, weight=3)
         self.flashcard.rowconfigure(2, weight=1)
         self.flashcard.columnconfigure(0, weight=1)
+        print(f"Back flashcard height={self.winfo_height()} width={self.winfo_width()}")
 
-        self.flashcard.letter = ctk.CTkLabel(self.flashcard, text=self.flag_list[0].letter)
-        self.flashcard.letter.grid(row=0, column=0, sticky='w')
-        self.flashcard.letter.bind("<Button-1>", self.show_flashcard_front)
-        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag_list[0].meaning, wraplength=int(self.master.winfo_width()*0.3), justify="left")
+        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, wraplength=int(self.master.winfo_width()*0.3), justify="left")
         self.flashcard.meaning.grid(row=1, column=0, sticky='w')
         self.flashcard.meaning.bind("<Button-1>", self.show_flashcard_front)
-        self.flashcard.morse_code = ctk.CTkLabel(self.flashcard, text=self.flag_list[0].morse_code)
+
+        isSingleFlag = isinstance(self.flag, Flag)
+        print(isSingleFlag)
+        text = self.flag.letter if isSingleFlag else " ".join([x.letter for x in self.flag.flags])
+        self.flashcard.letter = ctk.CTkLabel(self.flashcard, text=text)
+        self.flashcard.letter.grid(row=0, column=0, sticky='w')
+        self.flashcard.letter.bind("<Button-1>", self.show_flashcard_front)
+        if (not isSingleFlag): return
+
+        self.flashcard.morse_code = ctk.CTkLabel(self.flashcard, text=self.flag.morse_code)
         self.flashcard.morse_code.grid(row=2, column=0, sticky='e')
         self.flashcard.morse_code.bind("<Button-1>", self.show_flashcard_front)
+        if (text == ""): return
 
         infoicon = tksvg.SvgImage(file="graphics/icons/info-icon.svg", scaletoheight=int(self.flashcard.letter.cget("height")))
         self.flashcard.info_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
         self.flashcard.info_mnemonic.grid(row=0, column=0, sticky='e')
+        CustomTooltipLabel(self.flashcard.info_mnemonic, text=self.flag.mnemonics, font=ctk.CTkFont(size=16), hover_delay=200, anchor="e")
         self.flashcard.info_mnemonic.bind("<Button-1>", self.show_flashcard_front)
-        print(f"Back flashcard height={self.winfo_height()} width={self.winfo_width()}")
 
     # def flashcard_front_callback(self):
     #     self.flashcard_callback("front")

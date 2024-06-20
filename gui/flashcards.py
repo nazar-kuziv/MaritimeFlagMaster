@@ -29,17 +29,16 @@ from logic.alphabet import Alphabet
 
 class Flashcards(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
-        """Class for initializing the flashcard screen
+        """Class for initializing the flashcards screen
 
         To draw the flashcard, call show_flashcard_front or show_flashcard_back AFTER making this frame visible with the place/pack/grid functions
         """
         super().__init__(master, **kwargs)
         print("Initializing flashcards frame")
-        self.master = master
 
         self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
-        # flag_list = [Alphabet._allFlags[0]]
+        # self.flag_list = [Alphabet._allFlags[7]]
 
         self.exit_button = ctk.CTkButton(self, text="Exit", width=40, command=self.exit)
         self.exit_button.pack(side="top", anchor="nw", ipadx=10, ipady=10, padx=10, pady=10)
@@ -48,7 +47,7 @@ class Flashcards(ctk.CTkFrame):
         self.create_flashcard(self.flag_list[self.flag_index])
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
-        """Creates a flashcard object with the FLAG
+        """Creates a flashcard with the FLAG
         """
         self.flag = flag
         if (isinstance(flag, Flag)):
@@ -77,13 +76,13 @@ class Flashcards(ctk.CTkFrame):
             self.back_button.destroy()
         except AttributeError: pass
         if (self.flag_index > 0):
-            self.back_button = ctk.CTkButton(self, text="Back", font=ctk.CTkFont(size=16), width=40, command=lambda: self.increment_flag_index(event=None, number=-1))
+            self.back_button = ctk.CTkButton(self, text="Back", font=ctk.CTkFont(size=16), width=40, command=lambda: self.increment_flag_index(number=-1))
             self.back_button.place(relx=0.02, rely=0.5, anchor="w", relheight=0.2, relwidth=0.1)
 
         self.update_idletasks()
 
     def show_flashcard_front(self, event=None):
-        """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions (and possibly update idle tasks)
+        """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions
         """
         self.show_flashcard_base()
         
@@ -97,7 +96,7 @@ class Flashcards(ctk.CTkFrame):
                 img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.flashcard.winfo_height()*0.9/len(self.flags)))
             else:
                 print("height bigger than width")
-                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=int(self.flashcard.winfo_width()*0.9))
+                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
             label.grid(row=0, column=i, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_back)
@@ -106,7 +105,7 @@ class Flashcards(ctk.CTkFrame):
         print(f"Front flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
     
     def show_flashcard_back(self, event=None):
-        """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions (and possibly update idle tasks)
+        """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions
         """
         self.show_flashcard_base()
         self.flashcard.bind("<Button-1>", self.show_flashcard_front)
@@ -139,14 +138,14 @@ class Flashcards(ctk.CTkFrame):
         CustomTooltipLabel(self.flashcard.info_mnemonic, text=self.flag.mnemonics, font=ctk.CTkFont(size=16), hover_delay=200, anchor="e")
         self.flashcard.info_mnemonic.bind("<Button-1>", self.show_flashcard_front)
 
-    def change_flag_index(self, event=None, index: int = 0):
+    def change_flag_index(self, index: int = 0):
         if (index not in range(0, len(self.flag_list))):
             raise IndexError("Index out of range")
         self.flag_index = index
         self.create_flashcard(self.flag_list[self.flag_index])
         self.show_flashcard_front()
 
-    def increment_flag_index(self, event=None, number: int = 1):
+    def increment_flag_index(self, number: int = 1):
         """Adjust the flag index by the given number
         """
         self.change_flag_index(index=self.flag_index + number)

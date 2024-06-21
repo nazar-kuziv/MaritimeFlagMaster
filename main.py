@@ -7,19 +7,17 @@ from logic.alphabet import Alphabet
 from logic.flags import Flag
 from gui.main_window import MainWindow
 
-def check_internet(callback, url="https://www.google.com", timeout=5):
+def check_internet(callback):
     """
     Checks for an internet connection.
 
     Parameters:
     callback (function): The callback function to call with the result.
-    url (str): The URL to test the connection. Defaults to Google.
-    timeout (int): The timeout in seconds for the request. Defaults to 5 seconds.
     """
 
     def check():
         try:
-            response = requests.get(url, timeout=timeout)
+            response = requests.get("https://api.quotable.io/random?maxLength=50", timeout=5)
             if response.status_code == 200:
                 callback(True)
             else:

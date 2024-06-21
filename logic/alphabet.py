@@ -1,4 +1,6 @@
-from logic.flags import Flag, FlagMultiple
+import copy, re, random, requests
+
+from logic.flags import Flag, FlagMultiple, FlagSentence
 
 
 class AlphabetMeta(type):
@@ -142,3 +144,72 @@ class Alphabet(metaclass=AlphabetMeta):
                  FlagMultiple([_characters['R'], _characters['Y']], 'Trzymaj się z dala z wolną prędkością'),
                  FlagMultiple([_characters['A'], _characters['E']], 'Muszę opuścić mój statek'),
                  FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values())
+
+    @staticmethod
+    def get_all_flags():
+        """Returns a list of all posible flags. It is used for flashcards and meaning to flag mode.
+
+        :rtype: List[Flag, FlagMultiple]
+        """
+        flags = copy.deepcopy(Alphabet._allFlags)
+        random.shuffle(flags)
+        return flags
+
+    @staticmethod
+    def get_flags_for_flag2letter_mode():
+        """Returns a list of Flag objects for flag to letter mode.
+
+        :rtype: List[Flag]
+        """
+        flags = list(Alphabet._characters.values())
+        random.shuffle(flags)
+        return flags
+
+    @staticmethod
+    def get_flag_sentence() -> FlagSentence:
+        """Returns random sentence created from flags.
+
+        :rtype: FlagSentence
+        """
+        sentence = Alphabet._get_random_quote()
+        if not sentence:
+            raise Exception('Failed to get a quote')
+        cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence).upper().strip()
+        flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
+        return FlagSentence(flags, sentence, cleaned_sentence)
+
+    @staticmethod
+    def _get_random_quote() -> str:
+        """Returns a random quote from quotable.io.
+        Function need internet connection to work.
+
+        :rtype: str
+        :return: Random quote
+        """
+        try:
+            response = requests.get('https://api.quotable.io/random?maxLength=50')
+            if response.status_code == 200:
+                json_data = response.json()
+                quote = json_data['content']
+                return quote
+            else:
+                print('Failed to get a quote')
+        except requests.exceptions.RequestException as e:
+            print('Failed to get a quote:', e)
+
+    @staticmethod
+    def _translate_sentence_to_flags(sentence: str) -> list[Flag | None]:
+        """Translates sentence to flags.
+        None is used for spaces.
+
+        :param sentence: Sentence to translate
+        :rtype: list[Flag | None]
+        :return: Translated sentence in flag language
+        """
+        flags = []
+        for letter in sentence:
+            if letter in Alphabet._characters:
+                flags.append(Alphabet._characters[letter])
+            else:
+                flags.append(None)
+        return flags

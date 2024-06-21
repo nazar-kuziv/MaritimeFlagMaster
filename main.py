@@ -5,7 +5,7 @@ import threading
 
 from logic.alphabet import Alphabet
 from logic.flags import Flag
-
+from gui.main_window import MainWindow
 
 def check_internet(callback, url="https://www.google.com", timeout=5):
     """
@@ -46,21 +46,8 @@ def handle_internet_status(status):
 
 
 # Set up the Tkinter window
-window = tk.Tk()
-window.title("Internet Connection Checker")
-
-a = Alphabet.get_all_flags()
-print(a[0])
-
-# Ensure that tksvg.SvgImage is created correctly and attached to the label
-if isinstance(a[0], Flag):
-    svg_image = tksvg.SvgImage(file="graphics/" + a[0].img_path)
-else:
-    svg_image = tksvg.SvgImage(file="graphics/" + a[0].flags[0].img_path)
-
-label = tk.Label(window, image=svg_image)
-label.pack()
+app = MainWindow()
 
 check_internet(handle_internet_status)
 
-window.mainloop()
+app.mainloop()

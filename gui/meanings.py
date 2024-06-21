@@ -20,7 +20,7 @@ class Meanings(ctk.CTkFrame):
         # self.flag_list = [Alphabet._allFlags[7]]
 
         self.top_menu = ctk.CTkFrame(self)
-        self.top_menu.pack(side="top", anchor="w", padx=10, pady=10)
+        self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
         self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Exit", width=40, command=self.exit, fg_color="orange red")
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
 
@@ -36,7 +36,7 @@ class Meanings(ctk.CTkFrame):
             widget.destroy()
         self.update_idletasks()
 
-        self.top_menu.meaning_label = ctk.CTkLabel(self.top_menu, text=self.flag.meaning, fg_color='transparent', wraplength=int(self.winfo_width()*0.5))
+        self.top_menu.meaning_label = ctk.CTkLabel(self.top_menu, text=self.flag.meaning, width=500, fg_color='transparent', wraplength=int(self.winfo_width()*0.5))
         self.top_menu.meaning_label.pack(side="left", padx=10)
 
         self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Check", width=30, command=self.check_answer, state="disabled")
@@ -95,16 +95,41 @@ class Meanings(ctk.CTkFrame):
         print(f"Checking, {self.flag}, {len(self.selected_flags)}")
         if (len(self.selected_flags) == 1):
             print("Flag")
-            if (not isinstance(self.flag, Flag)): return
+            if (not isinstance(self.flag, Flag)):
+                print("Incorrect Flag")
+                self.show_answer(False)
+                return
             if (self.flag.check_flag(self.alphabet[self.selected_flags[0]])):
                 print("Correct Flag")
-            else: print("Incorrect Flag")
+                self.show_answer(True)
+            else:
+                print("Incorrect Flag")
+                self.show_answer(False)
         else:
             print("FlagMultiple")
-            if (not isinstance(self.flag, FlagMultiple)): return
+            if (not isinstance(self.flag, FlagMultiple)):
+                print("Incorrect FlagMultiple")
+                self.show_answer(False)
+                return
             if (self.flag.check_flags([self.alphabet[i] for i in self.selected_flags])):
                 print("Correct FlagMultiple")
-            else: print("Incorrect FlagMultiple")
+                self.show_answer(True)
+            else:
+                print("Incorrect FlagMultiple")
+                self.show_answer(False)
+    
+    def show_answer(self, isCorrect: bool):
+        try:
+            self.top_menu.answer.destroy()
+        except AttributeError: pass
+        answer_text = "Correct!" if isCorrect else "Wrong"
+        print(answer_text)
+        self.top_menu.answer = ctk.CTkLabel(self.top_menu, text=answer_text, fg_color='transparent')
+        self.top_menu.answer.pack(side="left", padx=10)
+        if (isCorrect):
+            for f in self.flag_images:
+                f.flag.unbind("<Button-1>")
+                f.flag.configure(cursor='')
 
     def change_question(self, event=None, index: int = 0):
         if (index not in range(0, len(self.flag_list))):

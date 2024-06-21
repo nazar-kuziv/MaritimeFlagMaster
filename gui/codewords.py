@@ -14,7 +14,8 @@ class Codewords(ctk.CTkFrame):
         print("Initializing codewords frame")
 
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
-        self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
+        # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
+        self.flag_list = Alphabet.get_flags_for_flag2letter_mode()
         
         self.question_widgets = []
         self.grid_rowconfigure(0, weight=1)
@@ -46,7 +47,7 @@ class Codewords(ctk.CTkFrame):
         self.question_widgets.append(self.answer_cell)
 
         validate_command = self.register(self.validate_answer)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=40, justify="center", validate="key", validatecommand=(validate_command, '%d', '%P', '%S'))
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, justify="center", validate="key", validatecommand=(validate_command, '%d', '%P', '%S'))
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
@@ -56,22 +57,23 @@ class Codewords(ctk.CTkFrame):
 
     def validate_answer(self, action, new_text, new_character):
         # print(f'Validating answer, {new_character} for {new_text} with action {action}.')
-        if (len(new_text) > 1):
-            return False
-        elif (action == '1'):
-            # print("changing answer")
-            self.answer_cell.entry.delete(0, 'end')
-            self.answer_cell.entry.insert(0, new_text.upper())
-            # after changing text of the Entry widget during validation, the validate function changes to None so you have to change it back to 'key' through this function
-            self.after_idle(lambda: self.answer_cell.entry.configure(validate="key"))
+        # if (len(new_text) > 1):
+        #     return False
+        # elif (action == '1'):
+        #     # print("changing answer")
+        #     self.answer_cell.entry.delete(0, 'end')
+        #     self.answer_cell.entry.insert(0, new_text.upper())
+        #     # after changing text of the Entry widget during validation, the validate function changes to None so you have to change it back to 'key' through this function
+        #     self.after_idle(lambda: self.answer_cell.entry.configure(validate="key"))
         return True
 
     def enter_answer(self, event=None):
         try:
             self.answer_response.destroy()
         except AttributeError: pass
-        correct_answer = self.flag.letter[0].upper()
-        if (self.answer_cell.entry.get().upper() != correct_answer):
+        # correct_answer = self.flag.letter[0].upper()
+        
+        if (not self.flag.check_letter(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self, text='Wrong', font=ctk.CTkFont(size=20), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)

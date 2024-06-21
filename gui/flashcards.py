@@ -36,7 +36,8 @@ class Flashcards(ctk.CTkFrame):
         super().__init__(master, **kwargs)
         print("Initializing flashcards frame")
 
-        self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
+        self.flag_list = Alphabet.get_all_flags()
+        # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
         # self.flag_list = [Alphabet._allFlags[7]]
 
@@ -68,7 +69,7 @@ class Flashcards(ctk.CTkFrame):
             self.next_button.destroy()
         except AttributeError: pass
         if (self.flag_index < len(self.flag_list)-1):
-            self.next_button = ctk.CTkButton(self, text="Next", font=ctk.CTkFont(size=16), width=40, command=self.increment_flag_index)
+            self.next_button = ctk.CTkButton(self, text="〉", font=ctk.CTkFont(size=30), width=40, command=self.increment_flag_index)
             self.next_button.place(relx=0.98, rely=0.5, anchor="e", relheight=0.2, relwidth=0.1)
         
         # back button
@@ -76,7 +77,7 @@ class Flashcards(ctk.CTkFrame):
             self.back_button.destroy()
         except AttributeError: pass
         if (self.flag_index > 0):
-            self.back_button = ctk.CTkButton(self, text="Back", font=ctk.CTkFont(size=16), width=40, command=lambda: self.increment_flag_index(number=-1))
+            self.back_button = ctk.CTkButton(self, text="〈", font=ctk.CTkFont(size=30), width=40, command=lambda: self.increment_flag_index(number=-1))
             self.back_button.place(relx=0.02, rely=0.5, anchor="w", relheight=0.2, relwidth=0.1)
 
         self.update_idletasks()

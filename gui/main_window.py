@@ -10,7 +10,7 @@ class MainWindow(ctk.CTk):
         super().__init__()
 
         self.title("Maritime Flag Master")
-        self.geometry("800x300")
+        self.geometry("1000x500")
 
         self.main_menu()
 
@@ -20,7 +20,7 @@ class MainWindow(ctk.CTk):
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.button_frame.grid_rowconfigure(0, weight=1)
-        buttonNames = ["Fiszki", "Słowo kodowe", "Znaczenie", "Zdanie"]
+        buttonNames = ["Fiszki", "Słowo kodowe", "Znaczenie", "Flagi → Zdanie"]
         commands = [self.flashcards, self.codewords, self.meanings, None]
         self.button = [None] * 4
         for i in range(4):

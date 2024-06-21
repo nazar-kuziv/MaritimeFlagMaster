@@ -14,13 +14,14 @@ class Meanings(ctk.CTkFrame):
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
 
-        self.flag_list = [Alphabet._characters['C'], Alphabet._characters['B'], Alphabet._characters['A']] # randomly choose a flag, change later
+        self.flag_list = Alphabet.get_all_flags()
+        # self.flag_list = [Alphabet._characters['C'], Alphabet._characters['B'], Alphabet._characters['A']] # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
         # self.flag_list = [Alphabet._allFlags[7]]
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", padx=10, pady=10)
-        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Exit", width=40, command=self.exit)
+        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Exit", width=40, command=self.exit, fg_color="orange red")
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
 
         self.flag_images = []
@@ -41,13 +42,13 @@ class Meanings(ctk.CTkFrame):
         self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Check", width=30, command=self.check_answer, state="disabled")
         self.top_menu.check_button.pack(side="left", ipadx=10, ipady=10)
 
-        self.alphabet = list(Alphabet._characters.values())
-        random.shuffle(self.alphabet)
+        self.alphabet = Alphabet.get_flag_keyboard()
+        print(len(self.alphabet))
         self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.input_frame.pack(side="bottom", fill="both", expand=True)
 
-        self.input_rows = 4
-        self.input_columns = 7
+        self.input_rows = 5
+        self.input_columns = 8
         for i in range(self.input_rows):
             self.input_frame.grid_rowconfigure(i, weight=1)
         for j in range(self.input_columns):
@@ -70,9 +71,11 @@ class Meanings(ctk.CTkFrame):
                 self.flag_images.append(flag_container)
                 
                 alphabet_index += 1
-                if (alphabet_index == 26): return
+                if (alphabet_index == 40): return
 
     def flag_input_handler(self, event=None, index: int = -1):
+        """Handler function for clicking on flags, 3 max at once. Indices of the selected flags are added to self.selected_flags
+        """
         if (index < 0): return
         print(f"{len(self.selected_flags)}, {index}")
         if (index not in self.selected_flags):
@@ -89,7 +92,19 @@ class Meanings(ctk.CTkFrame):
         else: self.top_menu.check_button.configure(state="disabled")
 
     def check_answer(self):
-        print("Checking")
+        print(f"Checking, {self.flag}, {len(self.selected_flags)}")
+        if (len(self.selected_flags) == 1):
+            print("Flag")
+            if (not isinstance(self.flag, Flag)): return
+            if (self.flag.check_flag(self.alphabet[self.selected_flags[0]])):
+                print("Correct Flag")
+            else: print("Incorrect Flag")
+        else:
+            print("FlagMultiple")
+            if (not isinstance(self.flag, FlagMultiple)): return
+            if (self.flag.check_flags([self.alphabet[i] for i in self.selected_flags])):
+                print("Correct FlagMultiple")
+            else: print("Incorrect FlagMultiple")
 
     def change_question(self, event=None, index: int = 0):
         if (index not in range(0, len(self.flag_list))):

@@ -100,11 +100,11 @@ class Alphabet(metaclass=AlphabetMeta):
                    '8': Flag('Oktoeight', 'flags/digits/8.svg', 'Eight',
                              'Osiem czerwonych, bo podwójnie?', '▬ ▬ ▬ · ·'),
                    '9': Flag('Novenine', 'flags/digits/9.svg', 'Nine', 'Dziewięć 6+7 po barwach - 4 pola', '▬ ▬ ▬ ▬ ·')}
-    _allFlags = [Flag('', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', ''),
-                 Flag('', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', ''),
-                 Flag('', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', ''),
-                 Flag('', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', ''),
-                 FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam moje jednostkę pływającą'),
+    _additionalFlags = [Flag('', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', ''),
+                        Flag('', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', ''),
+                        Flag('', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', ''),
+                        Flag('', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '')]
+    _allFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam moje jednostkę pływającą'),
                  FlagMultiple([_characters['A'], _characters['D']],
                               'Opuszczam mój statek, który ucierpiał w wypadku nuklearnym i stanowi potencjalne źródło niebezpieczeństwa promieniowania'),
                  FlagMultiple([_characters['A'], _characters['N']], 'Potrzebuję lekarza'),
@@ -143,7 +143,7 @@ class Alphabet(metaclass=AlphabetMeta):
                               'Jestem w sytuacji zagrożenia i potrzebuję natychmiastowej pomocy'),
                  FlagMultiple([_characters['R'], _characters['Y']], 'Trzymaj się z dala z wolną prędkością'),
                  FlagMultiple([_characters['A'], _characters['E']], 'Muszę opuścić mój statek'),
-                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values())
+                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values()) + _additionalFlags
 
     @staticmethod
     def get_all_flags():
@@ -152,6 +152,17 @@ class Alphabet(metaclass=AlphabetMeta):
         :rtype: List[Flag, FlagMultiple]
         """
         flags = copy.deepcopy(Alphabet._allFlags)
+        random.shuffle(flags)
+        return flags
+
+    @staticmethod
+    def get_flag_keyboard():
+        """Returns a list of all flags used in keyboard for meaning to flag mode.
+
+        :rtype: List[Flag]
+        """
+        flags = copy.deepcopy(list(Alphabet._characters.values()))
+        flags.extend(Alphabet._additionalFlags)
         random.shuffle(flags)
         return flags
 

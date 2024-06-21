@@ -48,6 +48,15 @@ class Flag:
         """
         user_meaning = user_meaning.strip().upper()
         return user_meaning == self._meaning.strip().upper()
+    
+    def check_flag(self, user_flag: 'Flag') -> bool:
+        """Checks if the flag provided by the user represents this flag
+
+        :param user_flag: Flag from user.
+        :rtype: bool
+        :return: True if the answer is correct, False otherwise.
+        """
+        return user_flag.letter.strip().capitalize() == self._letter
 
 
 class FlagMultiple:
@@ -62,6 +71,17 @@ class FlagMultiple:
     @property
     def meaning(self) -> str:
         return self._meaning
+    
+    def check_flags(self, user_flags: List[Flag]) -> bool:
+        """Checks if the flags provided by the user represent this FlagMultiple.
+
+        :param user_flags: List of flags from user.
+        :rtype: bool
+        :return: True if the answer is correct, False otherwise.
+        """
+        user_flags = [flag.meaning.strip().capitalize() for flag in user_flags]
+        correct_flags = [flag.meaning.strip().capitalize() for flag in self._flags]
+        return user_flags == correct_flags
 
 
 class FlagSentence:

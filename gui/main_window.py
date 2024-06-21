@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from .flashcards import Flashcards
 from .codewords import Codewords
+from .meanings import Meanings
 
 class MainWindow(ctk.CTk):
     """Class for initializing the main window
@@ -20,7 +21,7 @@ class MainWindow(ctk.CTk):
         self.button_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.button_frame.grid_rowconfigure(0, weight=1)
         buttonNames = ["Fiszki", "Słowo kodowe", "Znaczenie", "Zdanie"]
-        commands = [self.flashcards, self.codewords, None, None]
+        commands = [self.flashcards, self.codewords, self.meanings, None]
         self.button = [None] * 4
         for i in range(4):
             self.button_frame.grid_columnconfigure(i, weight=1)
@@ -39,3 +40,8 @@ class MainWindow(ctk.CTk):
         self.codewords_frame.grid(sticky="nsew")
         self.codewords_frame.show_question()
 
+    def meanings(self):
+        self.button_frame.destroy()
+        self.meanings_frame = Meanings(self, fg_color="transparent")
+        self.meanings_frame.grid(sticky="nsew")
+        self.meanings_frame.show_question()

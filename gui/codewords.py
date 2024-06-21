@@ -87,7 +87,7 @@ class Codewords(ctk.CTkFrame):
 
             # next button
             if (self.flag_index < len(self.flag_list)-1):
-                self.next_button = ctk.CTkButton(self, text="Next", font=ctk.CTkFont(size=16), width=80, height=80, command=self.next_question)
+                self.next_button = ctk.CTkButton(self, text="Next", font=ctk.CTkFont(size=16), width=80, height=80, command=self.increment_question)
                 self.next_button.grid(row=1, column=2)
                 self.question_widgets.append(self.next_button)
     
@@ -96,8 +96,8 @@ class Codewords(ctk.CTkFrame):
         self.flag = self.flag_list[self.flag_index]
         self.show_question()
 
-    def next_question(self):
-        self.change_question(self.flag_index+1)
+    def increment_question(self, number: int = 1):
+        self.change_question(self.flag_index + number)
     
     def exit(self):
         self.master.main_menu()

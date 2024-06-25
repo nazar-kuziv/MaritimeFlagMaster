@@ -126,7 +126,7 @@ class Alphabet(metaclass=AlphabetMeta):
                  FlagMultiple([_characters['J'], _characters['A']], 'Potrzebuję urządzeń przeciwpożarowych'),
                  FlagMultiple([_characters['J'], _characters['A'], _characters['4']],
                               'Potrzebuję materiału do pianowych gaśnic'),
-                 FlagMultiple([_characters['M'], _characters['A'], _characters['A']], 'Proszę o pilną poradę medyczną'),
+                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags[2]], 'Proszę o pilną poradę medyczną'),
                  FlagMultiple([_characters['M'], _characters['A'], _characters['B']],
                               'Proszę o zorganizowanie spotkania w wskazanej pozycji'),
                  FlagMultiple([_characters['M'], _characters['A'], _characters['C']],
@@ -177,34 +177,40 @@ class Alphabet(metaclass=AlphabetMeta):
         return flags
 
     @staticmethod
-    def get_flag_sentence() -> FlagSentence:
-        """Returns random sentence created from flags.
+    def get_flag_sentence() -> FlagSentence | None:
+        """Returns random sentence created from flags, or None if requests limit has been exceeded.
 
         :rtype: FlagSentence
         """
         sentence = Alphabet._get_random_quote()
         if not sentence:
-            raise Exception('Failed to get a quote')
+            return None
         cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence).upper().strip()
         flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
         return FlagSentence(flags, sentence, cleaned_sentence)
 
     @staticmethod
-    def _get_random_quote() -> str:
-        """Returns a random quote from quotable.io.
+    def _get_random_quote() -> str | None:
+        """Returns a random quote from zenquotes.io, or None if requests limit has been exceeded.
         Function need internet connection to work.
 
-        :rtype: str
+        :rtype: str | None
         :return: Random quote
         """
         try:
-            response = requests.get('https://api.quotable.io/random?maxLength=50')
+            response = requests.get("https://zenquotes.io/api/quotes")
             if response.status_code == 200:
-                json_data = response.json()
-                quote = json_data['content']
-                return quote
+                quotes = response.json()
+                for quote in quotes:
+                    try:
+                        quote_text = quote['q']
+                        if int(quote['c']) <= 50:
+                            return f"{quote_text}"
+                    except KeyError:
+                        return None
+                Alphabet._get_random_quote()
             else:
-                print('Failed to get a quote')
+                return f"Error: {response.status_code}"
         except requests.exceptions.RequestException as e:
             print('Failed to get a quote:', e)
 

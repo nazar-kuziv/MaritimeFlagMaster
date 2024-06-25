@@ -17,7 +17,7 @@ def check_internet(callback):
 
     def check():
         try:
-            response = requests.get("https://api.quotable.io/random?maxLength=50", timeout=5)
+            response = requests.get("https://zenquotes.io/api/quotes", timeout=5)
             if response.status_code == 200:
                 callback(True)
             else:

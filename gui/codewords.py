@@ -15,7 +15,7 @@ class Codewords(ctk.CTkFrame):
 
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
-        self.flag_list = Alphabet.get_flags_for_flag2letter_mode()
+        self.flag_list = Alphabet.get_characters_flags_shuffled()
         
         self.question_widgets = []
         self.grid_rowconfigure(0, weight=1)

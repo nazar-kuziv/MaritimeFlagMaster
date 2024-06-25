@@ -1,5 +1,6 @@
 import copy, re, random, requests
 
+from logic import constants
 from logic.flags import Flag, FlagMultiple, FlagSentence
 
 
@@ -126,7 +127,8 @@ class Alphabet(metaclass=AlphabetMeta):
                  FlagMultiple([_characters['J'], _characters['A']], 'Potrzebuję urządzeń przeciwpożarowych'),
                  FlagMultiple([_characters['J'], _characters['A'], _characters['4']],
                               'Potrzebuję materiału do pianowych gaśnic'),
-                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags[2]], 'Proszę o pilną poradę medyczną'),
+                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags[2]],
+                              'Proszę o pilną poradę medyczną'),
                  FlagMultiple([_characters['M'], _characters['A'], _characters['B']],
                               'Proszę o zorganizowanie spotkania w wskazanej pozycji'),
                  FlagMultiple([_characters['M'], _characters['A'], _characters['C']],
@@ -143,7 +145,8 @@ class Alphabet(metaclass=AlphabetMeta):
                               'Jestem w sytuacji zagrożenia i potrzebuję natychmiastowej pomocy'),
                  FlagMultiple([_characters['R'], _characters['Y']], 'Trzymaj się z dala z wolną prędkością'),
                  FlagMultiple([_characters['A'], _characters['E']], 'Muszę opuścić mój statek'),
-                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values()) + _additionalFlags
+                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(
+        _characters.values()) + _additionalFlags
 
     @staticmethod
     def get_all_flags():
@@ -177,24 +180,31 @@ class Alphabet(metaclass=AlphabetMeta):
         return flags
 
     @staticmethod
-    def get_flag_sentence() -> FlagSentence | None:
-        """Returns random sentence created from flags, or None if requests limit has been exceeded.
+    def get_flag_sentence() -> FlagSentence | str:
+        """Returns random sentence created from flags, if everything is ok.
+        Returs NO_INTERNET_CONNECTION if there is no internet connection.
+        Returs REQUEST_LIMIT_EXCEEDED if requests limit has been exceeded.
 
-        :rtype: FlagSentence
+        :rtype: FlagSentence | str
         """
         sentence = Alphabet._get_random_quote()
-        if not sentence:
-            return None
-        cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence).upper().strip()
-        flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
-        return FlagSentence(flags, sentence, cleaned_sentence)
+        match sentence:
+            case constants.REQUEST_LIMIT_EXCEEDED | constants.NO_INTERNET_CONNECTION:
+                return sentence
+            case _:
+                cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence).upper().strip()
+                flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
+                return FlagSentence(flags, sentence, cleaned_sentence)
 
     @staticmethod
-    def _get_random_quote() -> str | None:
-        """Returns a random quote from zenquotes.io, or None if requests limit has been exceeded.
+    def _get_random_quote() -> str:
+        """Returns a random quote from zenquotes.io if everything is ok.
+        Returs NO_INTERNET_CONNECTION if there is no internet connection.
+        Returs REQUEST_LIMIT_EXCEEDED if requests limit has been exceeded.
+
         Function need internet connection to work.
 
-        :rtype: str | None
+        :rtype: str
         :return: Random quote
         """
         try:
@@ -207,12 +217,12 @@ class Alphabet(metaclass=AlphabetMeta):
                         if int(quote['c']) <= 50:
                             return f"{quote_text}"
                     except KeyError:
-                        return None
+                        return constants.REQUEST_LIMIT_EXCEEDED
                 Alphabet._get_random_quote()
             else:
                 return f"Error: {response.status_code}"
-        except requests.exceptions.RequestException as e:
-            print('Failed to get a quote:', e)
+        except requests.exceptions.RequestException:
+            return constants.NO_INTERNET_CONNECTION
 
     @staticmethod
     def _translate_sentence_to_flags(sentence: str) -> list[Flag | None]:

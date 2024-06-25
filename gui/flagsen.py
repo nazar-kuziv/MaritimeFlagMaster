@@ -1,21 +1,19 @@
 import customtkinter as ctk
 import tksvg
+from custom_hovertip import CustomTooltipLabel
 import random
+import math
 from logic.flags import *
 from logic.alphabet import Alphabet
 
-class Codewords(ctk.CTkFrame):
+class FlagSen(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
-        """Class for initializing the codewords screen
+        """Class for initializing the Flags-sentence screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
         """
         super().__init__(master, **kwargs)
         print("Initializing codewords frame")
-
-        # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
-        # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
-        self.flag_list = Alphabet.get_flags_for_flag2letter_mode()
         
         self.question_widgets = []
         self.grid_rowconfigure(0, weight=1)
@@ -27,23 +25,39 @@ class Codewords(ctk.CTkFrame):
 
         self.exit_button = ctk.CTkButton(self, text="Exit", width=40, height=20, command=self.exit)
         self.exit_button.grid(row=0, column=0, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
-
-        self.flag_index = 0
-        self.flag = self.flag_list[0]
     
     def start(self): self.show_question()
-
+    
     def show_question(self):
-        """Make sure to first make the main Codewords frame visible with the place/pack/grid functions
+        """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
         """
         for widget in self.question_widgets:
             widget.destroy()
         self.update_idletasks()
+
+
+        # sentence = Alphabet.get_flag_sentence()
+        # sentence = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']]
+        sentence = list(Alphabet._characters.values())
+
+        self.flag_sentence = ctk.CTkLabel(self, text='', fg_color="transparent")
+        self.flag_sentence.grid(row=1, column=0, columnspan=3)
+        self.flag_sentence.flags = []
+
+        flag_columns = 12
+        flag_rows = math.floor(len(sentence)/flag_columns)
+        for i in range(flag_rows):
+            self.flag_sentence.grid_rowconfigure(i, weight=1)
+        for i in range(flag_columns):
+            self.flag_sentence.grid_columnconfigure(i, weight=1, uniform="yes")
+
+        for i, flag in enumerate(sentence):
+            img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.winfo_height()*0.08))
+            image = ctk.CTkLabel(self.flag_sentence, text='', image=img)
+            image.grid(row=math.floor(i/(flag_columns+1)), column=(i%(flag_columns+1)), padx=1, pady=10)
+            self.flag_sentence.flags.append(image)
         
-        img = tksvg.SvgImage(file=f"graphics/{self.flag.img_path}", scaletoheight=int(self.winfo_height()*0.5))
-        self.image = ctk.CTkLabel(self, text='', image=img)
-        self.image.grid(row=1, column=0, columnspan=3, sticky="n")
-        self.question_widgets.append(self.image)
+        self.question_widgets.append(self.flag_sentence)
 
         self.answer_cell = ctk.CTkFrame(self, fg_color="transparent")
         self.answer_cell.grid(row=2, column=1, pady=10)
@@ -92,8 +106,8 @@ class Codewords(ctk.CTkFrame):
 
             # next button
             if (self.flag_index < len(self.flag_list)-1):
-                self.next_button = ctk.CTkButton(self, text="Next", font=ctk.CTkFont(size=16), width=70, height=80, command=self.increment_question)
-                self.next_button.grid(row=1, column=2)
+                self.next_button = ctk.CTkButton(self, text="Next", font=ctk.CTkFont(size=16), width=70, height=40, command=self.increment_question)
+                self.next_button.grid(row=2, column=2)
                 self.question_widgets.append(self.next_button)
     
     def change_question(self, index):

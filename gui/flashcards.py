@@ -46,6 +46,8 @@ class Flashcards(ctk.CTkFrame):
 
         self.flag_index = 0
         self.create_flashcard(self.flag_list[self.flag_index])
+
+    def start(self): self.show_flashcard_front()
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard with the FLAG

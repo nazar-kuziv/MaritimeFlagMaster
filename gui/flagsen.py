@@ -35,26 +35,29 @@ class FlagSen(ctk.CTkFrame):
             widget.destroy()
         self.update_idletasks()
 
-
-        # sentence = Alphabet.get_flag_sentence()
+        self.sentence = Alphabet.get_flag_sentence()
+        print(self.sentence.cleaned_sentence)
         # sentence = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']]
-        sentence = list(Alphabet._characters.values())
+        # sentence = list(Alphabet._characters.values())
 
-        self.flag_sentence = ctk.CTkLabel(self, text='', fg_color="transparent")
+        if (self.sentence is None):
+            self.quit()
+
+        self.flag_sentence = ctk.CTkFrame(self, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
         self.flag_sentence.flags = []
 
         flag_columns = 12
-        flag_rows = math.floor(len(sentence)/flag_columns)
+        flag_rows = math.floor(len(self.sentence.flags)/flag_columns)
         for i in range(flag_rows):
             self.flag_sentence.grid_rowconfigure(i, weight=1)
         for i in range(flag_columns):
             self.flag_sentence.grid_columnconfigure(i, weight=1, uniform="yes")
 
-        for i, flag in enumerate(sentence):
-            img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.winfo_height()*0.08))
-            image = ctk.CTkLabel(self.flag_sentence, text='', image=img)
-            image.grid(row=math.floor(i/(flag_columns+1)), column=(i%(flag_columns+1)), padx=1, pady=10)
+        for i, flag in enumerate(self.sentence.flags):
+            img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.winfo_height()*0.1)) if (flag is not None) else None
+            image = ctk.CTkLabel(self.flag_sentence, text='', image=img, fg_color="transparent")
+            image.grid(row=math.floor(i/(flag_columns+1)), column=(i%(flag_columns+1)), padx=2, pady=10)
             self.flag_sentence.flags.append(image)
         
         self.question_widgets.append(self.flag_sentence)
@@ -64,24 +67,20 @@ class FlagSen(ctk.CTkFrame):
         self.question_widgets.append(self.answer_cell)
 
         validate_command = self.register(self.validate_answer)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, justify="center", validate="key", validatecommand=(validate_command, '%d', '%P', '%S'))
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=500, justify="center", validate="key", validatecommand=(validate_command,'%P'))
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
+
+        self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.sentence.cleaned_sentence)}", fg_color='transparent')
+        self.text_length.pack(side="left", padx=10)
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Enter', width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5)
 
-    def validate_answer(self, action, new_text, new_character):
-        # print(f'Validating answer, {new_character} for {new_text} with action {action}.')
-        # if (len(new_text) > 1):
-        #     return False
-        # elif (action == '1'):
-        #     # print("changing answer")
-        #     self.answer_cell.entry.delete(0, 'end')
-        #     self.answer_cell.entry.insert(0, new_text.upper())
-        #     # after changing text of the Entry widget during validation, the validate function changes to None so you have to change it back to 'key' through this function
-        #     self.after_idle(lambda: self.answer_cell.entry.configure(validate="key"))
+    def validate_answer(self, new_text):
+        if (len(new_text) > len(self.sentence.cleaned_sentence)): return False
+        self.text_length.configure(text=f"{len(new_text)}/{len(self.sentence.cleaned_sentence)}")
         return True
 
     def enter_answer(self, event=None):
@@ -90,7 +89,7 @@ class FlagSen(ctk.CTkFrame):
         except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
-        if (not self.flag.check_letter(self.answer_cell.entry.get())):
+        if (not self.sentence.check_sentence(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self, text='Wrong', font=ctk.CTkFont(size=20), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)
@@ -105,18 +104,9 @@ class FlagSen(ctk.CTkFrame):
             self.answer_cell.submit_button.configure(state="disabled")
 
             # next button
-            if (self.flag_index < len(self.flag_list)-1):
-                self.next_button = ctk.CTkButton(self, text="Next", font=ctk.CTkFont(size=16), width=70, height=40, command=self.increment_question)
-                self.next_button.grid(row=2, column=2)
-                self.question_widgets.append(self.next_button)
-    
-    def change_question(self, index):
-        self.flag_index = index
-        self.flag = self.flag_list[self.flag_index]
-        self.show_question()
-
-    def increment_question(self, number: int = 1):
-        self.change_question(self.flag_index + number)
+            self.next_button = ctk.CTkButton(self, text="New", font=ctk.CTkFont(size=16), width=70, height=40, command=self.show_question)
+            self.next_button.grid(row=2, column=2)
+            self.question_widgets.append(self.next_button)
     
     def exit(self):
         self.master.main_menu()

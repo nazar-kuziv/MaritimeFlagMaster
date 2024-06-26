@@ -3,6 +3,7 @@ import tksvg
 from custom_hovertip import CustomTooltipLabel
 import random
 import math
+from logic.constants import *
 from logic.flags import *
 from logic.alphabet import Alphabet
 
@@ -23,7 +24,7 @@ class FlagSen(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=3)
         self.grid_columnconfigure(2, weight=1, uniform="side")
 
-        self.exit_button = ctk.CTkButton(self, text="Exit", width=40, height=20, command=self.exit)
+        self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=40, height=20, command=self.exit)
         self.exit_button.grid(row=0, column=0, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
     
     def start(self): self.show_question()
@@ -36,12 +37,21 @@ class FlagSen(ctk.CTkFrame):
         self.update_idletasks()
 
         self.sentence = Alphabet.get_flag_sentence()
+        # self.sentence = NO_INTERNET_CONNECTION
+
+        if (isinstance(self.sentence, str)):
+            print("Didn't get request, ", self.sentence)
+            if (self.sentence == REQUEST_LIMIT_EXCEEDED):
+                error_text = "The limit for quote requests have been reached, please wait before trying again."
+            else:
+                error_text = "No internet connection has been detected."
+            error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=20), fg_color='white')
+            error_message.grid(row=0, column=1, rowspan=3)
+            return
+
         print(self.sentence.cleaned_sentence)
         # sentence = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']]
         # sentence = list(Alphabet._characters.values())
-
-        if (self.sentence is None):
-            self.quit()
 
         self.flag_sentence = ctk.CTkFrame(self, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
@@ -104,7 +114,7 @@ class FlagSen(ctk.CTkFrame):
             self.answer_cell.submit_button.configure(state="disabled")
 
             # next button
-            self.next_button = ctk.CTkButton(self, text="New", font=ctk.CTkFont(size=16), width=70, height=40, command=self.show_question)
+            self.next_button = ctk.CTkButton(self, text="Nowe zdanie", font=ctk.CTkFont(size=16), height=40, command=self.show_question)
             self.next_button.grid(row=2, column=2)
             self.question_widgets.append(self.next_button)
     

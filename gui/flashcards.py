@@ -41,7 +41,7 @@ class Flashcards(ctk.CTkFrame):
         # self.flag_list = [Alphabet._characters['6']]
         # self.flag_list = [Alphabet._allFlags[7]]
 
-        self.exit_button = ctk.CTkButton(self, text="Exit", width=40, command=self.exit)
+        self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=40, command=self.exit)
         self.exit_button.pack(side="top", anchor="nw", ipadx=10, ipady=10, padx=10, pady=10)
 
         self.flag_index = 0

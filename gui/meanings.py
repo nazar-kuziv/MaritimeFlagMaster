@@ -21,7 +21,7 @@ class Meanings(ctk.CTkFrame):
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
-        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Exit", width=40, command=self.exit, fg_color="orange red")
+        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=40, command=self.exit, fg_color="orange red")
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list = {}
 
@@ -158,7 +158,7 @@ class Meanings(ctk.CTkFrame):
                 f.flag.configure(cursor='')
             
             self.selected_flags = []
-            next_button = ctk.CTkButton(self.top_menu, text='Next', width=40, command=self.increment_question)
+            next_button = ctk.CTkButton(self.top_menu, text='Następny', width=40, command=self.increment_question)
             next_button.pack(side="right", ipadx=10, ipady=10)
             self.top_menu.list["next_button"] = next_button
 

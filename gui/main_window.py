@@ -13,6 +13,7 @@ class MainWindow(ctk.CTk):
 
         self.title("Maritime Flag Master")
         self.geometry("1000x500")
+        self.minsize(800, 400)
 
         self.main_menu()
 
@@ -28,8 +29,8 @@ class MainWindow(ctk.CTk):
                     lambda: self.new_menu(Meanings), 
                     lambda: self.new_menu(FlagSen), 
                     lambda: self.new_menu(SenFlag)]
-        self.button = [None] * 4
-        for i in range(4):
+        self.button = [None] * 5
+        for i in range(5):
             self.button_frame.grid_columnconfigure(i, weight=1)
             self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], command=commands[i])
             self.button[i].grid(row=0, column=i, padx=20, pady=20, sticky="nsew")

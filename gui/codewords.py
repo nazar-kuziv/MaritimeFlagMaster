@@ -25,7 +25,7 @@ class Codewords(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=3)
         self.grid_columnconfigure(2, weight=1, uniform="side")
 
-        self.exit_button = ctk.CTkButton(self, text="Exit", width=40, height=20, command=self.exit)
+        self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=40, height=20, command=self.exit)
         self.exit_button.grid(row=0, column=0, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
 
         self.flag_index = 0
@@ -92,7 +92,7 @@ class Codewords(ctk.CTkFrame):
 
             # next button
             if (self.flag_index < len(self.flag_list)-1):
-                self.next_button = ctk.CTkButton(self, text="Next", font=ctk.CTkFont(size=16), width=70, height=80, command=self.increment_question)
+                self.next_button = ctk.CTkButton(self, text="Następny", font=ctk.CTkFont(size=16), width=70, height=80, command=self.increment_question)
                 self.next_button.grid(row=1, column=2)
                 self.question_widgets.append(self.next_button)
     

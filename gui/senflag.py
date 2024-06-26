@@ -142,7 +142,7 @@ class SenFlag(ctk.CTkFrame):
             self.input_flags.append(new_input_flag)
             self.answer_flags.append(None)
         else:
-            input_image = tksvg.SvgImage(file=f"graphics/{self.alphabet[index].img_path}", scaletoheight=int(self.winfo_height()*0.04))
+            input_image = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{self.alphabet[index].img_path}"), scaletoheight=int(self.winfo_height()*0.04))
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
             new_input_flag.pack(side="left", padx=1)
             self.input_flags.append(new_input_flag)

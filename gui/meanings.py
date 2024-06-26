@@ -2,6 +2,8 @@ import customtkinter as ctk
 import tksvg
 from custom_hovertip import CustomTooltipLabel
 import random
+
+from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 
@@ -69,7 +71,7 @@ class Meanings(ctk.CTkFrame):
         # create svgs of flags the first time, after that shuffle both images and alphabet list
         if (len(self.images) == 0):
             for f in self.alphabet:
-                self.images.append(tksvg.SvgImage(file=f"graphics/{f.img_path}", scaletoheight=int(self.winfo_height()*0.8/self.input_columns)))
+                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletoheight=int(self.winfo_height()*0.8/self.input_columns)))
         else:
             temp = list(zip(self.images, self.alphabet))
             random.shuffle(temp)

@@ -1,6 +1,8 @@
 import customtkinter as ctk
 import tksvg
 import random
+
+from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 
@@ -40,7 +42,7 @@ class Codewords(ctk.CTkFrame):
             widget.destroy()
         self.update_idletasks()
         
-        img = tksvg.SvgImage(file=f"graphics/{self.flag.img_path}", scaletoheight=int(self.winfo_height()*0.5))
+        img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{self.flag.img_path}"), scaletoheight=int(self.winfo_height()*0.5))
         self.image = ctk.CTkLabel(self, text='', image=img)
         self.image.grid(row=1, column=0, columnspan=3, sticky="n")
         self.question_widgets.append(self.image)

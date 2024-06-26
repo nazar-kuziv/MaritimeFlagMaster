@@ -2,8 +2,11 @@ import customtkinter as ctk
 import tksvg
 from custom_hovertip import CustomTooltipLabel
 import random
+
+from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
+
 
 # TEMP FLAG CLASS...
 # class TEMPFlag():
@@ -96,10 +99,10 @@ class Flashcards(ctk.CTkFrame):
             self.flashcard.grid_columnconfigure(i, weight=1)
             if (self.flashcard.winfo_height() < self.flashcard.winfo_width() * len(self.flags)):
                 print("height smaller than width")
-                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletoheight=int(self.flashcard.winfo_height()*0.9/len(self.flags)))
+                img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{flag.img_path}"), scaletoheight=int(self.flashcard.winfo_height()*0.9/len(self.flags)))
             else:
                 print("height bigger than width")
-                img = tksvg.SvgImage(file=f"graphics/{flag.img_path}", scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
+                img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{flag.img_path}"), scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
             label.grid(row=0, column=i, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_back)
@@ -135,7 +138,7 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.morse_code.bind("<Button-1>", self.show_flashcard_front)
         if (text == ""): return
 
-        infoicon = tksvg.SvgImage(file="graphics/icons/info-icon.svg", scaletoheight=int(self.flashcard.letter.cget("height")))
+        infoicon = tksvg.SvgImage(file=Environment.resource_path("graphics/icons/info-icon.svg"), scaletoheight=int(self.flashcard.letter.cget("height")))
         self.flashcard.info_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
         self.flashcard.info_mnemonic.grid(row=0, column=0, sticky='e', padx=10, pady=10)
         CustomTooltipLabel(self.flashcard.info_mnemonic, text=self.flag.mnemonics, font=ctk.CTkFont(size=16), hover_delay=200, anchor="e")
@@ -156,3 +159,4 @@ class Flashcards(ctk.CTkFrame):
     def exit(self):
         self.master.main_menu()
         self.destroy()
+

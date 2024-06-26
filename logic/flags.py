@@ -1,5 +1,7 @@
 from typing import List
 
+import re
+
 
 class Flag:
     def __init__(self, letter: str, img_path: str, meaning: str, mnemonics: str, morse_code: str):
@@ -75,13 +77,13 @@ class FlagMultiple:
 
 
 class FlagSentence:
-    def __init__(self, flags: List[Flag], original_sentence: str, cleaned_sentence: str):
+    def __init__(self, flags: List[Flag | None], original_sentence: str, cleaned_sentence: str):
         self._flags = flags
         self._original_sentence = original_sentence
         self._cleaned_sentence = cleaned_sentence
 
     @property
-    def flags(self) -> List[Flag]:
+    def flags(self) -> List[Flag | None]:
         return self._flags
 
     @property
@@ -99,16 +101,26 @@ class FlagSentence:
         :rtype: bool
         :return: True if the answer is correct, False otherwise.
         """
-        user_sentence = user_sentence.strip().upper()
-        return user_sentence == self._cleaned_sentence
+        user_cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', user_sentence).upper().strip()
+        return user_cleaned_sentence == self._cleaned_sentence
 
-    def check_flags(self, user_flags: List[Flag]) -> bool:
+    def check_flags(self, user_flags: List[Flag | None]) -> bool:
         """Checks if the flags provided by the user represent this FlagSentence.
 
         :param user_flags: List of flags from user.
         :rtype: bool
         :return: True if the answer is correct, False otherwise.
         """
-        user_flags = [flag.meaning.strip().capitalize() for flag in user_flags]
-        correct_flags = [flag.meaning.strip().capitalize() for flag in self._flags]
-        return user_flags == correct_flags
+        user_flags_meanings = []
+        for flag in user_flags:
+            if flag is None:
+                user_flags_meanings.append(None)
+            else:
+                user_flags_meanings.append(flag.meaning.strip().capitalize())
+        correct_flags_meaning =[]
+        for flag in self._flags:
+            if flag is None:
+                correct_flags_meaning.append(None)
+            else:
+                correct_flags_meaning.append(flag.meaning.strip().capitalize())
+        return user_flags_meanings == correct_flags_meaning

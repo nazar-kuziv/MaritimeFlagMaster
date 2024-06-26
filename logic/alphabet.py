@@ -150,7 +150,7 @@ class Alphabet(metaclass=AlphabetMeta):
 
     @staticmethod
     def get_all_flags():
-        """Returns a list of all posible flags. It is used for flashcards and meaning to flag mode.
+        """Returns a list of all posible flags.
 
         :rtype: List[Flag, FlagMultiple]
         """
@@ -159,8 +159,8 @@ class Alphabet(metaclass=AlphabetMeta):
         return flags
 
     @staticmethod
-    def get_flag_keyboard():
-        """Returns a list of all flags used in keyboard for meaning to flag mode.
+    def get_single_flags_shuffled():
+        """Returns a shuffled list of all single flags.
 
         :rtype: List[Flag]
         """
@@ -170,8 +170,8 @@ class Alphabet(metaclass=AlphabetMeta):
         return flags
 
     @staticmethod
-    def get_flags_for_flag2letter_mode():
-        """Returns a list of Flag objects for flag to letter mode.
+    def get_characters_flags_shuffled():
+        """Returns a shuffled list of letter and numeral Flag objects.
 
         :rtype: List[Flag]
         """

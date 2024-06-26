@@ -1,6 +1,8 @@
 import customtkinter as ctk
 import tksvg
 import random
+
+from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 
@@ -15,7 +17,7 @@ class Codewords(ctk.CTkFrame):
 
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
-        self.flag_list = Alphabet.get_flags_for_flag2letter_mode()
+        self.flag_list = Alphabet.get_characters_flags_shuffled()
         
         self.question_widgets = []
         self.grid_rowconfigure(0, weight=1)
@@ -25,19 +27,22 @@ class Codewords(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=3)
         self.grid_columnconfigure(2, weight=1, uniform="side")
 
-        self.exit_button = ctk.CTkButton(self, text="Exit", width=40, height=20, command=self.exit)
+        self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=40, height=20, command=self.exit)
         self.exit_button.grid(row=0, column=0, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
 
         self.flag_index = 0
         self.flag = self.flag_list[0]
     
+    def start(self): self.show_question()
+
     def show_question(self):
         """Make sure to first make the main Codewords frame visible with the place/pack/grid functions
         """
         for widget in self.question_widgets:
             widget.destroy()
         self.update_idletasks()
-        img = tksvg.SvgImage(file=f"graphics/{self.flag.img_path}", scaletoheight=int(self.winfo_height()*0.5))
+        
+        img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{self.flag.img_path}"), scaletoheight=int(self.winfo_height()*0.5))
         self.image = ctk.CTkLabel(self, text='', image=img)
         self.image.grid(row=1, column=0, columnspan=3, sticky="n")
         self.question_widgets.append(self.image)
@@ -89,7 +94,7 @@ class Codewords(ctk.CTkFrame):
 
             # next button
             if (self.flag_index < len(self.flag_list)-1):
-                self.next_button = ctk.CTkButton(self, text="Next", font=ctk.CTkFont(size=16), width=80, height=80, command=self.increment_question)
+                self.next_button = ctk.CTkButton(self, text="Następny", font=ctk.CTkFont(size=16), width=70, height=80, command=self.increment_question)
                 self.next_button.grid(row=1, column=2)
                 self.question_widgets.append(self.next_button)
     

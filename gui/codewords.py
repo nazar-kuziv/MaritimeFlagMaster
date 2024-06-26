@@ -51,26 +51,13 @@ class Codewords(ctk.CTkFrame):
         self.answer_cell.grid(row=2, column=1, pady=10)
         self.question_widgets.append(self.answer_cell)
 
-        validate_command = self.register(self.validate_answer)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, justify="center", validate="key", validatecommand=(validate_command, '%d', '%P', '%S'))
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, validate="key")
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5)
-
-    def validate_answer(self, action, new_text, new_character):
-        # print(f'Validating answer, {new_character} for {new_text} with action {action}.')
-        # if (len(new_text) > 1):
-        #     return False
-        # elif (action == '1'):
-        #     # print("changing answer")
-        #     self.answer_cell.entry.delete(0, 'end')
-        #     self.answer_cell.entry.insert(0, new_text.upper())
-        #     # after changing text of the Entry widget during validation, the validate function changes to None so you have to change it back to 'key' through this function
-        #     self.after_idle(lambda: self.answer_cell.entry.configure(validate="key"))
-        return True
 
     def enter_answer(self, event=None):
         try:

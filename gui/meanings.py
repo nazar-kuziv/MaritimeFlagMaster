@@ -27,7 +27,7 @@ class Meanings(ctk.CTkFrame):
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list = {}
 
-        self.alphabet = Alphabet.get_single_flags_shuffled()[:-10]
+        self.alphabet = Alphabet.get_single_flags_shuffled()
         self.flag_images = []
         self.selected_flags = []
         self.flag_index = 0

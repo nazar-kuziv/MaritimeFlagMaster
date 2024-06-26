@@ -75,7 +75,7 @@ class FlagSen(ctk.CTkFrame):
         self.question_widgets.append(self.answer_cell)
 
         validate_command = self.register(self.validate_answer)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=500, justify="center", validate="key", validatecommand=(validate_command,'%P'))
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=500, validate="key", validatecommand=(validate_command,'%P'))
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
 
         self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.sentence.cleaned_sentence)}", fg_color='transparent')

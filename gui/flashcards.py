@@ -134,7 +134,7 @@ class Flashcards(ctk.CTkFrame):
         if (not isSingleFlag): return
 
         self.flashcard.morse_code = ctk.CTkLabel(self.flashcard, text=self.flag.morse_code)
-        self.flashcard.morse_code.grid(row=2, column=0, sticky='e', padx=10, pady=10)
+        self.flashcard.morse_code.grid(row=2, column=0, sticky='w', padx=10, pady=10)
         self.flashcard.morse_code.bind("<Button-1>", self.show_flashcard_front)
         if (text == ""): return
 

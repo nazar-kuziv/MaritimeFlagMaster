@@ -23,7 +23,7 @@ class SenFlag(ctk.CTkFrame):
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list = {}
 
-        self.alphabet = Alphabet.get_single_flags_shuffled()
+        self.alphabet = list(Alphabet._characters.values())
         self.flag_index = 0
         self.images = []
     
@@ -109,7 +109,7 @@ class SenFlag(ctk.CTkFrame):
                     flag_container = ctk.CTkFrame(self.input_frame, fg_color="transparent")
                     flag_container.grid_rowconfigure(0, weight=1)
                     flag_container.grid_columnconfigure(0, weight=1)
-                    flag_container.grid(row=i, column=j, sticky="nsew")
+                    flag_container.grid(row=i, column=j, columnspan=self.input_columns, sticky="nsew")
                     flag_container.flag = ctk.CTkLabel(flag_container, text='SPACJA', text_color="blue", cursor="hand2")
                     flag_container.flag.bind("<Button-1>", command=lambda event, i='SPACJA': self.flag_input_handler(event, index=i))
                     flag_container.flag.grid(ipadx=10, ipady=10)
@@ -142,7 +142,7 @@ class SenFlag(ctk.CTkFrame):
             self.input_flags.append(new_input_flag)
             self.answer_flags.append(None)
         else:
-            input_image = tksvg.SvgImage(file=f"graphics/{self.alphabet[index].img_path}", scaletoheight=int(self.winfo_height()*0.04))
+            input_image = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{self.alphabet[index].img_path}"), scaletoheight=int(self.winfo_height()*0.04))
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
             new_input_flag.pack(side="left", padx=1)
             self.input_flags.append(new_input_flag)

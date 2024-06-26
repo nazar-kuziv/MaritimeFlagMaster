@@ -192,6 +192,7 @@ class Alphabet(metaclass=AlphabetMeta):
         :rtype: FlagSentence | str
         """
         sentence = Alphabet._get_random_quote()
+        print(sentence)
         match sentence:
             case constants.REQUEST_LIMIT_EXCEEDED | constants.NO_INTERNET_CONNECTION:
                 return sentence
@@ -283,7 +284,8 @@ class Alphabet(metaclass=AlphabetMeta):
                     try:
                         quote_text = quote['q']
                         if int(quote['c']) <= 50:
-                            return f"{quote_text}"
+                            # return random.choice([x for x in quote_text.split(' ') if len(x) > 2])
+                            return f"{quote_text}" 
                     except KeyError:
                         return constants.REQUEST_LIMIT_EXCEEDED
                 Alphabet._get_random_quote()

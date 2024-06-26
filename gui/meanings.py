@@ -27,7 +27,7 @@ class Meanings(ctk.CTkFrame):
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list = {}
 
-        self.alphabet = Alphabet.get_single_flags_shuffled()
+        self.alphabet = Alphabet.get_single_flags_shuffled()[:-10]
         self.flag_images = []
         self.selected_flags = []
         self.flag_index = 0
@@ -54,7 +54,7 @@ class Meanings(ctk.CTkFrame):
         meaning_label.pack(side="left", padx=10)
         self.top_menu.list["meaning_label"] = meaning_label
 
-        check_button = ctk.CTkButton(self.top_menu, text="Check", width=30, command=self.check_answer, state="disabled")
+        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=30, command=self.check_answer, state="disabled")
         check_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list["check_button"] = check_button
 
@@ -93,7 +93,7 @@ class Meanings(ctk.CTkFrame):
                 self.flag_images.append(flag_container)
                 
                 alphabet_index += 1
-                if (alphabet_index == 40): return
+                if (alphabet_index == len(self.alphabet)): return
 
     def flag_input_handler(self, event=None, index: int = -1):
         """Handler function for clicking on flags, 3 max at once. Indices of the selected flags are added to self.selected_flags
@@ -155,6 +155,7 @@ class Meanings(ctk.CTkFrame):
         self.top_menu.list["answer"] = answer
         
         if (isCorrect):
+            self.top_menu.list["check_button"].configure(state="disabled")
             for f in self.flag_images:
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')

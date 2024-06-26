@@ -57,7 +57,7 @@ class Codewords(ctk.CTkFrame):
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
         
-        self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Enter', width=0, command=self.enter_answer)
+        self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5)
 
     def validate_answer(self, action, new_text, new_character):

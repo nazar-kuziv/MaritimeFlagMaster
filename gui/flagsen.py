@@ -50,8 +50,6 @@ class FlagSen(ctk.CTkFrame):
             return
 
         print(self.sentence.cleaned_sentence)
-        # sentence = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']]
-        # sentence = list(Alphabet._characters.values())
 
         self.flag_sentence = ctk.CTkFrame(self, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
@@ -85,7 +83,7 @@ class FlagSen(ctk.CTkFrame):
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
         
-        self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Enter', width=0, command=self.enter_answer)
+        self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5)
 
     def validate_answer(self, new_text):

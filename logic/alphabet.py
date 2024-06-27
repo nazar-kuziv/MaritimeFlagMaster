@@ -1,7 +1,10 @@
 import copy, re, random, requests
 
+import tkinter as tk
+from tkinter import filedialog
 from PIL import Image as PILImage
 from logic import constants
+from logic.environment import Environment
 from logic.flags import Flag, FlagMultiple, FlagSentence
 
 
@@ -198,59 +201,65 @@ class Alphabet(metaclass=AlphabetMeta):
                 return FlagSentence(flags, sentence, cleaned_sentence)
 
     @staticmethod
-    def saveFlagSentencePNG(sentence: list[Flag | None], file_path: str):
+    def saveFlagSentencePNG(sentence: list[Flag | None]):
         """Saves FlagSentence as PNG file.
 
         :param sentence: Sentence to save
-        :param file_path: Filename
         """
         cell_width = 200
         cell_height = 200
         x_padding = 10
         y_padding = 10
 
-        png_files = []
+        root = tk.Tk()
+        root.withdraw()
 
-        for flag in sentence:
-            if flag is None:
-                png_files.append(None)
-            else:
-                png_files.append('graphics/' + flag.png_img_path)
+        file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
+        if file_path:
+            png_files = []
 
-        max_rows = 0
-        max_columns = 0
+            for flag in sentence:
+                if flag is None:
+                    png_files.append(None)
+                else:
+                    png_files.append('graphics/' + flag.png_img_path)
 
-        current_columns = 0
-        for png_file in png_files:
-            if png_file is not None:
-                current_columns += 1
-                if current_columns > max_columns:
-                    max_columns = current_columns
-            else:
-                current_columns = 0
-                max_rows += 1
+            max_rows = 0
+            max_columns = 0
 
-        total_width = max_columns * cell_width + (max_columns - 1) * x_padding
-        total_height = (max_rows + 1) * cell_height + max_rows * y_padding
+            current_columns = 0
+            for png_file in png_files:
+                if png_file is not None:
+                    current_columns += 1
+                    if current_columns > max_columns:
+                        max_columns = current_columns
+                else:
+                    current_columns = 0
+                    max_rows += 1
 
-        # Create empty image
-        collage = PILImage.new('RGBA', (total_width, total_height), (255, 255, 255, 0))
+            total_width = max_columns * cell_width + (max_columns - 1) * x_padding
+            total_height = (max_rows + 1) * cell_height + max_rows * y_padding
 
-        x = 0
-        y = 0
-        for png_file in png_files:
-            if png_file is None:
-                x = 0
-                y += cell_height + y_padding
-                continue
+            # Create empty image
+            collage = PILImage.new('RGBA', (total_width, total_height), (255, 255, 255, 0))
 
-            Alphabet._embed_png(png_file, x, y, cell_width, cell_height, collage)
-            x += cell_width + x_padding
+            x = 0
+            y = 0
+            for png_file in png_files:
+                if png_file is None:
+                    x = 0
+                    y += cell_height + y_padding
+                    continue
 
-        collage.save(file_path, format='PNG')
+                Alphabet._embed_png(Environment.resource_path(png_file), x, y, cell_width, cell_height, collage)
+                x += cell_width + x_padding
+
+            collage.save(file_path, format='PNG')
+        root.destroy()
 
     @staticmethod
     def _embed_png(png_file, x, y, cell_width, cell_height, output_image):
+        """Embeds PNG image in another image."""
         with PILImage.open(png_file) as img:
             img = img.resize((cell_width, cell_height))
             output_image.paste(img, (x, y))
@@ -274,7 +283,6 @@ class Alphabet(metaclass=AlphabetMeta):
                     try:
                         quote_text = quote['q']
                         if int(quote['c']) <= 50:
-                            print(f"{quote_text}")
                             return f"{quote_text}"
                     except KeyError:
                         return constants.REQUEST_LIMIT_EXCEEDED

@@ -122,7 +122,7 @@ class FlagSentence:
                 user_flags_meanings.append(None)
             else:
                 user_flags_meanings.append(flag.meaning.strip().capitalize())
-        correct_flags_meaning =[]
+        correct_flags_meaning = []
         for flag in self._flags:
             if flag is None:
                 correct_flags_meaning.append(None)

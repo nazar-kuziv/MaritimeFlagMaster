@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import tksvg
-from custom_hovertip import CustomTooltipLabel
 import random
 
 from logic.environment import Environment
@@ -15,6 +14,7 @@ class Meanings(ctk.CTkFrame):
         """
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
+        self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
         self.flag_list = Alphabet.get_all_flags()
         # self.flag_list = [Alphabet._characters['C'], Alphabet._characters['B'], Alphabet._characters['A']] # randomly choose a flag, change later
@@ -23,7 +23,7 @@ class Meanings(ctk.CTkFrame):
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
-        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=40, command=self.exit, fg_color="orange red")
+        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list = {}
 
@@ -49,12 +49,14 @@ class Meanings(ctk.CTkFrame):
             self.input_frame.destroy()
         except AttributeError: pass
         self.update_idletasks()
+        self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        meaning_label = ctk.CTkLabel(self.top_menu, text=self.flag.meaning, width=500, fg_color='transparent', wraplength=int(self.winfo_width()*0.5))
+        meaning_label = ctk.CTkLabel(self.top_menu, text=self.flag.meaning, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.012)), 
+                                     fg_color='transparent', wraplength=int(self.master.winfo_width()*0.28))
         meaning_label.pack(side="left", padx=10)
         self.top_menu.list["meaning_label"] = meaning_label
 
-        check_button = ctk.CTkButton(self.top_menu, text="Check", width=30, command=self.check_answer, state="disabled")
+        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
         check_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list["check_button"] = check_button
 
@@ -71,12 +73,18 @@ class Meanings(ctk.CTkFrame):
         # create svgs of flags the first time, after that shuffle both images and alphabet list
         if (len(self.images) == 0):
             for f in self.alphabet:
-                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletoheight=int(self.winfo_height()*0.8/self.input_columns)))
+                if (self.master.winfo_height() < self.master.winfo_width()):
+                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
+                else:
+                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
         else:
             temp = list(zip(self.images, self.alphabet))
             random.shuffle(temp)
             self.images, self.alphabet = zip(*temp)
         
+        for f in self.images:
+            kwargs = { "scaletoheight":int(self.master.scale_size*0.8/self.input_columns) } if (self.master.winfo_height() < self.master.winfo_width()) else { "scaletowidth":int(self.master.scale_size*0.8/self.input_columns) }
+            f.configure(**kwargs)
         self.place_input_flags()
 
     def place_input_flags(self):
@@ -93,7 +101,7 @@ class Meanings(ctk.CTkFrame):
                 self.flag_images.append(flag_container)
                 
                 alphabet_index += 1
-                if (alphabet_index == 40): return
+                if (alphabet_index == len(self.alphabet)): return
 
     def flag_input_handler(self, event=None, index: int = -1):
         """Handler function for clicking on flags, 3 max at once. Indices of the selected flags are added to self.selected_flags
@@ -105,7 +113,8 @@ class Meanings(ctk.CTkFrame):
                 print("longer than 3")
                 return
             self.selected_flags.append(index)
-            event.widget.master.configure(fg_color=f"green{5 - len(self.selected_flags)}", text=len(self.selected_flags), font=ctk.CTkFont(size=20, weight='bold'), text_color=f"green{5 - len(self.selected_flags)}")
+            event.widget.master.configure(fg_color=f"green{5 - len(self.selected_flags)}", text=len(self.selected_flags), 
+                                          font=ctk.CTkFont(size=int(self.master.scale_size*0.03), weight='bold'), text_color=f"green{5 - len(self.selected_flags)}")
         else:
             print("removing selection")
             self.selected_flags.remove(index)
@@ -150,17 +159,18 @@ class Meanings(ctk.CTkFrame):
         except (AttributeError, KeyError) as e: pass
         answer_text = "Correct!" if isCorrect else "Wrong"
         print(answer_text)
-        answer = ctk.CTkLabel(self.top_menu, text=answer_text, fg_color='transparent')
+        answer = ctk.CTkLabel(self.top_menu, text=answer_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
         answer.pack(side="left", padx=10)
         self.top_menu.list["answer"] = answer
         
         if (isCorrect):
+            self.top_menu.list["check_button"].configure(state="disabled")
             for f in self.flag_images:
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')
             
             self.selected_flags = []
-            next_button = ctk.CTkButton(self.top_menu, text='Następny', width=40, command=self.increment_question)
+            next_button = ctk.CTkButton(self.top_menu, text='Następny', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.increment_question)
             next_button.pack(side="right", ipadx=10, ipady=10)
             self.top_menu.list["next_button"] = next_button
 

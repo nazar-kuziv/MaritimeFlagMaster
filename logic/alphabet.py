@@ -174,6 +174,16 @@ class Alphabet(metaclass=AlphabetMeta):
         return flags
 
     @staticmethod
+    def get_single_flags():
+        """Returns a list of all single flags.
+
+        :rtype: List[Flag]
+        """
+        flags = copy.deepcopy(list(Alphabet._characters.values()))
+        flags.extend(Alphabet._additionalFlags)
+        return flags
+
+    @staticmethod
     def get_characters_flags_shuffled():
         """Returns a shuffled list of letter and numeral Flag objects.
 
@@ -192,6 +202,7 @@ class Alphabet(metaclass=AlphabetMeta):
         :rtype: FlagSentence | str
         """
         sentence = Alphabet._get_random_quote()
+        print(sentence)
         match sentence:
             case constants.REQUEST_LIMIT_EXCEEDED | constants.NO_INTERNET_CONNECTION:
                 return sentence
@@ -210,9 +221,6 @@ class Alphabet(metaclass=AlphabetMeta):
         cell_height = 200
         x_padding = 10
         y_padding = 10
-
-        root = tk.Tk()
-        root.withdraw()
 
         file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
         if file_path:
@@ -255,7 +263,8 @@ class Alphabet(metaclass=AlphabetMeta):
                 x += cell_width + x_padding
 
             collage.save(file_path, format='PNG')
-        root.destroy()
+            return True
+        return False
 
     @staticmethod
     def _embed_png(png_file, x, y, cell_width, cell_height, output_image):
@@ -283,7 +292,8 @@ class Alphabet(metaclass=AlphabetMeta):
                     try:
                         quote_text = quote['q']
                         if int(quote['c']) <= 50:
-                            return f"{quote_text}"
+                            # return random.choice([x for x in quote_text.split(' ') if len(x) > 2])
+                            return f"{quote_text}" 
                     except KeyError:
                         return constants.REQUEST_LIMIT_EXCEEDED
                 Alphabet._get_random_quote()

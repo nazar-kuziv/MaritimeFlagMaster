@@ -7,23 +7,19 @@ from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.constants import *
 
-class SenFlag(ctk.CTkFrame):
+class MakeImage(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
-        """Class for initializing the Sentence-Flags screen
-
-        To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
-        """
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        self.top_menu = ctk.CTkFrame(self)
+        self.top_menu = ctk.CTkFrame(self, fg_color="transparent")
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
         self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list = {}
 
-        self.alphabet = list(Alphabet._characters.values())
+        self.alphabet = Alphabet.get_single_flags()
         self.flag_index = 0
         self.images = []
     
@@ -50,28 +46,8 @@ class SenFlag(ctk.CTkFrame):
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        self.sentence = Alphabet.get_flag_sentence()
-        # self.sentence = NO_INTERNET_CONNECTION
-
-        if (isinstance(self.sentence, str)):
-            print("Didn't get request, ", self.sentence)
-            if (self.sentence == REQUEST_LIMIT_EXCEEDED):
-                error_text = "The limit for quote requests have been reached, please wait before trying again."
-            else:
-                error_text = "No internet connection has been detected."
-            error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
-            error_message.grid(row=0, column=1, rowspan=3)
-            return
-
-        print(self.sentence.cleaned_sentence)
-
-        meaning_label = ctk.CTkLabel(self.top_menu, text=self.sentence.cleaned_sentence, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.011)), 
-                                     fg_color='transparent', wraplength=int(self.master.winfo_width()*0.28))
-        meaning_label.pack(side="left", padx=10)
-        self.top_menu.list["meaning_label"] = meaning_label
-
-        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
-        check_button.pack(side="left", ipadx=10, ipady=10)
+        check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
+        check_button.pack(side="right", ipadx=10, ipady=10)
         self.top_menu.list["check_button"] = check_button
 
         self.input_parent = ctk.CTkFrame(self, height=int(self.winfo_width()*0.1), fg_color="transparent")
@@ -79,9 +55,6 @@ class SenFlag(ctk.CTkFrame):
         self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, height=int(self.master.scale_size*0.05), orientation="horizontal")
         self.master.bind("<BackSpace>", self.delete_input_flag)
         self.flag_input_box.pack(side="top", fill="x")
-        self.flag_input_box.text_length = ctk.CTkLabel(self.flag_input_box, text=f"0/{len(self.sentence.cleaned_sentence)}", font=ctk.CTkFont(size=int(self.winfo_width()*0.013)), justify="right", 
-                                                       height=int(self.master.scale_size*0.055), width=int(self.winfo_width()*0.05), fg_color='transparent')
-        self.flag_input_box.text_length.pack(side="left", padx=10)
 
         self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.input_frame.pack(side="top", fill="both", expand=True)
@@ -136,8 +109,6 @@ class SenFlag(ctk.CTkFrame):
     def flag_input_handler(self, event=None, index: int | str = -1):
         """Handler function for clicking on flags.
         """
-        if (len(self.input_flags) >= len(self.sentence.cleaned_sentence)):
-            return
         print(f"New flag {index}")
         if ((isinstance(index, str) and index != "SPACJA") or (isinstance(index, int) and index < 0)):
             return
@@ -154,7 +125,6 @@ class SenFlag(ctk.CTkFrame):
             self.input_flags.append(new_input_flag)
             self.answer_flags.append(self.alphabet[index])
         
-        self.flag_input_box.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
         self.top_menu.list["check_button"].configure(state="enabled", cursor="hand2")
 
     
@@ -164,36 +134,14 @@ class SenFlag(ctk.CTkFrame):
             flag = self.input_flags.pop()
             flag.destroy()
             self.answer_flags.pop()
-            self.flag_input_box.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
             if (len(self.input_flags) <= 0):
                 self.top_menu.list["check_button"].configure(state="disabled", cursor='')
 
     def check_answer(self):
-        try:
-            self.answer_response.destroy()
-        except AttributeError: pass
-        # correct_answer = self.flag.letter[0].upper()
-        
-        if (not self.sentence.check_flags(self.answer_flags)):
-            print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self.top_menu, text="Wrong", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.05)), fg_color='transparent')
-            self.answer_response.pack(side="left", padx=10)
-            self.top_menu.list["answer_response"] = self.answer_response
-        else:
-            print("Correct answer!")
-            self.answer_response = ctk.CTkLabel(self.top_menu, text="Correct!", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.05)), fg_color='transparent')
-            self.answer_response.pack(side="left", padx=10)
-            self.top_menu.list["answer_response"] = self.answer_response
-
-            self.top_menu.list["check_button"].configure(state="disabled", cursor='')
-            for f in self.flag_images:
-                f.flag.unbind("<Button-1>")
-                f.flag.configure(cursor='')
-
-            # next button
-            self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.04)), height=40, command=self.show_question)
-            self.next_button.pack(side="right", padx=10)
-            self.top_menu.list["new_sentence"] = self.next_button
+        if Alphabet.saveFlagSentencePNG(self.answer_flags):
+            label = ctk.CTkLabel(self.top_menu, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
+            label.pack(side="right", padx=10)
+            label.after(2000, lambda: label.destroy())
     
     def exit(self):
         self.master.unbind("<BackSpace>")

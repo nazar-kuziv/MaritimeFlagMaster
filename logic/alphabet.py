@@ -174,6 +174,16 @@ class Alphabet(metaclass=AlphabetMeta):
         return flags
 
     @staticmethod
+    def get_single_flags():
+        """Returns a list of all single flags.
+
+        :rtype: List[Flag]
+        """
+        flags = copy.deepcopy(list(Alphabet._characters.values()))
+        flags.extend(Alphabet._additionalFlags)
+        return flags
+
+    @staticmethod
     def get_characters_flags_shuffled():
         """Returns a shuffled list of letter and numeral Flag objects.
 
@@ -211,9 +221,6 @@ class Alphabet(metaclass=AlphabetMeta):
         cell_height = 200
         x_padding = 10
         y_padding = 10
-
-        root = tk.Tk()
-        root.withdraw()
 
         file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
         if file_path:
@@ -256,7 +263,8 @@ class Alphabet(metaclass=AlphabetMeta):
                 x += cell_width + x_padding
 
             collage.save(file_path, format='PNG')
-        root.destroy()
+            return True
+        return False
 
     @staticmethod
     def _embed_png(png_file, x, y, cell_width, cell_height, output_image):

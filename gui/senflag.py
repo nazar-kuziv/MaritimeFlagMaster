@@ -6,6 +6,7 @@ from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.constants import *
+from gui.util_functions import *
 
 class SenFlag(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -26,12 +27,45 @@ class SenFlag(ctk.CTkFrame):
         self.alphabet = list(Alphabet._characters.values())
         self.flag_index = 0
         self.images = []
+        self.file_sentence = None
     
-    def start(self): self.show_question()
+    def start(self): self.show_choice()
+
+    def show_choice(self):
+        self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
+        self.choice_menu.pack(side="bottom", fill="y", expand=True)
+        self.top_menu.list["choice_menu"] = self.choice_menu
+
+        self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+                                                  command=lambda: self.flag_sentence_method(Alphabet.get_flag_sentence_from_api))
+        self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+        
+        self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+                                              command=self.get_file_sentence)
+        self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+    
+    def get_file_sentence(self):
+        print("loading file sentence...")
+        isLoaded = Alphabet.load_sentences_from_file()
+        if (isLoaded is None):
+            pass
+        elif (not isLoaded):
+            self.flag_sentence_method(lambda: "Didn't load")
+        else:
+            self.file_sentence = Alphabet.get_sentence_from_file()
+            if (not self.file_sentence):
+                self.flag_sentence_method(lambda: "Didn't load")
+            self.flag_sentence_method(lambda: self.file_sentence)
+
+    def flag_sentence_method(self, method):
+        self.get_flag_sentence_method = method
+        self.show_question()
+
     
     def show_question(self):
         """Make sure to first make the main SenFlags frame visible with the place/pack/grid functions
         """
+        loading_label = loading_widget(self.master)
         self.flag_images = []
         self.answer_flags = []
         self.input_flags = []
@@ -47,20 +81,22 @@ class SenFlag(ctk.CTkFrame):
         try:
             self.input_parent.destroy()
         except AttributeError: print("Couldn't destroy flag_input_box")
-        self.update_idletasks()
+        self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        self.sentence = Alphabet.get_flag_sentence_from_api()
+        self.sentence = self.get_flag_sentence_method()
         # self.sentence = NO_INTERNET_CONNECTION
 
         if (isinstance(self.sentence, str)):
             print("Didn't get request, ", self.sentence)
             if (self.sentence == REQUEST_LIMIT_EXCEEDED):
-                error_text = "The limit for quote requests have been reached, please wait before trying again."
+                error_text = "Limit zapytań cytatów został osiągnięty, prosimy chwilę poczekać."
+            elif (self.sentence == NO_INTERNET_CONNECTION):
+                error_text = "Brak połączenia z internetem."
             else:
-                error_text = "No internet connection has been detected."
+                error_text = "Błąd czytania z pliku."
             error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
-            error_message.grid(row=0, column=1, rowspan=3)
+            error_message.pack(side="bottom", expand=True)
             return
 
         print(self.sentence.cleaned_sentence)
@@ -106,6 +142,8 @@ class SenFlag(ctk.CTkFrame):
             self.images, self.alphabet = zip(*temp)
         
         self.place_input_flags()
+        self.update_idletasks()
+        loading_label.destroy()
 
     def place_input_flags(self):
         alphabet_index = 0
@@ -190,6 +228,11 @@ class SenFlag(ctk.CTkFrame):
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')
 
+            if (self.file_sentence):
+                self.file_sentence = Alphabet.get_sentence_from_file()
+                if (not self.file_sentence):
+                    return
+            
             # next button
             self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.04)), height=40, command=self.show_question)
             self.next_button.pack(side="right", padx=10)

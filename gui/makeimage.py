@@ -6,6 +6,7 @@ from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.constants import *
+from gui.util_functions import *
 
 class MakeImage(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -26,8 +27,7 @@ class MakeImage(ctk.CTkFrame):
     def start(self): self.show_question()
     
     def show_question(self):
-        """Make sure to first make the main SenFlags frame visible with the place/pack/grid functions
-        """
+        loading_label = loading_widget(self.master)
         self.flag_images = []
         self.answer_flags = []
         self.input_flags = []
@@ -79,6 +79,8 @@ class MakeImage(ctk.CTkFrame):
             self.images, self.alphabet = zip(*temp)
         
         self.place_input_flags()
+        self.update_idletasks()
+        loading_label.destroy()
 
     def place_input_flags(self):
         alphabet_index = 0

@@ -5,6 +5,7 @@ from logic.constants import *
 from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
+from gui.util_functions import *
 
 class FlagSen(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -26,28 +27,63 @@ class FlagSen(ctk.CTkFrame):
 
         self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         self.exit_button.grid(row=0, column=0, columnspan=5, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
+
+        self.file_sentence = None
     
-    def start(self): self.show_question()
+    def start(self): self.show_choice()
+
+    def show_choice(self):
+        self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
+        self.choice_menu.grid(row=1, column=1)
+        self.question_widgets.append(self.choice_menu)
+
+        self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+                                                  command=lambda: self.flag_sentence_method(Alphabet.get_flag_sentence_from_api))
+        self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+        
+        self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+                                              command=self.get_file_sentence)
+        self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
     
+    def get_file_sentence(self):
+        print("loading file sentence...")
+        isLoaded = Alphabet.load_sentences_from_file()
+        if (isLoaded is None):
+            pass
+        elif (not isLoaded):
+            self.flag_sentence_method(lambda: "Didn't load")
+        else:
+            self.file_sentence = Alphabet.get_sentence_from_file()
+            if (not self.file_sentence):
+                self.flag_sentence_method(lambda: "Didn't load")
+            self.flag_sentence_method(lambda: self.file_sentence)
+
+    def flag_sentence_method(self, method):
+        self.get_flag_sentence_method = method
+        self.show_question()
+
     def show_question(self):
         """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
         """
+        loading_label = loading_widget(self.master)
         for widget in self.question_widgets:
             widget.destroy()
-        self.update_idletasks()
+        self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-
-        self.sentence = Alphabet.get_flag_sentence_from_api()
+        
+        self.sentence = self.get_flag_sentence_method()
         # self.sentence = NO_INTERNET_CONNECTION
 
         if (isinstance(self.sentence, str)):
             print("Didn't get request, ", self.sentence)
             if (self.sentence == REQUEST_LIMIT_EXCEEDED):
-                error_text = "The limit for quote requests have been reached, please wait before trying again."
+                error_text = "Limit zapytań cytatów został osiągnięty, prosimy chwilę poczekać."
+            elif (self.sentence == NO_INTERNET_CONNECTION):
+                error_text = "Brak połączenia z internetem."
             else:
-                error_text = "No internet connection has been detected."
+                error_text = "Błąd czytania z pliku."
             error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
-            error_message.grid(row=0, column=1, rowspan=3)
+            error_message.grid(row=0, column=1, rowspan=2)
             return
 
         print(self.sentence.cleaned_sentence)
@@ -91,6 +127,8 @@ class FlagSen(ctk.CTkFrame):
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', width=0, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5)
+        self.update_idletasks()
+        loading_label.destroy()
 
     def validate_answer(self, new_text):
         if (len(new_text) > len(self.sentence.cleaned_sentence)): return False
@@ -117,6 +155,11 @@ class FlagSen(ctk.CTkFrame):
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(state="disabled")
             self.answer_cell.entry.unbind("<Return>")
+
+            if (self.file_sentence):
+                self.file_sentence = Alphabet.get_sentence_from_file()
+                if (not self.file_sentence):
+                    return
 
             # next button
             self.next_button = ctk.CTkButton(self, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=self.show_question)

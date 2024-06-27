@@ -231,12 +231,14 @@ class Alphabet(metaclass=AlphabetMeta):
     def load_sentences_from_file():
         """Loads sentences from file.
 
-        :return: True if everything is ok, False if something went wrong
-        :rtype: bool
+        :return: True if everything is ok, False if something went wrong, None if user not selected file
+        :rtype: bool | None
         """
         Alphabet._quotes = []
         filename = askopenfilename(filetypes=[("Text files", "*.txt")])
-        if filename:
+        try:
+            if not filename:
+                return None
             with open(filename, 'r') as file:
                 sentences_str = [line.strip() for line in file]
                 print(sentences_str)
@@ -244,8 +246,9 @@ class Alphabet(metaclass=AlphabetMeta):
                     cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._quotes.append(FlagSentence(flags, sentence_str, cleaned_sentence))
-                return True
-        return False
+            return True
+        except Exception:
+            return False
 
     @staticmethod
     def saveFlagSentencePNG(sentence: list[Flag | None]):

@@ -5,6 +5,7 @@ import random
 from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
+from gui.util_functions import *
 
 class Meanings(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -39,6 +40,7 @@ class Meanings(ctk.CTkFrame):
     def show_question(self):
         """Make sure to first make the main Meanings frame visible with the place/pack/grid functions
         """
+        loading_label = loading_widget(self.master)
         for widget in self.flag_images:
             widget.destroy()
         self.flag_images = []
@@ -86,6 +88,8 @@ class Meanings(ctk.CTkFrame):
             kwargs = { "scaletoheight":int(self.master.scale_size*0.8/self.input_columns) } if (self.master.winfo_height() < self.master.winfo_width()) else { "scaletowidth":int(self.master.scale_size*0.8/self.input_columns) }
             f.configure(**kwargs)
         self.place_input_flags()
+        self.update_idletasks()
+        loading_label.destroy()
 
     def place_input_flags(self):
         alphabet_index = 0

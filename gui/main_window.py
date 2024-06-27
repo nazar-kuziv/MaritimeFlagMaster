@@ -1,6 +1,5 @@
 import customtkinter as ctk
 
-from logic.alphabet import Alphabet
 from .flashcards import Flashcards
 from .codewords import Codewords
 from .meanings import Meanings

@@ -3,6 +3,7 @@ import copy, re, random, requests
 from tkinter import filedialog
 from tkinter.filedialog import askopenfilename
 
+import PIL
 from PIL import Image as PILImage
 from logic import constants
 from logic.environment import Environment
@@ -257,6 +258,8 @@ class Alphabet(metaclass=AlphabetMeta):
         :param sentence: Sentence to save
         :param background: Background color, either 'grey' or 'transparent'
         """
+
+        sentence = Alphabet.get_single_flags()
         cell_width = 200
         cell_height = 200
         x_padding = 10
@@ -289,9 +292,9 @@ class Alphabet(metaclass=AlphabetMeta):
             total_height = (max_rows + 1) * cell_height + max_rows * y_padding
 
             if background == 'grey':
-                bg_color = (128, 128, 128, 255)  # Grey background
+                bg_color = (128, 128, 128, 255)
             else:
-                bg_color = (255, 255, 255, 0)  # Transparent background
+                bg_color = (255, 255, 255, 0)
 
             # Create empty image
             collage = PILImage.new('RGBA', (total_width, total_height), bg_color)
@@ -304,7 +307,7 @@ class Alphabet(metaclass=AlphabetMeta):
                     y += cell_height + y_padding
                     continue
 
-                Alphabet._embed_png(Environment.resource_path(png_file), x, y, cell_width, cell_height, collage)
+                Alphabet._embed_png(Environment.resource_path(png_file), x, y, cell_width, cell_height, collage, background)
                 x += cell_width + x_padding
 
             collage.save(file_path, format='PNG')
@@ -312,11 +315,17 @@ class Alphabet(metaclass=AlphabetMeta):
         return False
 
     @staticmethod
-    def _embed_png(png_file, x, y, cell_width, cell_height, output_image):
+    def _embed_png(png_file, x, y, cell_width, cell_height, output_image, background: str):
         """Embeds PNG image in another image."""
         with PILImage.open(png_file) as img:
             img = img.resize((cell_width, cell_height))
-            output_image.paste(img, (x, y))
+            if background == 'grey':
+                background_img = PILImage.new('RGBA', (cell_width, cell_height), (128, 128, 128, 255))
+                img = img.convert('RGBA')
+                ready_flag = PILImage.alpha_composite(background_img, img)
+                output_image.paste(ready_flag, (x, y))
+            else:
+                output_image.paste(img, (x, y))
 
     @staticmethod
     def _get_random_quote() -> str:

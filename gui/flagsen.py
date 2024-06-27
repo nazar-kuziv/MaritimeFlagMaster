@@ -26,9 +26,29 @@ class FlagSen(ctk.CTkFrame):
 
         self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         self.exit_button.grid(row=0, column=0, columnspan=5, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
+
+        self.file_sentence = None
     
-    def start(self): self.show_question()
+    def start(self): self.show_choice()
+
+    def show_choice(self):
+        self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
+        self.choice_menu.grid(row=1, column=1)
+
+        self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+                                                  command=lambda: self.flag_sentence_method(Alphabet.get_flag_sentence))
+        self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+        
+        self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+                                              command=lambda: self.flag_sentence_method(self.get_file_sentence))
+        self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
     
+    def get_file_sentence(self): 
+        pass
+
+    def flag_sentence_method(self, method):
+        self.get_flag_sentence_method = method
+
     def show_question(self):
         """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
         """
@@ -36,16 +56,18 @@ class FlagSen(ctk.CTkFrame):
             widget.destroy()
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-
-        self.sentence = Alphabet.get_flag_sentence_from_api()
+        
+        self.sentence = self.get_flag_sentence_method()
         # self.sentence = NO_INTERNET_CONNECTION
 
         if (isinstance(self.sentence, str)):
             print("Didn't get request, ", self.sentence)
             if (self.sentence == REQUEST_LIMIT_EXCEEDED):
-                error_text = "The limit for quote requests have been reached, please wait before trying again."
+                error_text = "Limit zapytań cytatów został osiągnięty, prosimy chwilę poczekać."
+            elif (self.sentence == NO_INTERNET_CONNECTION):
+                error_text = "Brak połączenia z internetem."
             else:
-                error_text = "No internet connection has been detected."
+                error_text = "Błąd czytania z pliku."
             error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
             error_message.grid(row=0, column=1, rowspan=3)
             return

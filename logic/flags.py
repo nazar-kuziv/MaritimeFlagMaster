@@ -7,6 +7,7 @@ class Flag:
     def __init__(self, letter: str, img_path: str, meaning: str, mnemonics: str, morse_code: str):
         self._letter = letter
         self._img_path = img_path
+        self._png_img_path = img_path.replace('.svg', '.png')
         self._meaning = meaning
         self._mnemonics = mnemonics
         self._morse_code = morse_code
@@ -18,6 +19,10 @@ class Flag:
     @property
     def img_path(self) -> str:
         return self._img_path
+
+    @property
+    def png_img_path(self) -> str:
+        return self._png_img_path
 
     @property
     def meaning(self) -> str:

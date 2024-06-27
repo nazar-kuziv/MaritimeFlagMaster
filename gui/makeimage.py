@@ -140,7 +140,7 @@ class MakeImage(ctk.CTkFrame):
                 self.top_menu.list["check_button"].configure(state="disabled", cursor='')
 
     def check_answer(self):
-        if Alphabet.saveFlagSentencePNG(self.answer_flags):
+        if Alphabet.saveFlagSentencePNG(self.answer_flags, background="grey"):
             label = ctk.CTkLabel(self.top_menu, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             label.pack(side="right", padx=10)
             label.after(2000, lambda: label.destroy())

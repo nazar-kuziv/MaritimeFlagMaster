@@ -1,7 +1,8 @@
 import copy, re, random, requests
 
-import tkinter as tk
 from tkinter import filedialog
+from tkinter.filedialog import askopenfilename
+
 from PIL import Image as PILImage
 from logic import constants
 from logic.environment import Environment
@@ -152,6 +153,8 @@ class Alphabet(metaclass=AlphabetMeta):
                  FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(
         _characters.values()) + _additionalFlags
 
+    _quotes = []
+
     @staticmethod
     def get_all_flags():
         """Returns a list of all posible flags.
@@ -194,7 +197,7 @@ class Alphabet(metaclass=AlphabetMeta):
         return flags
 
     @staticmethod
-    def get_flag_sentence() -> FlagSentence | str:
+    def get_flag_sentence_from_api() -> FlagSentence | str:
         """Returns random sentence created from flags, if everything is ok.
         Returs NO_INTERNET_CONNECTION if there is no internet connection.
         Returs REQUEST_LIMIT_EXCEEDED if requests limit has been exceeded.
@@ -210,6 +213,39 @@ class Alphabet(metaclass=AlphabetMeta):
                 cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence).upper().strip()
                 flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                 return FlagSentence(flags, sentence, cleaned_sentence)
+
+    @staticmethod
+    def get_sentence_from_file():
+        """Returns random sentence from file created from flags, if everything is ok.
+        Returs None if there is no file selected, or if there is no sentence.
+
+        :rtype: FlagSentence | None
+        """
+        if len(Alphabet._quotes) > 0:
+            sentence = random.choice(Alphabet._quotes)
+            Alphabet._quotes.remove(sentence)
+            return sentence
+        return None
+
+    @staticmethod
+    def load_sentences_from_file():
+        """Loads sentences from file.
+
+        :return: True if everything is ok, False if something went wrong
+        :rtype: bool
+        """
+        Alphabet._quotes = []
+        filename = askopenfilename(filetypes=[("Text files", "*.txt")])
+        if filename:
+            with open(filename, 'r') as file:
+                sentences_str = [line.strip() for line in file]
+                print(sentences_str)
+                for sentence_str in sentences_str:
+                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()
+                    flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
+                    Alphabet._quotes.append(FlagSentence(flags, sentence_str, cleaned_sentence))
+                return True
+        return False
 
     @staticmethod
     def saveFlagSentencePNG(sentence: list[Flag | None]):
@@ -293,7 +329,7 @@ class Alphabet(metaclass=AlphabetMeta):
                         quote_text = quote['q']
                         if int(quote['c']) <= 50:
                             # return random.choice([x for x in quote_text.split(' ') if len(x) > 2])
-                            return f"{quote_text}" 
+                            return f"{quote_text}"
                     except KeyError:
                         return constants.REQUEST_LIMIT_EXCEEDED
                 Alphabet._get_random_quote()

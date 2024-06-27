@@ -1,4 +1,6 @@
 import customtkinter as ctk
+
+from logic.alphabet import Alphabet
 from .flashcards import Flashcards
 from .codewords import Codewords
 from .meanings import Meanings
@@ -31,7 +33,7 @@ class MainWindow(ctk.CTk):
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.update()
         buttonNames = ["Fiszki", "Słowo kodowe", "Znaczenie", "Flagi → Zdanie", "Zdanie → Flagi", "Stwórz zdjęcie"]
-        commands = [lambda: self.new_menu(Flashcards), 
+        commands = [lambda: self.new_menu(Flashcards),
                     lambda: self.new_menu(Codewords), 
                     lambda: self.new_menu(Meanings), 
                     lambda: self.new_menu(FlagSen), 

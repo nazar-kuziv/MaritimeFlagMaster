@@ -37,7 +37,7 @@ class FlagSen(ctk.CTkFrame):
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        self.sentence = Alphabet.get_flag_sentence()
+        self.sentence = Alphabet.get_flag_sentence_from_api()
         # self.sentence = NO_INTERNET_CONNECTION
 
         if (isinstance(self.sentence, str)):

@@ -20,10 +20,6 @@ class AlphabetMeta(type):
 
 
 class Alphabet(metaclass=AlphabetMeta):
-    _additionalFlags = [Flag('', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', ''),
-                        Flag('', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', ''),
-                        Flag('', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', ''),
-                        Flag('', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '')]
     _characters = {'A': Flag('Alfa', 'flags/letters/Alfa.svg',
                              'Mam nurka pod wodą; trzymajcie się z dala i idźcie powoli', "Anioł bo biało niebieski",
                              "• ▬"),
@@ -110,6 +106,10 @@ class Alphabet(metaclass=AlphabetMeta):
                    '8': Flag('Oktoeight', 'flags/digits/8.svg', 'Eight',
                              'Osiem czerwonych, bo podwójnie?', '▬ ▬ ▬ • •'),
                    '9': Flag('Novenine', 'flags/digits/9.svg', 'Nine', 'Dziewięć 6+7 po barwach - 4 pola', '▬ ▬ ▬ ▬ •')}
+    _additionalFlags = [Flag('', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', ''),
+                        Flag('', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', ''),
+                        Flag('', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', ''),
+                        Flag('', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '')]
     _allFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam moje jednostkę pływającą'),
                  FlagMultiple([_characters['A'], _characters['D']],
                               'Opuszczam mój statek, który ucierpiał w wypadku nuklearnym i stanowi potencjalne źródło niebezpieczeństwa promieniowania'),

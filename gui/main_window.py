@@ -31,7 +31,12 @@ class MainWindow(ctk.CTk):
         self.button_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.update()
-        buttonNames = ["Fiszki", "Słowo kodowe", "Znaczenie", "Flagi → Zdanie", "Zdanie → Flagi", "Stwórz zdjęcie"]
+        buttonNames = ["Fiszki\n\nFlagi i jej dane na kartkach", 
+                       "Słowo kodowe\n\nOdgadnij flagę po jego słowie kodowym NATO", 
+                       "Znaczenie\n\n Odgadnij flagi po ich znaczeniu", 
+                       "Flagi → Zdanie\n\nPrzetłumacz flagi na zdanie słowne", 
+                       "Zdanie → Flagi\n\nZamień litery zdania na flagi", 
+                       "Stwórz zdjęcie\n\nZapisz swoje własne zdanie z flag jako obrazek"]
         commands = [lambda: self.new_menu(Flashcards),
                     lambda: self.new_menu(Codewords), 
                     lambda: self.new_menu(Meanings), 
@@ -40,9 +45,11 @@ class MainWindow(ctk.CTk):
                     lambda: self.new_menu(MakeImage)]
         self.button = [None] * len(buttonNames)
         for i in range(len(buttonNames)):
-            self.button_frame.grid_columnconfigure(i, weight=1)
-            self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], font=ctk.CTkFont(size=int(self.button_frame.winfo_width()*0.013)), command=commands[i])
-            self.button[i].grid(row=0, column=i, padx=20, pady=20, sticky="nsew")
+            self.button_frame.grid_columnconfigure(i, weight=1, uniform="yes")
+            self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], 
+                                           font=ctk.CTkFont(size=int(self.button_frame.winfo_width()*0.013)), command=commands[i])
+            self.button[i]._text_label.configure(wraplength=int(self.winfo_width()*0.13))
+            self.button[i].grid(row=0, column=i, padx=10, pady=10, sticky="nsew")
             
     def new_menu(self, menu_callback):
         self.button_frame.destroy()

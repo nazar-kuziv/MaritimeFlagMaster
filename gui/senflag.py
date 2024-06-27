@@ -24,7 +24,7 @@ class SenFlag(ctk.CTkFrame):
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list = {}
 
-        self.alphabet = list(Alphabet._characters.values())
+        self.alphabet = Alphabet.get_characters_flags_shuffled()
         self.flag_index = 0
         self.images = []
         self.file_sentence = None

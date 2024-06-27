@@ -259,7 +259,6 @@ class Alphabet(metaclass=AlphabetMeta):
         :param background: Background color, either 'grey' or 'transparent'
         """
 
-        sentence = Alphabet.get_single_flags()
         cell_width = 200
         cell_height = 200
         x_padding = 10

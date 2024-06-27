@@ -23,6 +23,7 @@ class MakeImage(ctk.CTkFrame):
         self.alphabet = Alphabet.get_single_flags()
         self.flag_index = 0
         self.images = []
+        self.is_transparent = "grey"
     
     def start(self): self.show_question()
     
@@ -49,6 +50,15 @@ class MakeImage(ctk.CTkFrame):
         check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
         check_button.pack(side="right", ipadx=10, ipady=10)
         self.top_menu.list["check_button"] = check_button
+
+        def checkbox_event():
+            print('checkbox toggled, current value:', check_var.get())
+            self.is_transparent = 'transparent' if check_var.get() == 'on' else 'grey'
+        
+        check_var = ctk.StringVar(value='off')
+        self.top_menu.checkbox = ctk.CTkCheckBox(self.top_menu, text='Transparentne tło', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.01)), command=checkbox_event, 
+                                                 variable=check_var, onvalue='on', offvalue='off')
+        self.top_menu.checkbox.pack(side="right", padx=10)
 
         self.input_parent = ctk.CTkFrame(self, height=int(self.winfo_width()*0.1), fg_color="transparent")
         self.input_parent.pack(side="top", fill="x", padx=10)
@@ -140,7 +150,7 @@ class MakeImage(ctk.CTkFrame):
                 self.top_menu.list["check_button"].configure(state="disabled", cursor='')
 
     def check_answer(self):
-        if Alphabet.saveFlagSentencePNG(self.answer_flags, background="transparent"):
+        if Alphabet.saveFlagSentencePNG(self.answer_flags, background=self.is_transparent):
             label = ctk.CTkLabel(self.top_menu, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             label.pack(side="right", padx=10)
             label.after(2000, lambda: label.destroy())

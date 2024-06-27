@@ -16,6 +16,7 @@ class MainWindow(ctk.CTk):
         self.minsize(800, 400)
 
         self.main_menu()
+        self.scale_size = self.winfo_height() if (self.winfo_height() < self.winfo_width()) else self.winfo_width()
 
     def main_menu(self):
         self.grid_columnconfigure(0, weight=1)
@@ -23,6 +24,7 @@ class MainWindow(ctk.CTk):
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.button_frame.grid_rowconfigure(0, weight=1)
+        self.update()
         buttonNames = ["Fiszki", "Słowo kodowe", "Znaczenie", "Flagi → Zdanie", "Zdanie → Flagi"]
         commands = [lambda: self.new_menu(Flashcards), 
                     lambda: self.new_menu(Codewords), 
@@ -32,7 +34,7 @@ class MainWindow(ctk.CTk):
         self.button = [None] * 5
         for i in range(5):
             self.button_frame.grid_columnconfigure(i, weight=1)
-            self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], command=commands[i])
+            self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], font=ctk.CTkFont(size=int(self.button_frame.winfo_width()*0.015)), command=commands[i])
             self.button[i].grid(row=0, column=i, padx=20, pady=20, sticky="nsew")
             
     def new_menu(self, menu_callback):

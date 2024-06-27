@@ -4,6 +4,7 @@ from .codewords import Codewords
 from .meanings import Meanings
 from .flagsen import FlagSen
 from .senflag import SenFlag
+from .util_functions import *
 
 class MainWindow(ctk.CTk):
     """Class for initializing the main window
@@ -19,6 +20,8 @@ class MainWindow(ctk.CTk):
         self.scale_size = self.winfo_height() if (self.winfo_height() < self.winfo_width()) else self.winfo_width()
 
     def main_menu(self):
+        # self.bind("<Configure>", change_scale_size)
+
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")

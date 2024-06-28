@@ -161,7 +161,7 @@ class Meanings(ctk.CTkFrame):
         try:
             self.top_menu.list["answer"].destroy()
         except (AttributeError, KeyError) as e: pass
-        answer_text = "Correct!" if isCorrect else "Wrong"
+        answer_text = "Poprawnie!" if isCorrect else "Źle"
         print(answer_text)
         answer = ctk.CTkLabel(self.top_menu, text=answer_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
         answer.pack(side="left", padx=10)

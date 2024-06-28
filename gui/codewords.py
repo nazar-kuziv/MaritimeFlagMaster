@@ -69,12 +69,12 @@ class Codewords(ctk.CTkFrame):
         
         if (not self.flag.check_letter(self.answer_cell.entry.get())):
             print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self, text='Wrong', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)
             self.question_widgets.append(self.answer_response)
         else:
             print("Correct answer!")
-            self.answer_response = ctk.CTkLabel(self, text='Correct!', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self, text='Poprawnie!', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)
             self.question_widgets.append(self.answer_response)
 

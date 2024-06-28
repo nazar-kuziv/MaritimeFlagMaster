@@ -214,12 +214,12 @@ class SenFlag(ctk.CTkFrame):
         
         if (not self.sentence.check_flags(self.answer_flags)):
             print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self.top_menu, text="Wrong", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.05)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self.top_menu, text="Źle", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.02)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)
             self.top_menu.list["answer_response"] = self.answer_response
         else:
             print("Correct answer!")
-            self.answer_response = ctk.CTkLabel(self.top_menu, text="Correct!", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.05)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self.top_menu, text="Poprawnie!", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.02)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)
             self.top_menu.list["answer_response"] = self.answer_response
 

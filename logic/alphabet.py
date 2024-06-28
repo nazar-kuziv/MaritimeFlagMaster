@@ -1,10 +1,12 @@
-import copy, re, random, requests
-
+import copy
+import random
+import re
+import requests
 from tkinter import filedialog
 from tkinter.filedialog import askopenfilename
 
-import PIL
 from PIL import Image as PILImage
+
 from logic import constants
 from logic.environment import Environment
 from logic.flags import Flag, FlagMultiple, FlagSentence
@@ -233,7 +235,7 @@ class Alphabet(metaclass=AlphabetMeta):
         """Loads sentences from file.
 
         :return: True if everything is ok, False if something went wrong, None if user not selected file
-        :rtype: bool | None
+        :rtype: bool | Nonez
         """
         Alphabet._quotes = []
         filename = askopenfilename(filetypes=[("Text files", "*.txt")])
@@ -259,12 +261,47 @@ class Alphabet(metaclass=AlphabetMeta):
         :param background: Background color, either 'grey' or 'transparent'
         """
 
+        file_name = ''
+
+        for flag in sentence:
+            if flag is None:
+                file_name += ' '
+            elif isinstance(flag, Flag) and flag.letter == 'Nadazero':
+                file_name += '0'
+            elif isinstance(flag, Flag) and flag.letter == 'Unaone':
+                file_name += '1'
+            elif isinstance(flag, Flag) and flag.letter == 'Bissotwo':
+                file_name += '2'
+            elif isinstance(flag, Flag) and flag.letter == 'Terrathree':
+                file_name += '3'
+            elif isinstance(flag, Flag) and flag.letter == 'Kartefour':
+                file_name += '4'
+            elif isinstance(flag, Flag) and flag.letter == 'Pantafive':
+                file_name += '5'
+            elif isinstance(flag, Flag) and flag.letter == 'Soxisix':
+                file_name += '6'
+            elif isinstance(flag, Flag) and flag.letter == 'Setteseven':
+                file_name += '7'
+            elif isinstance(flag, Flag) and flag.letter == 'Oktoeight':
+                file_name += '8'
+            elif isinstance(flag, Flag) and flag.letter == 'Novenine':
+                file_name += '9'
+            elif isinstance(flag, Flag) and flag.letter != '':
+                file_name += flag.letter[0].upper()
+            else:
+                file_name += '_'
+
         cell_width = 200
         cell_height = 200
         x_padding = 10
         y_padding = 10
 
-        file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".png",
+            filetypes=[("PNG files", "*.png")],
+            initialfile=file_name
+        )
+
         if file_path:
             png_files = []
 
@@ -306,7 +343,8 @@ class Alphabet(metaclass=AlphabetMeta):
                     y += cell_height + y_padding
                     continue
 
-                Alphabet._embed_png(Environment.resource_path(png_file), x, y, cell_width, cell_height, collage, background)
+                Alphabet._embed_png(Environment.resource_path(png_file), x, y, cell_width, cell_height, collage,
+                                    background)
                 x += cell_width + x_padding
 
             collage.save(file_path, format='PNG')

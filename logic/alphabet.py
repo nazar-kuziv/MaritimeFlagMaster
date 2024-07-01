@@ -165,8 +165,7 @@ class Alphabet(metaclass=AlphabetMeta):
                               'Jestem w niebezpieczeństwie i potrzebuję natychmiastowej pomocy'),
                  FlagMultiple([_characters['R'], _characters['Y']], 'Zachowaj odstęp przy niskiej prędkości'),
                  FlagMultiple([_characters['A'], _characters['E']], 'Muszę opuścić mój statek'),
-                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')]
-    + list(_characters.values()) + _additionalFlags
+                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values()) + _additionalFlags
 
     _quotes = []
 

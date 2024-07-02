@@ -121,10 +121,10 @@ class Alphabet(metaclass=AlphabetMeta):
                              'Osiem czerwonych, bo podwójnie?', '▬ ▬ ▬ • •'),
                    '9': Flag('Novenine', 'flags/digits/9.svg', 'Dziewięć',
                              'Dziewięć 6+7 po barwach - 4 pola', '▬ ▬ ▬ ▬ •')}
-    _additionalFlags = [Flag('', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', ''),
-                        Flag('', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', ''),
-                        Flag('', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', ''),
-                        Flag('', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '')]
+    _additionalFlags = { '@': Flag('@', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', ''),
+                        '<': Flag('<', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', ''),
+                        '>': Flag('>', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', ''),
+                        '?': Flag('?', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '')}
     _allFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam mój statek'),
                  FlagMultiple([_characters['A'], _characters['D']],
                               'Opuszczam mój statek, który ucierpiał w wypadku nuklearnym i stanowi potencjalne źródło niebezpieczeństwa promieniowania'),
@@ -147,7 +147,7 @@ class Alphabet(metaclass=AlphabetMeta):
                  FlagMultiple([_characters['J'], _characters['A']], 'Potrzebuję urządzeń przeciwpożarowych'),
                  FlagMultiple([_characters['J'], _characters['A'], _characters['4']],
                               'Potrzebuję materiału do gaśnic pianowych'),
-                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags[2]],
+                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['>']],
                               'Proszę o pilną poradę medyczną'),
                  FlagMultiple([_characters['M'], _characters['A'], _characters['B']],
                               'Proszę o spotkanie we wskazanej pozycji'),
@@ -165,7 +165,7 @@ class Alphabet(metaclass=AlphabetMeta):
                               'Jestem w niebezpieczeństwie i potrzebuję natychmiastowej pomocy'),
                  FlagMultiple([_characters['R'], _characters['Y']], 'Zachowaj odstęp przy niskiej prędkości'),
                  FlagMultiple([_characters['A'], _characters['E']], 'Muszę opuścić mój statek'),
-                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values()) + _additionalFlags
+                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values()) + list(_additionalFlags.values())
 
     _quotes = []
 
@@ -186,7 +186,7 @@ class Alphabet(metaclass=AlphabetMeta):
         :rtype: List[Flag]
         """
         flags = copy.deepcopy(list(Alphabet._characters.values()))
-        flags.extend(Alphabet._additionalFlags)
+        flags.extend(list(Alphabet._additionalFlags.values()))
         random.shuffle(flags)
         return flags
 
@@ -197,7 +197,7 @@ class Alphabet(metaclass=AlphabetMeta):
         :rtype: List[Flag]
         """
         flags = copy.deepcopy(list(Alphabet._characters.values()))
-        flags.extend(Alphabet._additionalFlags)
+        flags.extend(list(Alphabet._additionalFlags.values()))
         return flags
 
     @staticmethod
@@ -417,6 +417,8 @@ class Alphabet(metaclass=AlphabetMeta):
         for letter in sentence:
             if letter in Alphabet._characters:
                 flags.append(Alphabet._characters[letter])
+            elif letter in Alphabet._additionalFlags:
+                flags.append(Alphabet._additionalFlags[letter])
             else:
                 flags.append(None)
         return flags

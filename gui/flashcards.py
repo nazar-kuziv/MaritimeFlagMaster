@@ -107,7 +107,8 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.meaning.bind("<Button-1>", self.show_flashcard_front)
 
         isSingleFlag = isinstance(self.flag, Flag)
-        text = self.flag.letter if isSingleFlag else " ".join([x.letter for x in self.flag.flags])
+        if (any(i in self.flag.letter for i in '@<>?')): text = ""
+        else: text = self.flag.letter if isSingleFlag else " ".join([x.letter for x in self.flag.flags])
         self.flashcard.letter = ctk.CTkLabel(self.flashcard, text=text, font=ctk.CTkFont(size=int(self.master.scale_size*0.035)))
         self.flashcard.letter.grid(row=0, column=0, sticky='w', padx=10, pady=10)
         self.flashcard.letter.bind("<Button-1>", self.show_flashcard_front)

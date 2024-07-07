@@ -111,10 +111,10 @@ class Alphabet:
                              'Osiem czerwonych, bo podwójnie?', '▬ ▬ ▬ • •'),
                    '9': Flag('Novenine', 'flags/digits/9.svg', 'Dziewięć',
                              'Dziewięć 6+7 po barwach - 4 pola', '▬ ▬ ▬ ▬ •')}
-    _additionalFlags = { '@': Flag('@', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', ''),
-                        '<': Flag('<', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', ''),
-                        '>': Flag('>', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', ''),
-                        '?': Flag('?', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '')}
+    _additionalFlags = { '?': Flag('?', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', ''),
+                        '!': Flag('!', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', ''),
+                        '`@': Flag('@', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', ''),
+                        '#': Flag('#', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '')}
     _allFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam mój statek'),
                  FlagMultiple([_characters['A'], _characters['D']],
                               'Opuszczam mój statek, który ucierpiał w wypadku nuklearnym i stanowi potencjalne źródło niebezpieczeństwa promieniowania'),
@@ -137,7 +137,7 @@ class Alphabet:
                  FlagMultiple([_characters['J'], _characters['A']], 'Potrzebuję urządzeń przeciwpożarowych'),
                  FlagMultiple([_characters['J'], _characters['A'], _characters['4']],
                               'Potrzebuję materiału do gaśnic pianowych'),
-                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['>']],
+                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['`@']],
                               'Proszę o pilną poradę medyczną'),
                  FlagMultiple([_characters['M'], _characters['A'], _characters['B']],
                               'Proszę o spotkanie we wskazanej pozycji'),
@@ -199,6 +199,25 @@ class Alphabet:
         flags = list(Alphabet._characters.values())
         random.shuffle(flags)
         return flags
+
+    @staticmethod
+    def get_flag_using_character(character: str) -> Flag|None|str:
+        """Returns a Flag object using a character.
+        Returns None if space character is passed.
+        Returns constants.INPUT_CHARACTER_ERROR if character is not found.
+
+        :param character: Character to search for
+        :rtype: Flag|None|str
+        """
+        if character in ['?', '!', '#']:
+            return Alphabet._additionalFlags[character]
+        # Two characters represent 'Second substitute' flag
+        elif character in ['`', '@']:
+            return Alphabet._additionalFlags['`@']
+        elif character == ' ':
+            return None
+        else:
+            return Alphabet._characters.get(character.upper(), constants.INPUT_CHARACTER_ERROR)
 
     @staticmethod
     def get_flag_sentence_from_api() -> FlagSentence | str:
@@ -384,7 +403,6 @@ class Alphabet:
                     try:
                         quote_text = quote['q']
                         if int(quote['c']) <= 50:
-                            # return random.choice([x for x in quote_text.split(' ') if len(x) > 2])
                             return f"{quote_text}"
                     except KeyError:
                         return constants.REQUEST_LIMIT_EXCEEDED

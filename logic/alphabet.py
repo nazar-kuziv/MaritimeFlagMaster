@@ -12,17 +12,7 @@ from logic.environment import Environment
 from logic.flags import Flag, FlagMultiple, FlagSentence
 
 
-class AlphabetMeta(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            instance = super().__call__(*args, **kwargs)
-            cls._instances[cls] = instance
-        return cls._instances[cls]
-
-
-class Alphabet(metaclass=AlphabetMeta):
+class Alphabet:
     _characters = {'A': Flag('Alfa', 'flags/letters/Alfa.svg',
                              'Mam nurka pod wodą; trzymajcie się z dala i idźcie powoli',
                              "Anioł bo biało niebieski", "• ▬"),
@@ -246,7 +236,7 @@ class Alphabet(metaclass=AlphabetMeta):
         """Loads sentences from file.
 
         :return: True if everything is ok, False if something went wrong, None if user not selected file
-        :rtype: bool | Nonez
+        :rtype: bool | None
         """
         Alphabet._quotes = []
         filename = askopenfilename(filetypes=[("Text files", "*.txt")])

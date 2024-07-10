@@ -43,10 +43,10 @@ class MainWindow(ctk.CTk):
         self.button_frame.pack(fill="both", expand=True, padx=10, pady=10,)
         self.button_frame.grid_rowconfigure(0, weight=1)
         buttonNames = ["Fiszki\n\nPoznaj flagi i co oznaczają", 
-                       "Słowo kodowe\n\nOdgadnij flagę po jego słowie kodowym NATO", 
-                       "Znaczenie\n\n Odgadnij flagi po ich znaczeniu", 
-                       "Flagi → Zdanie\n\nPrzetłumacz flagi na zdanie słowne", 
-                       "Zdanie → Flagi\n\nZamień litery zdania na flagi", 
+                       "Słowo kodowe\n\nDopasuj słowo kodowe MKS do flagi", 
+                       "Znaczenie\n\nDopasuj flagi do komunikatu", 
+                       "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
+                       "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag", 
                        "Stwórz zdjęcie\n\nZapisz swoje własne zdanie z flag jako obrazek"]
         commands = [lambda: self.new_menu(Flashcards),
                     lambda: self.new_menu(Codewords), 

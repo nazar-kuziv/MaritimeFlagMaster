@@ -102,7 +102,7 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.columnconfigure(0, weight=1)
         print(f"Back flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
 
-        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), wraplength=int(self.flashcard.winfo_width()*0.75), justify="left")
+        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), wraplength=int(self.flashcard.winfo_width()*0.75), justify="left")
         self.flashcard.meaning.grid(row=1, column=0, sticky='w', padx=10)
         self.flashcard.meaning.bind("<Button-1>", self.show_flashcard_front)
 
@@ -122,7 +122,7 @@ class Flashcards(ctk.CTkFrame):
         infoicon = tksvg.SvgImage(file=Environment.resource_path("graphics/icons/info-icon.svg"), scaletoheight=int(self.master.scale_size*0.05))
         self.flashcard.info_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
         self.flashcard.info_mnemonic.grid(row=0, column=0, sticky='ne', padx=10, pady=10)
-        CustomTooltipLabel(self.flashcard.info_mnemonic, text=self.flag.meaning_mnemonics, font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
+        CustomTooltipLabel(self.flashcard.info_mnemonic, text=f"Mnemotechnika:\n{self.flag.mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
         self.flashcard.info_mnemonic.bind("<Button-1>", self.show_flashcard_front)
 
     def change_flag_index(self, index: int = 0):

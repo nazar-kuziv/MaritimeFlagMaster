@@ -160,17 +160,21 @@ class Alphabet:
     _quotes = []
 
     @staticmethod
-    def get_all_flags():
-        """Returns a list of all posible flags.
+    def get_all_flags(size: int = 0) -> list[Flag | FlagMultiple]:
+        """Returns a list of a specified size of all possible flags. If size is not provided, returns all existing ones.
+         If size is bigger than the number of flags (66), returns all flags.
 
+        :param size: Size of the list to return
         :rtype: List[Flag, FlagMultiple]
         """
         flags = copy.deepcopy(Alphabet._allFlags)
         random.shuffle(flags)
+        if 0 < size < len(flags):
+            return flags[:size]
         return flags
 
     @staticmethod
-    def get_single_flags_shuffled():
+    def get_single_flags_shuffled()-> list[Flag]:
         """Returns a shuffled list of all single flags.
 
         :rtype: List[Flag]
@@ -181,7 +185,7 @@ class Alphabet:
         return flags
 
     @staticmethod
-    def get_single_flags():
+    def get_single_flags() -> list[Flag]:
         """Returns a list of all single flags.
 
         :rtype: List[Flag]
@@ -191,13 +195,17 @@ class Alphabet:
         return flags
 
     @staticmethod
-    def get_characters_flags_shuffled():
-        """Returns a shuffled list of letter and numeral Flag objects.
+    def get_characters_flags_shuffled(size: int = 0) -> list[Flag]:
+        """Returns a shuffled list of a specified size of letter and numeral Flag objects.If size is not provided, returns all existing ones.
+         If size is bigger than the number of flags (36), returns all flags.
 
+        :param size: Size of the list to return
         :rtype: List[Flag]
         """
         flags = list(Alphabet._characters.values())
         random.shuffle(flags)
+        if 0 < size < len(flags):
+            return flags[:size]
         return flags
 
     @staticmethod

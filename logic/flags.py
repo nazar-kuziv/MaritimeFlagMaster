@@ -4,13 +4,15 @@ import re
 
 
 class Flag:
-    def __init__(self, letter: str, img_path: str, meaning: str, mnemonics: str, morse_code: str):
+    def __init__(self, letter: str, img_path: str, meaning: str, meaning_mnemonics: str, morse_code: str,
+                 morse_mnemonics: str):
         self._letter = letter
         self._img_path = img_path
         self._png_img_path = img_path.replace('.svg', '.png')
         self._meaning = meaning
-        self._mnemonics = mnemonics
+        self._meaning_mnemonics = meaning_mnemonics
         self._morse_code = morse_code
+        self._morse_mnemonics = morse_mnemonics
 
     @property
     def letter(self) -> str:
@@ -29,12 +31,16 @@ class Flag:
         return self._meaning
 
     @property
-    def mnemonics(self) -> str:
-        return self._mnemonics
+    def meaning_mnemonics(self) -> str:
+        return self._meaning_mnemonics
 
     @property
     def morse_code(self) -> str:
         return self._morse_code
+
+    @property
+    def morse_mnemonics(self) -> str:
+        return self._morse_mnemonics
 
     def check_letter(self, user_letter: str) -> bool:
         """Checks if the letter provided by the user represents this flag

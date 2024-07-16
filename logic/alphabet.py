@@ -158,7 +158,8 @@ class Alphabet:
                  FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values()) + list(
         _additionalFlags.values())
 
-    _quotes = []
+    _sentences_from_user_file = []
+    _default_sentences = []
 
     @staticmethod
     def get_all_flags(size: int = 0) -> list[Flag | FlagMultiple]:
@@ -229,6 +230,40 @@ class Alphabet:
             return Alphabet._characters.get(character.upper(), constants.INPUT_CHARACTER_ERROR)
 
     @staticmethod
+    def get_default_sentence() -> FlagSentence | None:
+        """Returns random sentence from default set created from flags, if everything is ok.
+        Returs None if there is no file selected, or if there is no sentence.
+
+        :rtype: FlagSentence | None
+        """
+        if len(Alphabet._default_sentences) > 0:
+            sentence = random.choice(Alphabet._default_sentences)
+            Alphabet._default_sentences.remove(sentence)
+            return sentence
+        return None
+
+    @staticmethod
+    def load_default_sentences() -> bool:
+        """Loads sentences from default set.
+
+        :return: True if everything is ok, False if something went wrong
+        :rtype: bool
+        """
+        filename = 'static/files/default_sentences.txt'
+        Alphabet._default_sentences = []
+        try:
+            with open(filename, 'r') as file:
+                sentences_str = [line.strip() for line in file]
+                print(sentences_str)
+                for sentence_str in sentences_str:
+                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()
+                    flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
+                    Alphabet._default_sentences.append(FlagSentence(flags, sentence_str, cleaned_sentence))
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
     def get_flag_sentence_from_api() -> FlagSentence | str:
         """Returns random sentence created from flags, if everything is ok.
         Returs NO_INTERNET_CONNECTION if there is no internet connection.
@@ -236,7 +271,7 @@ class Alphabet:
 
         :rtype: FlagSentence | str
         """
-        sentence = Alphabet._get_random_quote()
+        sentence = Alphabet._get_random_sentence()
         print(sentence)
         match sentence:
             case constants.REQUEST_LIMIT_EXCEEDED | constants.NO_INTERNET_CONNECTION:
@@ -247,26 +282,26 @@ class Alphabet:
                 return FlagSentence(flags, sentence, cleaned_sentence)
 
     @staticmethod
-    def get_sentence_from_file():
-        """Returns random sentence from file created from flags, if everything is ok.
+    def get_sentence_from_user_file() -> FlagSentence | None:
+        """Returns random sentence from user's file created from flags, if everything is ok.
         Returs None if there is no file selected, or if there is no sentence.
 
         :rtype: FlagSentence | None
         """
-        if len(Alphabet._quotes) > 0:
-            sentence = random.choice(Alphabet._quotes)
-            Alphabet._quotes.remove(sentence)
+        if len(Alphabet._sentences_from_user_file) > 0:
+            sentence = random.choice(Alphabet._sentences_from_user_file)
+            Alphabet._sentences_from_user_file.remove(sentence)
             return sentence
         return None
 
     @staticmethod
-    def load_sentences_from_file():
-        """Loads sentences from file.
+    def load_sentences_from_user_file() -> bool | None:
+        """Loads sentences from user's file.
 
         :return: True if everything is ok, False if something went wrong, None if user not selected file
         :rtype: bool | None
         """
-        Alphabet._quotes = []
+        Alphabet._sentences_from_user_file = []
         filename = askopenfilename(filetypes=[("Text files", "*.txt")])
         try:
             if not filename:
@@ -277,17 +312,19 @@ class Alphabet:
                 for sentence_str in sentences_str:
                     cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
-                    Alphabet._quotes.append(FlagSentence(flags, sentence_str, cleaned_sentence))
+                    Alphabet._sentences_from_user_file.append(FlagSentence(flags, sentence_str, cleaned_sentence))
             return True
         except Exception:
             return False
 
     @staticmethod
-    def saveFlagSentencePNG(sentence: list[Flag | None], background: str = 'grey'):
+    def saveFlagSentencePNG(sentence: list[Flag | None], background: str = 'grey') -> bool:
         """Saves FlagSentence as PNG file.
 
         :param sentence: Sentence to save
         :param background: Background color, either 'grey' or 'transparent'
+        :return True if everything is ok, False if user didn't select file
+        :rtype: bool
         """
 
         file_name = ''
@@ -382,7 +419,15 @@ class Alphabet:
 
     @staticmethod
     def _embed_png(png_file, x, y, cell_width, cell_height, output_image, background: str):
-        """Embeds PNG image in another image."""
+        """Embeds PNG image in another image.
+        :param png_file: Path to PNG file
+        :param x: X position to paste image
+        :param y: Y position to paste image
+        :param cell_width: Width of the cell
+        :param cell_height: Height of the cell
+        :param output_image: Image to embed PNG in
+        :param background: Background color, either 'grey' or 'transparent'
+        """
         with PILImage.open(png_file) as img:
             img = img.resize((cell_width, cell_height))
             if background == 'grey':
@@ -394,28 +439,28 @@ class Alphabet:
                 output_image.paste(img, (x, y))
 
     @staticmethod
-    def _get_random_quote() -> str:
-        """Returns a random quote from zenquotes.io if everything is ok.
+    def _get_random_sentence() -> str:
+        """Returns a random sentence from zenquotes.io if everything is ok.
         Returs NO_INTERNET_CONNECTION if there is no internet connection.
         Returs REQUEST_LIMIT_EXCEEDED if requests limit has been exceeded.
 
         Function need internet connection to work.
 
         :rtype: str
-        :return: Random quote
+        :return: Random sentence
         """
         try:
             response = requests.get("https://zenquotes.io/api/quotes")
             if response.status_code == 200:
-                quotes = response.json()
-                for quote in quotes:
+                sentences = response.json()
+                for sentence in sentences:
                     try:
-                        quote_text = quote['q']
-                        if int(quote['c']) <= 50:
-                            return f"{quote_text}"
+                        sentence_text = sentence['q']
+                        if int(sentence['c']) <= 50:
+                            return f"{sentence_text}"
                     except KeyError:
                         return constants.REQUEST_LIMIT_EXCEEDED
-                Alphabet._get_random_quote()
+                Alphabet._get_random_sentence()
             else:
                 return f"Error: {response.status_code}"
         except requests.exceptions.RequestException:

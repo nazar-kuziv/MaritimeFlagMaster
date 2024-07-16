@@ -47,7 +47,7 @@ class MainWindow(ctk.CTk):
                        "Znaczenie\n\nDopasuj flagi do komunikatu", 
                        "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
                        "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag", 
-                       "Stwórz zdjęcie\n\nZapisz swoje własne zdanie z flag jako obrazek"]
+                       "Stwórz zdjęcie\n\nZłóż własny komunikat za pomocą flag"]
         commands = [lambda: self.new_menu(Flashcards),
                     lambda: self.new_menu(Codewords), 
                     lambda: self.new_menu(Meanings), 

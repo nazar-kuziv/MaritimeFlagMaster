@@ -113,8 +113,8 @@ class Alphabet:
                              'Dziewięć 6+7 po barwach - 4 pola', '▬ ▬ ▬ ▬ •', "4 kreski i kropka")}
     _additionalFlags = {'?': Flag('?', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', '', ''),
                         '!': Flag('!', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', '', ''),
-                        '`@': Flag('@', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', '', ''),
-                        '#': Flag('#', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '', '')}
+                        '"@': Flag('"@', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', '', ''),
+                        '#£': Flag('#£', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '', '')}
     _allFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam mój statek'),
                  FlagMultiple([_characters['A'], _characters['D']],
                               'Opuszczam mój statek, który ucierpiał w wypadku nuklearnym i stanowi potencjalne źródło niebezpieczeństwa promieniowania'),
@@ -219,11 +219,14 @@ class Alphabet:
         :param character: Character to search for
         :rtype: Flag|None|str
         """
-        if character in ['?', '!', '#']:
+        if character in ['?', '!']:
             return Alphabet._additionalFlags[character]
         # Two characters represent 'Second substitute' flag
-        elif character in ['`', '@']:
-            return Alphabet._additionalFlags['`@']
+        elif character in ['"', '@']:
+            return Alphabet._additionalFlags['"@']
+        # Two characters represent 'Third substitute' flag
+        elif character in ["#", "£"]:
+            return Alphabet._additionalFlags['#£']
         elif character == ' ':
             return None
         else:

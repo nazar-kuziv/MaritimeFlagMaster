@@ -28,7 +28,7 @@ class FlagSen(ctk.CTkFrame):
         self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         self.exit_button.grid(row=0, column=0, columnspan=5, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
 
-        self.file_sentence = None
+        # self.file_sentence = None
     
     def start(self): self.show_choice()
 
@@ -37,26 +37,28 @@ class FlagSen(ctk.CTkFrame):
         self.choice_menu.grid(row=1, column=1)
         self.question_widgets.append(self.choice_menu)
 
+        self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+                                                  command=lambda: self.get_file_sentence(Alphabet.load_default_sentences, Alphabet.get_default_sentence))
+        self.default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+        self.question_widgets.append(self.choice_menu)
+
         self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
                                                   command=lambda: self.flag_sentence_method(Alphabet.get_flag_sentence_from_api))
         self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
         
         self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                              command=self.get_file_sentence)
+                                              command=lambda: self.get_file_sentence(Alphabet.load_sentences_from_user_file, Alphabet.get_sentence_from_user_file))
         self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
     
-    def get_file_sentence(self):
+    def get_file_sentence(self, method, next_method):
         print("loading file sentence...")
-        isLoaded = Alphabet.load_sentences_from_file()
+        isLoaded = method()
         if (isLoaded is None):
             pass
         elif (not isLoaded):
             self.flag_sentence_method(lambda: "Didn't load")
         else:
-            self.file_sentence = Alphabet.get_sentence_from_file()
-            if (not self.file_sentence):
-                self.flag_sentence_method(lambda: "Didn't load")
-            self.flag_sentence_method(lambda: self.file_sentence)
+            self.flag_sentence_method(next_method)
 
     def flag_sentence_method(self, method):
         self.get_flag_sentence_method = method
@@ -74,7 +76,7 @@ class FlagSen(ctk.CTkFrame):
         self.sentence = self.get_flag_sentence_method()
         # self.sentence = NO_INTERNET_CONNECTION
 
-        if (isinstance(self.sentence, str)):
+        if (isinstance(self.sentence, str) or self.sentence is None):
             print("Didn't get request, ", self.sentence)
             if (self.sentence == REQUEST_LIMIT_EXCEEDED):
                 error_text = "Limit zapytań cytatów został osiągnięty, prosimy chwilę poczekać."
@@ -84,6 +86,7 @@ class FlagSen(ctk.CTkFrame):
                 error_text = "Błąd czytania z pliku."
             error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
             error_message.grid(row=0, column=1, rowspan=2)
+            loading_label.destroy()
             return
 
         print(self.sentence.cleaned_sentence)
@@ -155,11 +158,6 @@ class FlagSen(ctk.CTkFrame):
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(state="disabled")
             self.answer_cell.entry.unbind("<Return>")
-
-            if (self.file_sentence):
-                self.file_sentence = Alphabet.get_sentence_from_file()
-                if (not self.file_sentence):
-                    return
 
             # next button
             self.next_button = ctk.CTkButton(self, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=self.show_question)

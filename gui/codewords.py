@@ -51,7 +51,7 @@ class Codewords(ctk.CTkFrame):
         self.answer_cell.grid(row=2, column=1, pady=10)
         self.question_widgets.append(self.answer_cell)
 
-        print(self.flag.letter)
+        print(self.flag.code_word)
         self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), width=int(self.master.scale_size*0.3), validate="key")
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
         self.answer_cell.entry.pack(side="left")
@@ -66,7 +66,7 @@ class Codewords(ctk.CTkFrame):
         except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
-        if (not self.flag.check_letter(self.answer_cell.entry.get())):
+        if (not self.flag.check_code_word(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)

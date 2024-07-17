@@ -113,7 +113,7 @@ class Alphabet:
                              'Dziewięć 6+7 po barwach - 4 pola', '▬ ▬ ▬ ▬ •', "4 kreski i kropka")}
     _additionalFlags = {'?': Flag('?', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', '', ''),
                         '!': Flag('!', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', '', ''),
-                        '"@': Flag('"@', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', '', ''),
+                        '@"': Flag('@"', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', '', ''),
                         '#£': Flag('#£', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '', '')}
     _multipleFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam mój statek'),
                       FlagMultiple([_characters['A'], _characters['D']],
@@ -137,7 +137,7 @@ class Alphabet:
                       FlagMultiple([_characters['J'], _characters['A']], 'Potrzebuję urządzeń przeciwpożarowych'),
                       FlagMultiple([_characters['J'], _characters['A'], _characters['4']],
                                    'Potrzebuję materiału do gaśnic pianowych'),
-                      FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['"@']],
+                      FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['@"']],
                                    'Proszę o pilną poradę medyczną'),
                       FlagMultiple([_characters['M'], _characters['A'], _characters['B']],
                                    'Proszę o spotkanie we wskazanej pozycji'),
@@ -240,7 +240,7 @@ class Alphabet:
             return Alphabet._additionalFlags[character]
         # Two characters represent 'Second substitute' flag
         elif character in ['"', '@']:
-            return Alphabet._additionalFlags['"@']
+            return Alphabet._additionalFlags['@"']
         # Two characters represent 'Third substitute' flag
         elif character in ["#", "£"]:
             return Alphabet._additionalFlags['#£']
@@ -354,28 +354,28 @@ class Alphabet:
             for flag in sentence:
                 if flag is None:
                     file_name += ' '
-                elif isinstance(flag, Flag) and flag.letter == 'Nadazero':
+                elif isinstance(flag, Flag) and flag.code_word == 'Nadazero':
                     file_name += '0'
-                elif isinstance(flag, Flag) and flag.letter == 'Unaone':
+                elif isinstance(flag, Flag) and flag.code_word == 'Unaone':
                     file_name += '1'
-                elif isinstance(flag, Flag) and flag.letter == 'Bissotwo':
+                elif isinstance(flag, Flag) and flag.code_word == 'Bissotwo':
                     file_name += '2'
-                elif isinstance(flag, Flag) and flag.letter == 'Terrathree':
+                elif isinstance(flag, Flag) and flag.code_word == 'Terrathree':
                     file_name += '3'
-                elif isinstance(flag, Flag) and flag.letter == 'Kartefour':
+                elif isinstance(flag, Flag) and flag.code_word == 'Kartefour':
                     file_name += '4'
-                elif isinstance(flag, Flag) and flag.letter == 'Pantafive':
+                elif isinstance(flag, Flag) and flag.code_word == 'Pantafive':
                     file_name += '5'
-                elif isinstance(flag, Flag) and flag.letter == 'Soxisix':
+                elif isinstance(flag, Flag) and flag.code_word == 'Soxisix':
                     file_name += '6'
-                elif isinstance(flag, Flag) and flag.letter == 'Setteseven':
+                elif isinstance(flag, Flag) and flag.code_word == 'Setteseven':
                     file_name += '7'
-                elif isinstance(flag, Flag) and flag.letter == 'Oktoeight':
+                elif isinstance(flag, Flag) and flag.code_word == 'Oktoeight':
                     file_name += '8'
-                elif isinstance(flag, Flag) and flag.letter == 'Novenine':
+                elif isinstance(flag, Flag) and flag.code_word == 'Novenine':
                     file_name += '9'
-                elif isinstance(flag, Flag) and flag.letter not in ('?', '!', '"@', '#£'):
-                    file_name += flag.letter[0].upper()
+                elif isinstance(flag, Flag) and flag.code_word not in ('?', '!', '@"', '#£'):
+                    file_name += flag.code_word[0].upper()
                 else:
                     file_name += '_'
 

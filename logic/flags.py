@@ -4,19 +4,19 @@ import re
 
 
 class Flag:
-    def __init__(self, letter: str, img_path: str, meaning: str, meaning_mnemonics: str, morse_code: str,
+    def __init__(self, code_word: str, img_path: str, meaning: str, flag_mnemonics: str, morse_code: str,
                  morse_mnemonics: str):
-        self._letter = letter
+        self._code_word = code_word
         self._img_path = img_path
         self._png_img_path = img_path.replace('.svg', '.png')
         self._meaning = meaning
-        self._meaning_mnemonics = meaning_mnemonics
+        self._flag_mnemonics = flag_mnemonics
         self._morse_code = morse_code
         self._morse_mnemonics = morse_mnemonics
 
     @property
-    def letter(self) -> str:
-        return self._letter
+    def code_word(self) -> str:
+        return self._code_word
 
     @property
     def img_path(self) -> str:
@@ -31,8 +31,8 @@ class Flag:
         return self._meaning
 
     @property
-    def meaning_mnemonics(self) -> str:
-        return self._meaning_mnemonics
+    def flag_mnemonics(self) -> str:
+        return self._flag_mnemonics
 
     @property
     def morse_code(self) -> str:
@@ -42,15 +42,15 @@ class Flag:
     def morse_mnemonics(self) -> str:
         return self._morse_mnemonics
 
-    def check_letter(self, user_letter: str) -> bool:
-        """Checks if the letter provided by the user represents this flag
+    def check_code_word(self, user_code_word: str) -> bool:
+        """Checks if the code word provided by the user represents this flag
 
-        :param user_letter: Letter from user.
+        :param user_code_word: Code word from user.
         :rtype: bool
         :return: True if the answer is correct, False otherwise.
         """
-        user_letter = user_letter.strip().upper()
-        return user_letter == self._letter.strip().upper()
+        user_code_word = user_code_word.strip().upper()
+        return user_code_word == self._code_word.strip().upper()
 
     def check_flag(self, user_flag: 'Flag') -> bool:
         """Checks if the flag provided by the user represents this flag
@@ -59,7 +59,31 @@ class Flag:
         :rtype: bool
         :return: True if the answer is correct, False otherwise.
         """
-        return user_flag.letter.strip().capitalize() == self._letter.strip().capitalize()
+        return user_flag.code_word.strip().capitalize() == self.code_word.strip().capitalize()
+
+    def get_flag_character(self) -> str:
+        if self.code_word == 'Nadazero':
+            return '0'
+        elif self.code_word == 'Unaone':
+            return '1'
+        elif self.code_word == 'Bissotwo':
+            return '2'
+        elif self.code_word == 'Terrathree':
+            return  '3'
+        elif self.code_word == 'Kartefour':
+            return '4'
+        elif self.code_word == 'Pantafive':
+            return '5'
+        elif self.code_word == 'Soxisix':
+            return '6'
+        elif self.code_word == 'Setteseven':
+            return '7'
+        elif self.code_word == 'Oktoeight':
+            return '8'
+        elif self.code_word == 'Novenine':
+            return '9'
+        else :
+            return self.code_word[0].upper()
 
 
 class FlagMultiple:

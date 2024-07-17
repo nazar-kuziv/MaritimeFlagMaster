@@ -54,7 +54,7 @@ class MakeImage(ctk.CTkFrame):
                 for i in range(length):
                     char = self.top_menu.input_text.get(f"1.0+{i}c").upper()
                     if (i < len(self.answer_flags)):
-                        flagChar = " " if self.answer_flags[i] is None else self.answer_flags[i].letter[0].upper()
+                        flagChar = " " if self.answer_flags[i] is None else self.answer_flags[i].code_word[0].upper()
                         if (char != flagChar):
                             self.input_images[i].destroy()
                             del self.input_images[i]
@@ -155,7 +155,7 @@ class MakeImage(ctk.CTkFrame):
             self.input_images.insert(pos, new_input_flag)
             self.answer_flags.insert(pos, self.alphabet[index])
             if (event is not None):
-                self.top_menu.input_text.insert('end', self.alphabet[index].letter[0])
+                self.top_menu.input_text.insert('end', self.alphabet[index].code_word[0])
         
         self.top_menu.check_button.configure(state="enabled", cursor="hand2")
 

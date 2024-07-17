@@ -108,12 +108,12 @@ class Flashcards(ctk.CTkFrame):
 
         isSingleFlag = isinstance(self.flag, Flag)
         if (isSingleFlag):
-            if (any(i in self.flag.letter for i in 
+            if (any(i in self.flag.code_word for i in
                     ''.join(x for x in Alphabet._additionalFlags.keys())
                     )): text = ""
-            else: text = self.flag.letter
+            else: text = self.flag.code_word
         else:
-            text = " ".join([x.letter for x in self.flag.flags])
+            text = " ".join([x.code_word for x in self.flag.flags])
         self.flashcard.letter = ctk.CTkLabel(self.flashcard, text=text, font=ctk.CTkFont(size=int(self.master.scale_size*0.035)))
         self.flashcard.letter.grid(row=0, column=0, sticky='w', padx=10, pady=10)
         self.flashcard.letter.bind("<Button-1>", self.show_flashcard_front)
@@ -130,7 +130,7 @@ class Flashcards(ctk.CTkFrame):
         infoicon = tksvg.SvgImage(file=Environment.resource_path("graphics/icons/info-icon.svg"), scaletoheight=int(self.master.scale_size*0.05))
         self.flashcard.flag_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
         self.flashcard.flag_mnemonic.grid(row=0, column=0, sticky='ne', padx=10, pady=10)
-        CustomTooltipLabel(self.flashcard.flag_mnemonic, text=f"Mnemotechnika flagi:\n{self.flag.meaning_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
+        CustomTooltipLabel(self.flashcard.flag_mnemonic, text=f"Mnemotechnika flagi:\n{self.flag.flag_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
         self.flashcard.flag_mnemonic.bind("<Button-1>", self.show_flashcard_front)
 
         self.flashcard.morse.morse_mnemonic = ctk.CTkLabel(self.flashcard.morse, text='', image=infoicon)

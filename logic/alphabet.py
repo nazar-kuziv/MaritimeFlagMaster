@@ -115,56 +115,55 @@ class Alphabet:
                         '!': Flag('!', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', '', ''),
                         '"@': Flag('"@', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', '', ''),
                         '#£': Flag('#£', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '', '')}
-    _allFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam mój statek'),
-                 FlagMultiple([_characters['A'], _characters['D']],
-                              'Opuszczam mój statek, który ucierpiał w wypadku nuklearnym i stanowi potencjalne źródło niebezpieczeństwa promieniowania'),
-                 FlagMultiple([_characters['A'], _characters['N']], 'Potrzebuję lekarza'),
-                 FlagMultiple([_characters['A'], _characters['N'], _characters['1']],
-                              'Potrzebuję lekarza; mam poważne oparzenia'),
-                 FlagMultiple([_characters['A'], _characters['N'], _characters['2']],
-                              'Potrzebuję lekarza; mam ofiary promieniowania'),
-                 FlagMultiple([_characters['E'], _characters['L']], 'Powtórz pozycję niebezpieczeństwa'),
-                 FlagMultiple([_characters['E'], _characters['L'], _characters['1']],
-                              'Jaką jest pozycja statku w niebezpieczeństwie?'),
-                 FlagMultiple([_characters['G'], _characters['M']], 'Nie mogę uratować mojego statku'),
-                 FlagMultiple([_characters['G'], _characters['N']], 'Powinieneś zabrać osoby z pokładu'),
-                 FlagMultiple([_characters['G'], _characters['N'], _characters['1']],
-                              'Życzę sobie zdjęcia niektórych osób. Na pokładzie pozostanie załoga zredukowana do minimum'),
-                 FlagMultiple([_characters['G'], _characters['N'], _characters['2']], 'Zabiorę ludzi z pokładu'),
-                 FlagMultiple([_characters['G'], _characters['N'], _characters['3']],
-                              'Czy możesz zabrać ludzi z pokładu?'),
-                 FlagMultiple([_characters['I'], _characters['T']], 'Płonę'),
-                 FlagMultiple([_characters['J'], _characters['A']], 'Potrzebuję urządzeń przeciwpożarowych'),
-                 FlagMultiple([_characters['J'], _characters['A'], _characters['4']],
-                              'Potrzebuję materiału do gaśnic pianowych'),
-                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['"@']],
-                              'Proszę o pilną poradę medyczną'),
-                 FlagMultiple([_characters['M'], _characters['A'], _characters['B']],
-                              'Proszę o spotkanie we wskazanej pozycji'),
-                 FlagMultiple([_characters['M'], _characters['A'], _characters['C']],
-                              'Proszę o zorganizowanie przyjęcia do szpitala'),
-                 FlagMultiple([_characters['M'], _characters['A'], _characters['D']],
-                              'Jestem oddalony o (wskazana liczba) godzin od najbliższego portu'),
-                 FlagMultiple([_characters['M'], _characters['S'], _characters['1']],
-                              'Mój statek stanowi niebezpieczne źródło promieniowania; możesz zbliżyć się od sterburty'),
-                 FlagMultiple([_characters['V'], _characters['G']],
-                              'Zakrycie niskich chmur wynosi... (liczba oktantów lub ósmych części nieba)'),
-                 FlagMultiple([_characters['U'], _characters['S'], _characters['4']],
-                              'Nic nie można zrobić, dopóki pogoda się nie poprawi'),
-                 FlagMultiple([_characters['N'], _characters['C']],
-                              'Jestem w niebezpieczeństwie i potrzebuję natychmiastowej pomocy'),
-                 FlagMultiple([_characters['R'], _characters['Y']], 'Zachowaj odstęp przy niskiej prędkości'),
-                 FlagMultiple([_characters['A'], _characters['E']], 'Muszę opuścić mój statek'),
-                 FlagMultiple([_characters['D'], _characters['X']], 'Tonę')] + list(_characters.values()) + list(
-        _additionalFlags.values())
-
+    _multipleFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam mój statek'),
+                      FlagMultiple([_characters['A'], _characters['D']],
+                                   'Opuszczam mój statek, który ucierpiał w wypadku nuklearnym i stanowi potencjalne źródło niebezpieczeństwa promieniowania'),
+                      FlagMultiple([_characters['A'], _characters['N']], 'Potrzebuję lekarza'),
+                      FlagMultiple([_characters['A'], _characters['N'], _characters['1']],
+                                   'Potrzebuję lekarza; mam poważne oparzenia'),
+                      FlagMultiple([_characters['A'], _characters['N'], _characters['2']],
+                                   'Potrzebuję lekarza; mam ofiary promieniowania'),
+                      FlagMultiple([_characters['E'], _characters['L']], 'Powtórz pozycję niebezpieczeństwa'),
+                      FlagMultiple([_characters['E'], _characters['L'], _characters['1']],
+                                   'Jaką jest pozycja statku w niebezpieczeństwie?'),
+                      FlagMultiple([_characters['G'], _characters['M']], 'Nie mogę uratować mojego statku'),
+                      FlagMultiple([_characters['G'], _characters['N']], 'Powinieneś zabrać osoby z pokładu'),
+                      FlagMultiple([_characters['G'], _characters['N'], _characters['1']],
+                                   'Życzę sobie zdjęcia niektórych osób. Na pokładzie pozostanie załoga zredukowana do minimum'),
+                      FlagMultiple([_characters['G'], _characters['N'], _characters['2']], 'Zabiorę ludzi z pokładu'),
+                      FlagMultiple([_characters['G'], _characters['N'], _characters['3']],
+                                   'Czy możesz zabrać ludzi z pokładu?'),
+                      FlagMultiple([_characters['I'], _characters['T']], 'Płonę'),
+                      FlagMultiple([_characters['J'], _characters['A']], 'Potrzebuję urządzeń przeciwpożarowych'),
+                      FlagMultiple([_characters['J'], _characters['A'], _characters['4']],
+                                   'Potrzebuję materiału do gaśnic pianowych'),
+                      FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['"@']],
+                                   'Proszę o pilną poradę medyczną'),
+                      FlagMultiple([_characters['M'], _characters['A'], _characters['B']],
+                                   'Proszę o spotkanie we wskazanej pozycji'),
+                      FlagMultiple([_characters['M'], _characters['A'], _characters['C']],
+                                   'Proszę o zorganizowanie przyjęcia do szpitala'),
+                      FlagMultiple([_characters['M'], _characters['A'], _characters['D']],
+                                   'Jestem oddalony o (wskazana liczba) godzin od najbliższego portu'),
+                      FlagMultiple([_characters['M'], _characters['S'], _characters['1']],
+                                   'Mój statek stanowi niebezpieczne źródło promieniowania; możesz zbliżyć się od sterburty'),
+                      FlagMultiple([_characters['V'], _characters['G']],
+                                   'Zakrycie niskich chmur wynosi... (liczba oktantów lub ósmych części nieba)'),
+                      FlagMultiple([_characters['U'], _characters['S'], _characters['4']],
+                                   'Nic nie można zrobić, dopóki pogoda się nie poprawi'),
+                      FlagMultiple([_characters['N'], _characters['C']],
+                                   'Jestem w niebezpieczeństwie i potrzebuję natychmiastowej pomocy'),
+                      FlagMultiple([_characters['R'], _characters['Y']], 'Zachowaj odstęp przy niskiej prędkości'),
+                      FlagMultiple([_characters['A'], _characters['E']], 'Muszę opuścić mój statek'),
+                      FlagMultiple([_characters['D'], _characters['X']], 'Tonę')]
+    _allFlags = list(_characters.values()) + list(_additionalFlags.values()) + _multipleFlags
     _sentences_from_user_file = []
     _default_sentences = []
 
     @staticmethod
     def get_all_flags(size: int = 0) -> list[Flag | FlagMultiple]:
         """Returns a list of a specified size of all possible flags. If size is not provided, returns all existing ones.
-         If size is bigger than the number of flags (66), returns all flags.
+         If size is bigger than the number of flags (66) returns all flags.
 
         :param size: Size of the list to return
         :rtype: List[Flag, FlagMultiple]
@@ -174,6 +173,24 @@ class Alphabet:
         if 0 < size < len(flags):
             return flags[:size]
         return flags
+
+    @staticmethod
+    def get_all_flags_with_meaning(size: int = 0) -> list[Flag | FlagMultiple]:
+        """Returns a list of a specified size of all possible flags which have meaning. If size is not provided, returns all existing ones.
+         If size is bigger than the number of flags (65), returns all flags.
+
+        :param size: Size of the list to return
+        :rtype: List[Flag, FlagMultiple]
+        """
+        list_of_all_flags_with_meaning = copy.deepcopy(Alphabet._characters)
+        list_of_all_flags_with_meaning.pop('R')
+        list_of_all_flags_with_meaning = list(list_of_all_flags_with_meaning.values())
+        list_of_all_flags_with_meaning.extend(Alphabet._additionalFlags.values())
+        list_of_all_flags_with_meaning.extend(Alphabet._multipleFlags)
+        random.shuffle(list_of_all_flags_with_meaning)
+        if 0 < size < len(list_of_all_flags_with_meaning):
+            return list_of_all_flags_with_meaning[:size]
+        return list_of_all_flags_with_meaning
 
     @staticmethod
     def get_single_flags_shuffled() -> list[Flag]:
@@ -321,55 +338,63 @@ class Alphabet:
             return False
 
     @staticmethod
-    def saveFlagSentencePNG(sentence: list[Flag | None], background: str = 'grey') -> bool:
+    def saveFlagSentencePNG(sentence: list[Flag | None], background: str = 'grey',
+                            suggest_file_name: bool = True) -> bool:
         """Saves FlagSentence as PNG file.
 
         :param sentence: Sentence to save
         :param background: Background color, either 'grey' or 'transparent'
+        :param suggest_file_name: If True, suggests file name based on sentence
         :return True if everything is ok, False if user didn't select file
         :rtype: bool
         """
-
         file_name = ''
 
-        for flag in sentence:
-            if flag is None:
-                file_name += ' '
-            elif isinstance(flag, Flag) and flag.letter == 'Nadazero':
-                file_name += '0'
-            elif isinstance(flag, Flag) and flag.letter == 'Unaone':
-                file_name += '1'
-            elif isinstance(flag, Flag) and flag.letter == 'Bissotwo':
-                file_name += '2'
-            elif isinstance(flag, Flag) and flag.letter == 'Terrathree':
-                file_name += '3'
-            elif isinstance(flag, Flag) and flag.letter == 'Kartefour':
-                file_name += '4'
-            elif isinstance(flag, Flag) and flag.letter == 'Pantafive':
-                file_name += '5'
-            elif isinstance(flag, Flag) and flag.letter == 'Soxisix':
-                file_name += '6'
-            elif isinstance(flag, Flag) and flag.letter == 'Setteseven':
-                file_name += '7'
-            elif isinstance(flag, Flag) and flag.letter == 'Oktoeight':
-                file_name += '8'
-            elif isinstance(flag, Flag) and flag.letter == 'Novenine':
-                file_name += '9'
-            elif isinstance(flag, Flag) and flag.letter != '':
-                file_name += flag.letter[0].upper()
-            else:
-                file_name += '_'
+        if suggest_file_name:
+            for flag in sentence:
+                if flag is None:
+                    file_name += ' '
+                elif isinstance(flag, Flag) and flag.letter == 'Nadazero':
+                    file_name += '0'
+                elif isinstance(flag, Flag) and flag.letter == 'Unaone':
+                    file_name += '1'
+                elif isinstance(flag, Flag) and flag.letter == 'Bissotwo':
+                    file_name += '2'
+                elif isinstance(flag, Flag) and flag.letter == 'Terrathree':
+                    file_name += '3'
+                elif isinstance(flag, Flag) and flag.letter == 'Kartefour':
+                    file_name += '4'
+                elif isinstance(flag, Flag) and flag.letter == 'Pantafive':
+                    file_name += '5'
+                elif isinstance(flag, Flag) and flag.letter == 'Soxisix':
+                    file_name += '6'
+                elif isinstance(flag, Flag) and flag.letter == 'Setteseven':
+                    file_name += '7'
+                elif isinstance(flag, Flag) and flag.letter == 'Oktoeight':
+                    file_name += '8'
+                elif isinstance(flag, Flag) and flag.letter == 'Novenine':
+                    file_name += '9'
+                elif isinstance(flag, Flag) and flag.letter not in ('?', '!', '"@', '#£'):
+                    file_name += flag.letter[0].upper()
+                else:
+                    file_name += '_'
 
         cell_width = 200
         cell_height = 200
         x_padding = 10
         y_padding = 10
 
-        file_path = filedialog.asksaveasfilename(
-            defaultextension=".png",
-            filetypes=[("PNG files", "*.png")],
-            initialfile=file_name
-        )
+        if suggest_file_name:
+            file_path = filedialog.asksaveasfilename(
+                defaultextension=".png",
+                filetypes=[("PNG files", "*.png")],
+                initialfile=file_name
+            )
+        else:
+            file_path = filedialog.asksaveasfilename(
+                defaultextension=".png",
+                filetypes=[("PNG files", "*.png")]
+            )
 
         if file_path:
             png_files = []

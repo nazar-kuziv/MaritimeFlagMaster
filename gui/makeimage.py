@@ -68,7 +68,7 @@ class MakeImage(ctk.CTkFrame):
         self.top_menu.input_text.bind("<KeyRelease>", textbox_callback)
         self.top_menu.input_text.focus()
 
-        self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
+        self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.save_image, state="disabled")
         self.top_menu.check_button.pack(side="right", ipadx=10, ipady=10)
 
         def checkbox_event():
@@ -169,7 +169,7 @@ class MakeImage(ctk.CTkFrame):
             if (len(self.input_images) <= 0):
                 self.top_menu.check_button.configure(state="disabled", cursor='')
 
-    def check_answer(self):
+    def save_image(self):
         if Alphabet.saveFlagSentencePNG(self.answer_flags, background=self.is_transparent):
             label = ctk.CTkLabel(self.top_menu, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             label.pack(side="right", padx=10)

@@ -18,23 +18,21 @@ class FlagSen(ctk.CTkFrame):
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         
         self.question_widgets = []
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=3)
         self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1, uniform="side")
+        self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=3)
-        self.grid_columnconfigure(2, weight=1, uniform="side")
+        self.grid_columnconfigure(2, weight=0)
 
         self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        self.exit_button.grid(row=0, column=0, columnspan=5, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
-
-        # self.file_sentence = None
+        self.exit_button.grid(row=0, column=0, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
     
     def start(self): self.show_choice()
 
     def show_choice(self):
         self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
-        self.choice_menu.grid(row=1, column=1)
+        self.choice_menu.grid(row=1, column=0, columnspan=2)
         self.question_widgets.append(self.choice_menu)
 
         self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
@@ -72,6 +70,15 @@ class FlagSen(ctk.CTkFrame):
             widget.destroy()
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
+
+        def save_image():
+            if (Alphabet.saveFlagSentencePNG(self.sentence.flags)):
+                label = ctk.CTkLabel(self, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
+                label.grid(column=1, row=0, sticky="e", pady=10)
+                label.after(4000, lambda: label.destroy())
+        
+        self.save_image = ctk.CTkButton(self, text='Zapisz obecne jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
+        self.save_image.grid(column=2, row=0, sticky="ne", ipadx=10, ipady=10, padx=10, pady=10)
         
         self.sentence = self.get_flag_sentence_method()
         # self.sentence = NO_INTERNET_CONNECTION
@@ -115,7 +122,7 @@ class FlagSen(ctk.CTkFrame):
         self.question_widgets.append(self.flag_sentence)
 
         self.answer_cell = ctk.CTkFrame(self, fg_color="transparent")
-        self.answer_cell.grid(row=2, column=1, pady=10)
+        self.answer_cell.grid(row=2, column=0, columnspan=3, pady=10)
         self.question_widgets.append(self.answer_cell)
 
         validate_command = self.register(self.validate_answer)

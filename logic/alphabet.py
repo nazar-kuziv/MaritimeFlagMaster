@@ -252,7 +252,7 @@ class Alphabet:
         :return: True if everything is ok, False if something went wrong
         :rtype: bool
         """
-        filename = 'static/files/default_sentences.txt'
+        filename = Environment.resource_path('static/files/default_sentences.txt')
         Alphabet._default_sentences = []
         try:
             with open(filename, 'r') as file:

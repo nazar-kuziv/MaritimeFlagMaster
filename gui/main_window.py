@@ -14,6 +14,7 @@ class MainWindow(ctk.CTk):
     """
     def __init__(self):
         super().__init__()
+        # ctk.set_appearance_mode("Dark") # Dark, Light
 
         self.title("Maritime Flag Master")
         self.geometry("1000x500")

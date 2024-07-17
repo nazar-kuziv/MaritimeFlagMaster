@@ -6,7 +6,7 @@ githubFranzyd = 'https://github.com/Franzyd'
 
 class AboutWindow(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
-        super().__init__(fg_color='ghost white', *args, **kwargs)
+        super().__init__(fg_color=('ghost white', 'gray14'), *args, **kwargs)
 
         self.program = ctk.CTkLabel(self, text='MaritimeFlagMaster, ver. 0.2', fg_color='transparent')
         self.program.pack(anchor="w", padx=8)

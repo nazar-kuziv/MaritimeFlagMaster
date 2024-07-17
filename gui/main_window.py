@@ -1,5 +1,6 @@
 import customtkinter as ctk
 
+from .about import AboutWindow
 from .flashcards import Flashcards
 from .codewords import Codewords
 from .meanings import Meanings
@@ -22,6 +23,8 @@ class MainWindow(ctk.CTk):
         self.main_menu()
         self.scale_size = self.winfo_height() if (self.winfo_height() < self.winfo_width()) else self.winfo_width()
 
+        self.about_window = None
+
     def main_menu(self):
         # self.bind("<Configure>", change_scale_size)
         self.update()
@@ -38,6 +41,18 @@ class MainWindow(ctk.CTk):
         self.maritime_flag_master = ctk.CTkLabel(self.title_frame, text='Maritime Flag Master!', 
                                                  font = ctk.CTkFont(size=int(self.winfo_width()*0.017), weight='bold'), fg_color='transparent')
         self.maritime_flag_master.pack(side="left")
+
+        def open_about_window():
+            if self.about_window is None or not self.about_window.winfo_exists():
+                self.about_window = AboutWindow(self)  # create window if its None or destroyed
+                self.about_window.after(50, self.about_window.lift)
+            else:
+                self.about_window.focus()
+        
+        self.about = ctk.CTkFrame(self, fg_color="transparent")
+        self.about.place(anchor="ne", rely=0, relx=1)
+        self.about.button = ctk.CTkButton(self.about, text='O aplikacji', font = ctk.CTkFont(size=int(self.winfo_width()*0.013)), width=0, command=open_about_window)
+        self.about.button.pack(padx=5, pady=5)
 
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(fill="both", expand=True, padx=10, pady=10,)

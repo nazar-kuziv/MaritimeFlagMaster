@@ -27,7 +27,6 @@ class SenFlag(ctk.CTkFrame):
         self.alphabet = Alphabet.get_characters_flags_shuffled()
         self.flag_index = 0
         self.images = []
-        self.file_sentence = None
     
     def start(self): self.show_choice()
 
@@ -36,26 +35,27 @@ class SenFlag(ctk.CTkFrame):
         self.choice_menu.pack(side="bottom", fill="y", expand=True)
         self.top_menu.list["choice_menu"] = self.choice_menu
 
+        self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+                                                  command=lambda: self.get_file_sentence(Alphabet.load_default_sentences, Alphabet.get_default_sentence))
+        self.default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+
         self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
                                                   command=lambda: self.flag_sentence_method(Alphabet.get_flag_sentence_from_api))
         self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
         
         self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                              command=self.get_file_sentence)
+                                              command=lambda: self.get_file_sentence(Alphabet.load_sentences_from_user_file, Alphabet.get_sentence_from_user_file))
         self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
     
-    def get_file_sentence(self):
+    def get_file_sentence(self, method, next_method):
         print("loading file sentence...")
-        isLoaded = Alphabet.load_sentences_from_file()
+        isLoaded = method()
         if (isLoaded is None):
             pass
         elif (not isLoaded):
             self.flag_sentence_method(lambda: "Didn't load")
         else:
-            self.file_sentence = Alphabet.get_sentence_from_file()
-            if (not self.file_sentence):
-                self.flag_sentence_method(lambda: "Didn't load")
-            self.flag_sentence_method(lambda: self.file_sentence)
+            self.flag_sentence_method(next_method)
 
     def flag_sentence_method(self, method):
         self.get_flag_sentence_method = method
@@ -87,7 +87,7 @@ class SenFlag(ctk.CTkFrame):
         self.sentence = self.get_flag_sentence_method()
         # self.sentence = NO_INTERNET_CONNECTION
 
-        if (isinstance(self.sentence, str)):
+        if (isinstance(self.sentence, str) or self.sentence is None):
             print("Didn't get request, ", self.sentence)
             if (self.sentence == REQUEST_LIMIT_EXCEEDED):
                 error_text = "Limit zapytań cytatów został osiągnięty, prosimy chwilę poczekać."
@@ -227,15 +227,10 @@ class SenFlag(ctk.CTkFrame):
             for f in self.flag_images:
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')
-
-            if (self.file_sentence):
-                self.file_sentence = Alphabet.get_sentence_from_file()
-                if (not self.file_sentence):
-                    return
             
             # next button
-            self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.04)), height=40, command=self.show_question)
-            self.next_button.pack(side="right", padx=10)
+            self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.02)), command=self.show_question)
+            self.next_button.pack(side="right", fill='y')
             self.top_menu.list["new_sentence"] = self.next_button
     
     def exit(self):

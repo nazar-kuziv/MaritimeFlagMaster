@@ -137,7 +137,7 @@ class Alphabet:
                  FlagMultiple([_characters['J'], _characters['A']], 'Potrzebuję urządzeń przeciwpożarowych'),
                  FlagMultiple([_characters['J'], _characters['A'], _characters['4']],
                               'Potrzebuję materiału do gaśnic pianowych'),
-                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['`@']],
+                 FlagMultiple([_characters['M'], _characters['A'], _additionalFlags['"@']],
                               'Proszę o pilną poradę medyczną'),
                  FlagMultiple([_characters['M'], _characters['A'], _characters['B']],
                               'Proszę o spotkanie we wskazanej pozycji'),

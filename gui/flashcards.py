@@ -102,28 +102,41 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.columnconfigure(0, weight=1)
         print(f"Back flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
 
-        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), wraplength=int(self.flashcard.winfo_width()*0.75), justify="left")
+        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), wraplength=int(self.flashcard.winfo_width()*0.75), justify="left")
         self.flashcard.meaning.grid(row=1, column=0, sticky='w', padx=10)
         self.flashcard.meaning.bind("<Button-1>", self.show_flashcard_front)
 
         isSingleFlag = isinstance(self.flag, Flag)
-        if (any(i in self.flag.letter for i in '@<>?')): text = ""
-        else: text = self.flag.letter if isSingleFlag else " ".join([x.letter for x in self.flag.flags])
+        if (isSingleFlag):
+            if (any(i in self.flag.letter for i in 
+                    ''.join(x for x in Alphabet._additionalFlags.keys())
+                    )): text = ""
+            else: text = self.flag.letter
+        else:
+            text = " ".join([x.letter for x in self.flag.flags])
         self.flashcard.letter = ctk.CTkLabel(self.flashcard, text=text, font=ctk.CTkFont(size=int(self.master.scale_size*0.035)))
         self.flashcard.letter.grid(row=0, column=0, sticky='w', padx=10, pady=10)
         self.flashcard.letter.bind("<Button-1>", self.show_flashcard_front)
         if (not isSingleFlag): return
 
-        self.flashcard.morse_code = ctk.CTkLabel(self.flashcard, text=self.flag.morse_code, font=ctk.CTkFont(size=int(self.master.scale_size*0.035)))
-        self.flashcard.morse_code.grid(row=2, column=0, sticky='w', padx=10, pady=10)
-        self.flashcard.morse_code.bind("<Button-1>", self.show_flashcard_front)
+        self.flashcard.morse = ctk.CTkFrame(self.flashcard, fg_color="transparent")
+        self.flashcard.morse.grid(column=0, row=2, sticky="w")
+
+        self.flashcard.morse.morse_code = ctk.CTkLabel(self.flashcard.morse, text=self.flag.morse_code, font=ctk.CTkFont(size=int(self.master.scale_size*0.035)))
+        self.flashcard.morse.morse_code.pack(side="left", padx=10, pady=10)
+        self.flashcard.morse.morse_code.bind("<Button-1>", self.show_flashcard_front)
         if (text == ""): return
 
         infoicon = tksvg.SvgImage(file=Environment.resource_path("graphics/icons/info-icon.svg"), scaletoheight=int(self.master.scale_size*0.05))
-        self.flashcard.info_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
-        self.flashcard.info_mnemonic.grid(row=0, column=0, sticky='ne', padx=10, pady=10)
-        CustomTooltipLabel(self.flashcard.info_mnemonic, text=self.flag.meaning_mnemonics, font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
-        self.flashcard.info_mnemonic.bind("<Button-1>", self.show_flashcard_front)
+        self.flashcard.flag_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
+        self.flashcard.flag_mnemonic.grid(row=0, column=0, sticky='ne', padx=10, pady=10)
+        CustomTooltipLabel(self.flashcard.flag_mnemonic, text=f"Mnemotechnika flagi:\n{self.flag.meaning_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
+        self.flashcard.flag_mnemonic.bind("<Button-1>", self.show_flashcard_front)
+
+        self.flashcard.morse.morse_mnemonic = ctk.CTkLabel(self.flashcard.morse, text='', image=infoicon)
+        self.flashcard.morse.morse_mnemonic.pack(side="left")
+        CustomTooltipLabel(self.flashcard.morse.morse_mnemonic, text=f"Mnemotechnika morse-a:\n{self.flag.morse_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
+        self.flashcard.morse.morse_mnemonic.bind("<Button-1>", self.show_flashcard_front)
 
     def change_flag_index(self, index: int = 0):
         if (index not in range(0, len(self.flag_list))):

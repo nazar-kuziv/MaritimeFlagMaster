@@ -27,6 +27,7 @@ class Meanings(ctk.CTkFrame):
         self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list = {}
+        self.meaning_frame = None
 
         self.alphabet = Alphabet.get_single_flags_shuffled()
         self.flag_images = []
@@ -47,15 +48,19 @@ class Meanings(ctk.CTkFrame):
         for widget in self.top_menu.list.values():
             widget.destroy()
         self.top_menu.list = {}
+        if (self.meaning_frame is not None):
+            self.meaning_frame.destroy()
         try:
             self.input_frame.destroy()
         except AttributeError: pass
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        meaning_label = ctk.CTkLabel(self.top_menu, text=self.flag.meaning, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.012)), 
-                                     fg_color='transparent', wraplength=int(self.master.winfo_width()*0.28))
-        meaning_label.pack(side="left", padx=10)
+        self.meaning_frame = ctk.CTkFrame(self)
+        self.meaning_frame.pack()
+
+        meaning_label = ctk.CTkLabel(self.meaning_frame, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.017)), wraplength=int(self.master.winfo_width()*0.8))
+        meaning_label.pack(padx=5)
         self.top_menu.list["meaning_label"] = meaning_label
 
         check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
@@ -175,7 +180,7 @@ class Meanings(ctk.CTkFrame):
             
             self.selected_flags = []
             next_button = ctk.CTkButton(self.top_menu, text='Następny', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.increment_question)
-            next_button.pack(side="right", ipadx=10, ipady=10)
+            next_button.pack(side="right", ipadx=10, fill="y")
             self.top_menu.list["next_button"] = next_button
 
     def change_question(self, event=None, index: int = 0):

@@ -17,7 +17,7 @@ class MainWindow(ctk.CTk):
         # ctk.set_appearance_mode("Dark") # Dark, Light
 
         self.title("Maritime Flag Master")
-        self.geometry("1000x500")
+        self.geometry("1000x600")
         self.minsize(800, 400)
         # self.state('zoomed')
 

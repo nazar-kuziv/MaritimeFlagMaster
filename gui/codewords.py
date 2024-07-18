@@ -80,6 +80,7 @@ class Codewords(ctk.CTkFrame):
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(state="disabled")
             self.answer_cell.entry.unbind("<Return>")
+            self.master.bind("<Return>", lambda x: self.increment_question())
 
             # next button
             if (self.flag_index < len(self.flag_list)-1):
@@ -89,6 +90,7 @@ class Codewords(ctk.CTkFrame):
                 self.question_widgets.append(self.next_button)
     
     def change_question(self, index):
+        self.master.unbind("<Return>")
         self.flag_index = index
         self.flag = self.flag_list[self.flag_index]
         self.show_question()

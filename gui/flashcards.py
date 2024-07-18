@@ -130,12 +130,12 @@ class Flashcards(ctk.CTkFrame):
         infoicon = tksvg.SvgImage(file=Environment.resource_path("graphics/icons/info-icon.svg"), scaletoheight=int(self.master.scale_size*0.05))
         self.flashcard.flag_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
         self.flashcard.flag_mnemonic.grid(row=0, column=0, sticky='ne', padx=10, pady=10)
-        CustomTooltipLabel(self.flashcard.flag_mnemonic, text=f"Mnemotechnika flagi:\n{self.flag.flag_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
+        CustomTooltipLabel(self.flashcard.flag_mnemonic, text=f"Skojarzenie mnemotechniczne:\n{self.flag.flag_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
         self.flashcard.flag_mnemonic.bind("<Button-1>", self.show_flashcard_front)
 
         self.flashcard.morse.morse_mnemonic = ctk.CTkLabel(self.flashcard.morse, text='', image=infoicon)
         self.flashcard.morse.morse_mnemonic.pack(side="left")
-        CustomTooltipLabel(self.flashcard.morse.morse_mnemonic, text=f"Mnemotechnika morse-a:\n{self.flag.morse_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
+        CustomTooltipLabel(self.flashcard.morse.morse_mnemonic, text=f"Skojarzenie mnemotechniczne:\n{self.flag.morse_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
         self.flashcard.morse.morse_mnemonic.bind("<Button-1>", self.show_flashcard_front)
 
     def change_flag_index(self, index: int = 0):

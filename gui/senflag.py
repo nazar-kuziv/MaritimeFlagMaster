@@ -194,6 +194,8 @@ class SenFlag(ctk.CTkFrame):
         
         self.flag_input_box.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
         self.top_menu.list["check_button"].configure(state="enabled", cursor="hand2")
+        if (self.answer_response is not None):
+            self.answer_response.destroy()
 
     
     def delete_input_flag(self, event = None):
@@ -205,6 +207,8 @@ class SenFlag(ctk.CTkFrame):
             self.flag_input_box.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
             if (len(self.input_flags) <= 0):
                 self.top_menu.list["check_button"].configure(state="disabled", cursor='')
+            if (self.answer_response is not None):
+                self.answer_response.destroy()
 
     def check_answer(self):
         try:

@@ -87,8 +87,6 @@ class MainWindow(ctk.CTk):
             widget.destroy()
 
     def submenu(self, buttonNames: list[str], commands: list):
-        # for widget in self.winfo_children():
-        #     widget.destroy()
 
         self.sub_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.sub_frame.lower(self.main_frame)

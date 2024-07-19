@@ -170,7 +170,7 @@ class FlagSen(ctk.CTkFrame):
 
             # next button
             self.next_button = ctk.CTkButton(self, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=self.show_question)
-            self.next_button.grid(row=2, column=2)
+            self.next_button.grid(row=2, column=2, sticky="e", padx=10)
             self.question_widgets.append(self.next_button)
     
     def exit(self):

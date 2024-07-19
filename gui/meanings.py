@@ -68,7 +68,7 @@ class Meanings(ctk.CTkFrame):
         self.meaning_frame.pack()
 
         meaning_label = ctk.CTkLabel(self.meaning_frame, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.017)), wraplength=int(self.master.winfo_width()*0.8))
-        meaning_label.pack(padx=5)
+        meaning_label.pack(padx=5, pady=5)
         self.top_menu.dict["meaning_label"] = meaning_label
 
         check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")

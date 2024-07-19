@@ -24,9 +24,18 @@ class Meanings(ctk.CTkFrame):
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
+        self.top_menu.grid_columnconfigure(0, weight=1, uniform="yes")
+        self.top_menu.grid_columnconfigure(1, weight=1, uniform="yes")
+        self.top_menu.grid_columnconfigure(2, weight=1, uniform="yes")
+        self.top_menu.grid_columnconfigure(3, weight=1, uniform="yes")
+        self.top_menu.grid_columnconfigure(4, weight=1, uniform="yes")
+        self.top_menu.grid_columnconfigure(5, weight=1, uniform="yes")
+        self.top_menu.grid_columnconfigure(6, weight=1, uniform="yes")
+
         self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
-        self.top_menu.list = {}
+        self.top_menu.exit_button.grid(row=0, column=0, sticky="w", ipadx=10, ipady=10)
+        self.top_menu.dict = {}
+        self.meaning_frame = None
 
         self.alphabet = Alphabet.get_single_flags_shuffled()
         self.flag_images = []
@@ -44,23 +53,31 @@ class Meanings(ctk.CTkFrame):
         for widget in self.flag_images:
             widget.destroy()
         self.flag_images = []
-        for widget in self.top_menu.list.values():
+        for widget in self.top_menu.dict.values():
             widget.destroy()
-        self.top_menu.list = {}
+        self.top_menu.dict = {}
+        if (self.meaning_frame is not None):
+            self.meaning_frame.destroy()
         try:
             self.input_frame.destroy()
         except AttributeError: pass
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        meaning_label = ctk.CTkLabel(self.top_menu, text=self.flag.meaning, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.012)), 
-                                     fg_color='transparent', wraplength=int(self.master.winfo_width()*0.28))
-        meaning_label.pack(side="left", padx=10)
-        self.top_menu.list["meaning_label"] = meaning_label
+        self.meaning_frame = ctk.CTkFrame(self)
+        self.meaning_frame.pack()
+
+        meaning_label = ctk.CTkLabel(self.meaning_frame, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.017)), wraplength=int(self.master.winfo_width()*0.8))
+        meaning_label.pack(padx=5, pady=5)
+        self.top_menu.dict["meaning_label"] = meaning_label
 
         check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
-        check_button.pack(side="left", ipadx=10, ipady=10)
-        self.top_menu.list["check_button"] = check_button
+        check_button.grid(row=0, column=3, ipadx=10, ipady=10)
+        self.top_menu.dict["check_button"] = check_button
+
+        clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.clear_checked_flags, state="disabled")
+        clear_button.grid(row=0, column=4, ipadx=10, ipady=10)
+        self.top_menu.dict["clear_button"] = clear_button
 
         self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.input_frame.pack(side="bottom", fill="both", expand=True)
@@ -112,6 +129,7 @@ class Meanings(ctk.CTkFrame):
         """
         if (index < 0): return
         print(f"{len(self.selected_flags)}, {index}")
+        print(event.widget)
         if (index not in self.selected_flags):
             if (len(self.selected_flags) >= 3):
                 print("longer than 3")
@@ -125,8 +143,23 @@ class Meanings(ctk.CTkFrame):
             event.widget.master.configure(fg_color="transparent", text="")
             for i, indx in enumerate(self.selected_flags):
                 self.flag_images[indx].flag.configure(fg_color=f"green{4 - i}", text=(i+1), text_color=f"green{4 - i}")
-        if (len(self.selected_flags) > 0): self.top_menu.list["check_button"].configure(state="normal")
-        else: self.top_menu.list["check_button"].configure(state="disabled")
+        if (len(self.selected_flags) > 0):
+            [ x.configure(state="normal") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+        else: 
+            [ x.configure(state="disabled") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+        try:
+            self.top_menu.dict["answer"].destroy()
+        except (AttributeError, KeyError) as e: pass
+
+    def clear_checked_flags(self):
+        for index in self.selected_flags:
+            print("removing selection")
+            self.flag_images[index].flag.configure(fg_color="transparent", text="")
+        self.selected_flags.clear()
+        [ x.configure(state="disabled") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+        try:
+            self.top_menu.dict["answer"].destroy()
+        except (AttributeError, KeyError) as e: pass
 
     def check_answer(self):
         print(f"Checking, {self.flag}, {len(self.selected_flags)}")
@@ -159,24 +192,24 @@ class Meanings(ctk.CTkFrame):
     
     def show_answer(self, isCorrect: bool):
         try:
-            self.top_menu.list["answer"].destroy()
+            self.top_menu.dict["answer"].destroy()
         except (AttributeError, KeyError) as e: pass
         answer_text = "Poprawnie!" if isCorrect else "Źle"
         print(answer_text)
         answer = ctk.CTkLabel(self.top_menu, text=answer_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
-        answer.pack(side="left", padx=10)
-        self.top_menu.list["answer"] = answer
+        answer.grid(row=0, column=5, sticky="e", padx=10)
+        self.top_menu.dict["answer"] = answer
         
         if (isCorrect):
-            self.top_menu.list["check_button"].configure(state="disabled")
+            [ x.configure(state="disabled") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
             for f in self.flag_images:
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')
             
             self.selected_flags = []
             next_button = ctk.CTkButton(self.top_menu, text='Następny', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.increment_question)
-            next_button.pack(side="right", ipadx=10, ipady=10)
-            self.top_menu.list["next_button"] = next_button
+            next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
+            self.top_menu.dict["next_button"] = next_button
 
     def change_question(self, event=None, index: int = 0):
         if (index not in range(0, len(self.flag_list))):

@@ -17,7 +17,7 @@ class MainWindow(ctk.CTk):
         # ctk.set_appearance_mode("Dark") # Dark, Light
 
         self.title("Maritime Flag Master")
-        self.geometry("1000x500")
+        self.geometry("1000x600")
         self.minsize(800, 400)
         # self.state('zoomed')
 
@@ -87,8 +87,6 @@ class MainWindow(ctk.CTk):
             widget.destroy()
 
     def submenu(self, buttonNames: list[str], commands: list):
-        # for widget in self.winfo_children():
-        #     widget.destroy()
 
         self.sub_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.sub_frame.lower(self.main_frame)

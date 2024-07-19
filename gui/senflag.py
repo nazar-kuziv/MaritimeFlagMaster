@@ -110,14 +110,14 @@ class SenFlag(ctk.CTkFrame):
         check_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list["check_button"] = check_button
 
-        self.input_parent = ctk.CTkFrame(self, height=int(self.winfo_width()*0.1), fg_color="transparent")
+        self.input_parent = ctk.CTkFrame(self, height=int(self.master.scale_size*0.05), fg_color="transparent")
         self.input_parent.pack(side="top", fill="x", padx=10)
+        self.text_length = ctk.CTkLabel(self.input_parent, text=f"0/{len(self.sentence.cleaned_sentence)}", font=ctk.CTkFont(size=int(self.winfo_width()*0.013)), justify="right", 
+                                                       height=int(self.master.scale_size*0.055), fg_color='transparent')
+        self.text_length.pack(side="left", padx=(0, 5))
         self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, height=int(self.master.scale_size*0.05), orientation="horizontal")
         self.master.bind("<BackSpace>", self.delete_input_flag)
-        self.flag_input_box.pack(side="top", fill="x")
-        self.flag_input_box.text_length = ctk.CTkLabel(self.flag_input_box, text=f"0/{len(self.sentence.cleaned_sentence)}", font=ctk.CTkFont(size=int(self.winfo_width()*0.013)), justify="right", 
-                                                       height=int(self.master.scale_size*0.055), width=int(self.winfo_width()*0.05), fg_color='transparent')
-        self.flag_input_box.text_length.pack(side="left", padx=10)
+        self.flag_input_box.pack(side="left", fill="x", expand=True)
 
         self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.input_frame.pack(side="top", fill="both", expand=True)
@@ -192,10 +192,11 @@ class SenFlag(ctk.CTkFrame):
             self.input_flags.append(new_input_flag)
             self.answer_flags.append(self.alphabet[index])
         
-        self.flag_input_box.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
+        self.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
         self.top_menu.list["check_button"].configure(state="enabled", cursor="hand2")
-        if (self.answer_response is not None):
+        try:
             self.answer_response.destroy()
+        except AttributeError: pass
 
     
     def delete_input_flag(self, event = None):
@@ -204,7 +205,7 @@ class SenFlag(ctk.CTkFrame):
             flag = self.input_flags.pop()
             flag.destroy()
             self.answer_flags.pop()
-            self.flag_input_box.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
+            self.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
             if (len(self.input_flags) <= 0):
                 self.top_menu.list["check_button"].configure(state="disabled", cursor='')
             if (self.answer_response is not None):
@@ -218,12 +219,12 @@ class SenFlag(ctk.CTkFrame):
         
         if (not self.sentence.check_flags(self.answer_flags)):
             print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self.top_menu, text="Źle", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.02)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self.top_menu, text="Źle", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)
             self.top_menu.list["answer_response"] = self.answer_response
         else:
             print("Correct answer!")
-            self.answer_response = ctk.CTkLabel(self.top_menu, text="Poprawnie!", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.02)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self.top_menu, text="Poprawnie!", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)
             self.top_menu.list["answer_response"] = self.answer_response
 
@@ -233,9 +234,18 @@ class SenFlag(ctk.CTkFrame):
                 f.flag.configure(cursor='')
             
             # next button
-            self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.02)), command=self.show_question)
+            self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.show_question)
             self.next_button.pack(side="right", fill='y')
             self.top_menu.list["new_sentence"] = self.next_button
+
+            def save_image():
+                if (Alphabet.saveFlagSentencePNG(self.sentence.flags)):
+                    label = ctk.CTkLabel(self.input_parent, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
+                    label.pack(side="right", padx=10)
+                    label.after(4000, lambda: label.destroy())
+        
+            self.save_image = ctk.CTkButton(self.input_parent, text='Zapisz jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
+            self.save_image.pack(side="right", ipadx=10, ipady=10, padx=10, pady=10)
     
     def exit(self):
         self.master.unbind("<BackSpace>")

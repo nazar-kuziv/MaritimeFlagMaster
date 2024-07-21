@@ -79,10 +79,10 @@ class Flashcards(ctk.CTkFrame):
             self.flashcard.grid_columnconfigure(i, weight=1)
             if (self.flashcard.winfo_height() < self.flashcard.winfo_width() * len(self.flags)):
                 print("height smaller than width")
-                img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{flag.img_path}"), scaletoheight=int(self.flashcard.winfo_height()*0.9/len(self.flags)))
+                img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletoheight=int(self.flashcard.winfo_height()*0.9/len(self.flags)))
             else:
                 print("height bigger than width")
-                img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{flag.img_path}"), scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
+                img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
             label.grid(row=0, column=i, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_back)
@@ -127,7 +127,7 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.morse.morse_code.bind("<Button-1>", self.show_flashcard_front)
         if (text == ""): return
 
-        infoicon = tksvg.SvgImage(file=Environment.resource_path("graphics/icons/info-icon.svg"), scaletoheight=int(self.master.scale_size*0.05))
+        infoicon = tksvg.SvgImage(file=Environment.resource_path("static/graphics/icons/info-icon.svg"), scaletoheight=int(self.master.scale_size*0.05))
         self.flashcard.flag_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
         self.flashcard.flag_mnemonic.grid(row=0, column=0, sticky='ne', padx=10, pady=10)
         CustomTooltipLabel(self.flashcard.flag_mnemonic, text=f"Skojarzenie mnemotechniczne:\n{self.flag.flag_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")

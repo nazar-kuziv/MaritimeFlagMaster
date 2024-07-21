@@ -42,7 +42,7 @@ class Codewords(ctk.CTkFrame):
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         
-        img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{self.flag.img_path}"), scaletoheight=int(self.master.scale_size*0.5))
+        img = tksvg.SvgImage(file=Environment.resource_path(self.flag.img_path), scaletoheight=int(self.master.scale_size*0.5))
         self.image = ctk.CTkLabel(self, text='', image=img)
         self.image.grid(row=1, column=0, columnspan=3, sticky="n")
         self.question_widgets.append(self.image)

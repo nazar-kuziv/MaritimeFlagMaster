@@ -17,7 +17,7 @@ class Translator:
         """
         Translator._locale = locale
         if file_format in Translator._supported_format:
-            files = glob.glob(os.path.join('data', f'*.{file_format}'))
+            files = glob.glob(os.path.join('static/locales', f'*.{file_format}'))
             for fil in files:
                 file_name_without_extension = os.path.splitext(os.path.basename(fil))[0]
                 with open(fil, 'r', encoding='utf8') as f:

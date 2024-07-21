@@ -2,8 +2,7 @@ import copy
 import random
 import re
 import requests
-from tkinter import filedialog
-from tkinter.filedialog import askopenfilename
+from customtkinter import filedialog
 
 from PIL import Image as PILImage
 
@@ -13,108 +12,109 @@ from logic.flags import Flag, FlagMultiple, FlagSentence
 
 
 class Alphabet:
-    _characters = {'A': Flag('Alfa', 'flags/letters/Alfa.svg',
+    _characters = {'A': Flag('Alfa', 'static/graphics/flags/letters/Alfa.svg',
                              'Mam nurka pod wodą; trzymajcie się z dala i idźcie powoli',
                              "Anioł bo biało niebieski", "• ▬", "a-zot"),
-                   'B': Flag('Bravo', 'flags/letters/Bravo.svg',
+                   'B': Flag('Bravo', 'static/graphics/flags/letters/Bravo.svg',
                              'Ładuję, wyładowuję albo mam na statku ładunki niebezpieczne',
                              "Bolszewik bo czerwony", "▬ • • •", "bo-ta-ni-ka"),
-                   'C': Flag('Charlie', 'flags/letters/Charlie.svg',
+                   'C': Flag('Charlie', 'static/graphics/flags/letters/Charlie.svg',
                              'Tak (potwierdzenie albo "znaczenie poprzedzającej grupy powinno być zrozumiane w trybie twierdzącym")',
                              'Ciastko tortowe', '▬ • ▬ •', "co-raz moc-niej"),
-                   'D': Flag('Delta', 'flags/letters/Delta.svg',
+                   'D': Flag('Delta', 'static/graphics/flags/letters/Delta.svg',
                              'Trzymajcie się z dala ode mnie; manewruję z trudnością',
                              'Dunaj, rzeka a na brzegach plaże', '▬ • •', "do-li-na"),
-                   'E': Flag('Echo', 'flags/letters/Echo.svg',
+                   'E': Flag('Echo', 'static/graphics/flags/letters/Echo.svg',
                              'Zmieniam swój kurs w prawo (sterburta)',
                              'Ewa niebieskie oczy czerwone usta', '•', "Ełk"),
-                   'F': Flag('Foxtrot', 'flags/letters/Foxtrot.svg',
+                   'F': Flag('Foxtrot', 'static/graphics/flags/letters/Foxtrot.svg',
                              'Jestem niezdolny do ruchu; nawiążcie łączność ze mną',
                              'Fikuśny kwadrat', '• • ▬ •', "fi-lan-tro-pia"),
-                   'G': Flag('Golf', 'flags/letters/Golf.svg',
+                   'G': Flag('Golf', 'static/graphics/flags/letters/Golf.svg',
                              'Potrzebuję pilota\n\nNadany przez statek rybacki: wybieram sieci.',
                              'Gówno za płotem', '▬ ▬ •', "go-spo-da"),
-                   'H': Flag('Hotel', 'flags/letters/Hotel.svg',
+                   'H': Flag('Hotel', 'static/graphics/flags/letters/Hotel.svg',
                              'Mam pilota na statku',
                              'Halina polska dziewczyna', '• • • •', "ha-la-bar-da"),
-                   'I': Flag('India', 'flags/letters/India.svg',
+                   'I': Flag('India', 'static/graphics/flags/letters/India.svg',
                              'Zmieniam swój kurs w lewo (bakburta)',
                              'Igła lub Ippon(Japonia)', '• •', "i-gła"),
-                   'J': Flag('Juliett', 'flags/letters/Juliett.svg',
+                   'J': Flag('Juliett', 'static/graphics/flags/letters/Juliett.svg',
                              'Mam pożar i niebezpieczny ładunek na statku, trzymajcie sie z dala ode mnie',
                              'Jastarnia - półwysep a z obu stron woda', '• ▬ ▬ ▬', "je-dno-kon-no"),
-                   'K': Flag('Kilo', 'flags/letters/Kilo.svg',
+                   'K': Flag('Kilo', 'static/graphics/flags/letters/Kilo.svg',
                              'Pragne nawiązać z wami łączność',
                              'Kołobrzeg, plaża i morze', '▬ • ▬', "ko-la-no"),
-                   'L': Flag('Lima', 'flags/letters/Lima.svg',
+                   'L': Flag('Lima', 'static/graphics/flags/letters/Lima.svg',
                              'Zatrzymajcie natychmiast wasz statek',
                              'Lotnik (szachownica, ale nie białoczerwona)', '• ▬ ▬ ▬', "Le-o-ni-das"),
-                   'M': Flag('Mike', 'flags/letters/Mike.svg',
+                   'M': Flag('Mike', 'static/graphics/flags/letters/Mike.svg',
                              'Zatrzymałem mój statek i nie posuwam się po wodzie',
                              'Miecze', '▬ ▬', "mo-tor"),
-                   'N': Flag('November', 'flags/letters/November.svg',
+                   'N': Flag('November', 'static/graphics/flags/letters/November.svg',
                              'Nie (zaprzeczenie albo "znaczenie poprzedzającej grupy powinno być zrozumiane w trybie przeczącym")',
                              'Nie gram w szachy', '▬ •', "no-ga"),
-                   'O': Flag('Oscar', 'flags/letters/Oscar.svg',
+                   'O': Flag('Oscar', 'static/graphics/flags/letters/Oscar.svg',
                              'Człowiek za burtą',
                              'Ogień na dachu', '▬ ▬ ▬', "O-po-czno"),
-                   'P': Flag('Papa', 'flags/letters/Papa.svg',
+                   'P': Flag('Papa', 'static/graphics/flags/letters/Papa.svg',
                              'W porcie: zameldować się na statku (wychodzimy w morze)\n\nNa morzu: moje sieci zaczepiły o przeszkodę',
                              'Port', '• ▬ ▬ •', "Pe-lo-po-nez"),
-                   'Q': Flag('Quebec', 'flags/letters/Quebec.svg',
+                   'Q': Flag('Quebec', 'static/graphics/flags/letters/Quebec.svg',
                              'Mój statek jest zdrowy i proszę o prawo zdolności ruchów',
                              'Qrczak cały żółty', '▬ ▬ • ▬', "Qo-spo-dar-stwo"),
-                   'R': Flag('Romeo', 'flags/letters/Romeo.svg',
+                   'R': Flag('Romeo', 'static/graphics/flags/letters/Romeo.svg',
                              'Brak znaczenia pojedynczej litery',
                              'Rycerz(„Złoty Krzyżak”)', '• ▬ •', "re-for-ma"),
-                   'S': Flag('Sierra', 'flags/letters/Sierra.svg',
+                   'S': Flag('Sierra', 'static/graphics/flags/letters/Sierra.svg',
                              'Moje maszyny pracują wstecz',
                              'Sadzawka, Studnia', '• • •', "Sa-ha-ra"),
-                   'T': Flag('Tango', 'flags/letters/Tango.svg',
+                   'T': Flag('Tango', 'static/graphics/flags/letters/Tango.svg',
                              'Trzymajcie się z dala ode mnie; jestem zajęty trałowaniem we dwójkę',
                              'Tuluza miasto we Francji', '▬', "ton"),
-                   'U': Flag('Uniform', 'flags/letters/Uniform.svg',
+                   'U': Flag('Uniform', 'static/graphics/flags/letters/Uniform.svg',
                              'Kierujecie się ku niebezpieczeństwu',
                              'U lotnika', '• • ▬', "Ur-bi-no"),
-                   'V': Flag('Victor', 'flags/letters/Victor.svg',
+                   'V': Flag('Victor', 'static/graphics/flags/letters/Victor.svg',
                              'Potrzebuję pomocy',
                              'V', '• • • ▬', "Vin-cent van Gogh"),
-                   'W': Flag('Whiskey', 'flags/letters/Whiskey.svg',
+                   'W': Flag('Whiskey', 'static/graphics/flags/letters/Whiskey.svg',
                              'Potrzebuję pomocy lekarskiej',
                              'Wojna w porcie', '• ▬ ▬', "wi-no-rośl"),
-                   'X': Flag('X-ray', 'flags/letters/X-ray.svg',
+                   'X': Flag('X-ray', 'static/graphics/flags/letters/X-ray.svg',
                              'Wstrzymajcie się z wykonywaniem waszych zamierzeń i uważajcie na moje sygnały',
                              'Xsiądz', '▬ • • ▬', "Xo-chi-mil-co"),
-                   'Y': Flag('Yankee', 'flags/letters/Yankee.svg',
+                   'Y': Flag('Yankee', 'static/graphics/flags/letters/Yankee.svg',
                              'Wlokę moją kotwicę',
                              'Yayecznica', '▬ • ▬ ▬', "York Hull, Oks-ford"),
-                   'Z': Flag('Zulu', 'flags/letters/Zulu.svg',
+                   'Z': Flag('Zulu', 'static/graphics/flags/letters/Zulu.svg',
                              'Potrzebuję holownika\n\nStatki rybackie: wydaję sieci',
                              'Zlepek kolorów', '▬ ▬ • •', "zło-to-list-na"),
-                   '0': Flag('Nadazero', 'flags/digits/0.svg', 'Zero',
+                   '0': Flag('Nadazero', 'static/graphics/flags/digits/0.svg', 'Zero',
                              'Zero w Yayecznicy (bo wpadło...)', '▬ ▬ ▬ ▬ ▬', "5 kresek"),
-                   '1': Flag('Unaone', 'flags/digits/1.svg', 'Jeden',
+                   '1': Flag('Unaone', 'static/graphics/flags/digits/1.svg', 'Jeden',
                              'Jeden Japoniec', '• ▬ ▬ ▬ ▬', "1 kropka i same kreski"),
-                   '2': Flag('Bissotwo', 'flags/digits/2.svg', 'Dwa',
+                   '2': Flag('Bissotwo', 'static/graphics/flags/digits/2.svg', 'Dwa',
                              'Dwa (bo nie Japoniec?)', '• • ▬ ▬ ▬', "2 kropki i same kreski"),
-                   '3': Flag('Terrathree', 'flags/digits/3.svg', 'Trzy',
+                   '3': Flag('Terrathree', 'static/graphics/flags/digits/3.svg', 'Trzy',
                              'Tróbarwna Francuska(Tuluza)', '• • • ▬ ▬', "3 kropki i same kreski"),
-                   '4': Flag('Kartefour', 'flags/digits/4.svg', 'Cztery',
+                   '4': Flag('Kartefour', 'static/graphics/flags/digits/4.svg', 'Cztery',
                              'Cztery białe ramiona (krzyża)', '• • • • ▬', "4 kropki i kreska"),
-                   '5': Flag('Pantafive', 'flags/digits/5.svg', 'Pięć',
+                   '5': Flag('Pantafive', 'static/graphics/flags/digits/5.svg', 'Pięć',
                              'Piątka w Kołobrzegu', '• • • • •', "5 kropek"),
-                   '6': Flag('Soxisix', 'flags/digits/6.svg', 'Sześć',
+                   '6': Flag('Soxisix', 'static/graphics/flags/digits/6.svg', 'Sześć',
                              'Sześciu Murzynów na sniegu', '▬ • • • •', "1 kreska i same kropki"),
-                   '7': Flag('Setteseven', 'flags/digits/7.svg', 'Siedem',
+                   '7': Flag('Setteseven', 'static/graphics/flags/digits/7.svg', 'Siedem',
                              'Siódemka Warszawska', '▬ ▬ • • •', "2 kreski i same kropki"),
-                   '8': Flag('Oktoeight', 'flags/digits/8.svg', 'Osiem',
+                   '8': Flag('Oktoeight', 'static/graphics/flags/digits/8.svg', 'Osiem',
                              'Osiem czerwonych, bo podwójnie?', '▬ ▬ ▬ • •', "3 kreski i same kropki"),
-                   '9': Flag('Novenine', 'flags/digits/9.svg', 'Dziewięć',
+                   '9': Flag('Novenine', 'static/graphics/flags/digits/9.svg', 'Dziewięć',
                              'Dziewięć 6+7 po barwach - 4 pola', '▬ ▬ ▬ ▬ •', "4 kreski i kropka")}
-    _additionalFlags = {'?': Flag('?', 'flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', '', ''),
-                        '!': Flag('!', 'flags/other/Repeat_One.svg', 'Zastępcza 1', '', '', ''),
-                        '@"': Flag('@"', 'flags/other/Repeat_Two.svg', 'Zastępcza 2', '', '', ''),
-                        '#£': Flag('#£', 'flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '', '')}
+    _additionalFlags = {
+        '?': Flag('?', 'static/graphics/flags/other/Answer.svg', 'Flaga wywoławcza pytania i odpowiedzi', '', '', ''),
+        '!': Flag('!', 'static/graphics/flags/other/Repeat_One.svg', 'Zastępcza 1', '', '', ''),
+        '@"': Flag('@"', 'static/graphics/flags/other/Repeat_Two.svg', 'Zastępcza 2', '', '', ''),
+        '#£': Flag('#£', 'static/graphics/flags/other/Repeat_Three.svg', 'Zastępcza 3', '', '', '')}
     _multipleFlags = [FlagMultiple([_characters['A'], _characters['C']], 'Opuszczam mój statek'),
                       FlagMultiple([_characters['A'], _characters['D']],
                                    'Opuszczam mój statek, który ucierpiał w wypadku nuklearnym i stanowi potencjalne źródło niebezpieczeństwa promieniowania'),
@@ -322,7 +322,7 @@ class Alphabet:
         :rtype: bool | None
         """
         Alphabet._sentences_from_user_file = []
-        filename = askopenfilename(filetypes=[("Text files", "*.txt")])
+        filename = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
         try:
             if not filename:
                 return None
@@ -403,7 +403,7 @@ class Alphabet:
                 if flag is None:
                     png_files.append(None)
                 else:
-                    png_files.append('graphics/' + flag.png_img_path)
+                    png_files.append(flag.png_img_path)
 
             max_rows = 0
             max_columns = 0

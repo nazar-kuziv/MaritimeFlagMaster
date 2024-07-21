@@ -113,9 +113,9 @@ class FlagSen(ctk.CTkFrame):
         for i, flag in enumerate(self.sentence.flags):
             img = None
             if (self.master.winfo_height() < self.master.winfo_width()):
-                img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{flag.img_path}"), scaletoheight=int(self.master.scale_size*0.1)) if (flag is not None) else None
+                img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletoheight=int(self.master.scale_size*0.1)) if (flag is not None) else None
             else:
-                img = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{flag.img_path}"), scaletowidth=int(self.master.scale_size*0.05)) if (flag is not None) else None
+                img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.master.scale_size*0.05)) if (flag is not None) else None
             image = ctk.CTkLabel(self.flag_sentence, text='', image=img, fg_color="transparent")
             image.grid(row=math.floor(i/(flag_columns+1)), column=(i%(flag_columns+1)), padx=2, pady=10)
             self.flag_sentence.flags.append(image)

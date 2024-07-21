@@ -98,9 +98,9 @@ class MakeImage(ctk.CTkFrame):
 
         for f in self.alphabet:
             if (self.master.winfo_height() < self.master.winfo_width()):
-                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
+                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
             else:
-                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
+                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
             
         
         self.place_input_flags()
@@ -149,7 +149,7 @@ class MakeImage(ctk.CTkFrame):
             if (event is not None):
                 self.top_menu.input_text.insert('end', ' ')
         else:
-            input_image = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{self.alphabet[index].img_path}"), scaletoheight=int(self.master.scale_size*0.04))
+            input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[index].img_path), scaletoheight=int(self.master.scale_size*0.04))
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
             new_input_flag.pack(side="left", padx=1)
             self.input_images.insert(pos, new_input_flag)

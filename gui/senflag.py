@@ -133,9 +133,9 @@ class SenFlag(ctk.CTkFrame):
         if (len(self.images) == 0):
             for f in self.alphabet:
                 if (self.master.winfo_height() < self.master.winfo_width()):
-                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
+                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
                 else:
-                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
+                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
         else:
             temp = list(zip(self.images, self.alphabet))
             random.shuffle(temp)
@@ -186,7 +186,7 @@ class SenFlag(ctk.CTkFrame):
             self.input_flags.append(new_input_flag)
             self.answer_flags.append(None)
         else:
-            input_image = tksvg.SvgImage(file=Environment.resource_path(f"graphics/{self.alphabet[index].img_path}"), scaletoheight=int(self.master.scale_size*0.04))
+            input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[index].img_path), scaletoheight=int(self.master.scale_size*0.04))
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
             new_input_flag.pack(side="left", padx=1)
             self.input_flags.append(new_input_flag)

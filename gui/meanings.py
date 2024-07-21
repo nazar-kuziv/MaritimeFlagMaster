@@ -93,9 +93,9 @@ class Meanings(ctk.CTkFrame):
         if (len(self.images) == 0):
             for f in self.alphabet:
                 if (self.master.winfo_height() < self.master.winfo_width()):
-                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
+                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
                 else:
-                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f"graphics/{f.img_path}"), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
+                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
         else:
             temp = list(zip(self.images, self.alphabet))
             random.shuffle(temp)

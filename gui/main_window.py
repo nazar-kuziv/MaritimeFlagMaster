@@ -12,6 +12,7 @@ from .util_functions import *
 class MainWindow(ctk.CTk):
     """Class for initializing the main window
     """
+
     def __init__(self):
         super().__init__()
         # ctk.set_appearance_mode("Dark") # Dark, Light
@@ -26,10 +27,27 @@ class MainWindow(ctk.CTk):
 
         self.about_window = None
 
+        self.tests_submenu = {
+            "buttonNames": ["Słowo kodowe\n\nDopasuj słowo kodowe MKS do flagi", 
+            "Znaczenie\n\nDopasuj flagi do komunikatu", 
+            "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
+            "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
+            "commands": [lambda: self.new_menu(Codewords), 
+            lambda: self.new_menu(Meanings), 
+            lambda: self.new_menu(FlagSen), 
+            lambda: self.new_menu(SenFlag),]
+        }
+    
     def main_menu(self):
         # self.bind("<Configure>", change_scale_size)
         previous_widgets = self.winfo_children()
         self.update()
+
+        self.breadcrumb = BreadcrumbTrail(self,
+            page_names=["Start"],
+            page_functions=[None]
+        )
+        self.breadcrumb.pack(anchor="nw")
 
         self.main_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.main_frame.lower()
@@ -54,7 +72,7 @@ class MainWindow(ctk.CTk):
         self.about = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         self.about.place(anchor="ne", rely=0, relx=1)
         self.about.button = ctk.CTkButton(self.about, text='O aplikacji', font = ctk.CTkFont(size=int(self.winfo_width()*0.013)), width=0, command=open_about_window)
-        self.about.button.pack(padx=5, pady=5)
+        self.about.button.pack(padx=5)
 
         self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         self.button_frame.pack(fill="both", expand=True, padx=10, pady=10,)
@@ -63,16 +81,7 @@ class MainWindow(ctk.CTk):
                  "Testy\n\nSprawdź się!",
                  "Stwórz zdjęcie\n\nZłóż własny komunikat za pomocą flag"]
         commands = [lambda: self.new_menu(Flashcards),
-                    lambda: self.submenu(
-                        ["Słowo kodowe\n\nDopasuj słowo kodowe MKS do flagi", 
-                       "Znaczenie\n\nDopasuj flagi do komunikatu", 
-                       "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
-                       "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
-                       [lambda: self.new_menu(Codewords), 
-                        lambda: self.new_menu(Meanings), 
-                        lambda: self.new_menu(FlagSen), 
-                        lambda: self.new_menu(SenFlag),]
-                    ),
+                    lambda: self.submenu(**self.tests_submenu),
                     lambda: self.new_menu(MakeImage)]
         self.button = [None] * len(buttonNames)
         for i in range(len(buttonNames)):

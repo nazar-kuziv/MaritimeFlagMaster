@@ -5,6 +5,7 @@ from custom_hovertip import CustomTooltipLabel
 from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
+from .util_functions import *
 
 class Flashcards(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -21,8 +22,14 @@ class Flashcards(ctk.CTkFrame):
         # self.flag_list = [Alphabet._characters['6']]
         # self.flag_list = [Alphabet._allFlags[7]]
 
-        self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        self.exit_button.pack(side="top", anchor="nw", ipadx=10, ipady=10, padx=10, pady=10)
+        # self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
+        # self.exit_button.pack(side="top", anchor="nw", ipadx=10, ipady=10, padx=10, pady=10)
+
+        self.breadcrumb = BreadcrumbTrail(self,
+            page_names=["Start", "Fiszki"],
+            page_functions=[lambda: self.exit(self.master.main_menu), None]
+        )
+        self.breadcrumb.pack(side="top", anchor="nw")
 
         self.flag_index = 0
         self.create_flashcard(self.flag_list[self.flag_index])
@@ -150,7 +157,7 @@ class Flashcards(ctk.CTkFrame):
         """
         self.change_flag_index(index=self.flag_index + number)
     
-    def exit(self):
-        self.master.main_menu()
+    def exit(self, function):
+        function()
         self.destroy()
 

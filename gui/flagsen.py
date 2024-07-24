@@ -41,7 +41,7 @@ class FlagSen(ctk.CTkFrame):
         self.question_widgets.append(self.choice_menu)
 
         self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                                  command=lambda: self.flag_sentence_method(Alphabet.get_flag_sentence_from_api))
+                                                  command=lambda: self.flag_sentence_mode_method(Alphabet.get_flag_sentence_from_api))
         self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
         
         self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
@@ -54,13 +54,35 @@ class FlagSen(ctk.CTkFrame):
         if (isLoaded is None):
             pass
         elif (not isLoaded):
-            self.flag_sentence_method(lambda: "Didn't load")
+            self.flag_sentence_mode_method(lambda: "Didn't load")
         else:
-            self.flag_sentence_method(next_method)
+            self.flag_sentence_mode_method(next_method)
 
-    def flag_sentence_method(self, method):
+    def flag_sentence_mode_method(self, method):
         self.get_flag_sentence_method = method
+        message = self.get_new_sentence()
+        if (message is not None):
+            error_message = ctk.CTkLabel(self, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
+            error_message.grid(row=0, column=1, rowspan=2)
+            return
         self.show_question()
+    
+    def get_new_sentence(self):
+        error_text = None
+        self.sentence = self.get_flag_sentence_method()
+        # self.sentence = NO_INTERNET_CONNECTION
+
+        if (isinstance(self.sentence, str) or self.sentence is None):
+            print("Didn't get new sentence, ", self.sentence)
+            if (self.sentence == REQUEST_LIMIT_EXCEEDED):
+                error_text = "Limit zapytań cytatów został osiągnięty, prosimy chwilę poczekać."
+            elif (self.sentence == NO_INTERNET_CONNECTION):
+                error_text = "Brak połączenia z internetem."
+            else:
+                error_text = "Błąd czytania z pliku."
+            return error_text
+
+        print(self.sentence.cleaned_sentence)
 
     def show_question(self):
         """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
@@ -80,24 +102,6 @@ class FlagSen(ctk.CTkFrame):
         
         self.save_image = ctk.CTkButton(self, text='Zapisz obecne jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
         self.save_image.grid(column=2, row=0, sticky="ne", ipadx=10, ipady=10, padx=10, pady=10)
-        
-        self.sentence = self.get_flag_sentence_method()
-        # self.sentence = NO_INTERNET_CONNECTION
-
-        if (isinstance(self.sentence, str) or self.sentence is None):
-            print("Didn't get request, ", self.sentence)
-            if (self.sentence == REQUEST_LIMIT_EXCEEDED):
-                error_text = "Limit zapytań cytatów został osiągnięty, prosimy chwilę poczekać."
-            elif (self.sentence == NO_INTERNET_CONNECTION):
-                error_text = "Brak połączenia z internetem."
-            else:
-                error_text = "Błąd czytania z pliku."
-            error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
-            error_message.grid(row=0, column=1, rowspan=2)
-            loading_label.destroy()
-            return
-
-        print(self.sentence.cleaned_sentence)
 
         self.flag_sentence = ctk.CTkFrame(self, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
@@ -168,6 +172,14 @@ class FlagSen(ctk.CTkFrame):
             self.answer_cell.submit_button.configure(state="disabled")
             self.answer_cell.entry.unbind("<Return>")
 
+            message = self.get_new_sentence()
+            if (message == "Błąd czytania z pliku."):
+                return
+            elif (message is not None):
+                error_message = ctk.CTkLabel(self, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
+                error_message.grid(row=0, column=1, rowspan=2)
+                return
+            
             # next button
             self.next_button = ctk.CTkButton(self, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=self.show_question)
             self.next_button.grid(row=2, column=2, sticky="e", padx=10)

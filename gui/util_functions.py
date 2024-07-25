@@ -10,12 +10,23 @@ import inspect
 #         event.widget.scale_size = event.height if event.height < event.width else event.width
 #         print(event.widget.scale_size)
 
+def get_scale_size(widget: ctk.CTkBaseClass) -> int:
+    """Calculates and returns the scaling size to which to adjust element sizes
+
+    :param widget: Any ctk widget
+    :type widget: ctk.CTkBaseClass
+    :return: Scale size
+    :rtype: int
+    """
+    root = widget.winfo_toplevel()
+    return root.winfo_height() if (root.winfo_height() < root.winfo_width()) else root.winfo_width()
+
 class AppPage(ABC):
     """Abstract class of every CTkFrame that acts as a new application page (e.g. for breadcrumbs)
     """
     @abstractmethod
-    def __init__(self, page_name: str = "Start"):
-        add_breadcrumb(page_name, self)
+    def __init__(self, page_name: str):
+        add_breadcrumb(page_name, self.__class__)
 
     @abstractmethod
     def start(self):

@@ -159,6 +159,6 @@ class Flashcards(ctk.CTkFrame, Util.AppPage):
     
     def exit(self, to_class: Util.AppPage):
         print("exiting flashcards page...")
-        to_class.start()
+        new_page = to_class(self.winfo_toplevel(), fg_color="transparent")
         self.destroy()
 

@@ -7,14 +7,15 @@ from .meanings import Meanings
 from .flagsen import FlagSen
 from .senflag import SenFlag
 from .makeimage import MakeImage
-from .util_functions import *
+import gui.util_functions as Util
 
-class MainWindow(ctk.CTk):
+class MainWindow(ctk.CTk, Util.AppPage):
     """Class for initializing the main window
     """
 
     def __init__(self):
-        super().__init__()
+        ctk.CTk.__init__(self)
+        Util.AppPage.__init__(self, "Start")
         # ctk.set_appearance_mode("Dark") # Dark, Light
 
         self.title("Maritime Flag Master")
@@ -22,7 +23,6 @@ class MainWindow(ctk.CTk):
         self.minsize(800, 400)
         # self.state('zoomed')
 
-        self.main_menu()
         self.scale_size = self.winfo_height() if (self.winfo_height() < self.winfo_width()) else self.winfo_width()
 
         self.about_window = None
@@ -32,29 +32,29 @@ class MainWindow(ctk.CTk):
             "Znaczenie\n\nDopasuj flagi do komunikatu", 
             "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
             "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
-            "commands": [lambda: self.new_menu(Codewords), 
-            lambda: self.new_menu(Meanings), 
-            lambda: self.new_menu(FlagSen), 
-            lambda: self.new_menu(SenFlag),]
+            "commands": [lambda: self.new_page(Codewords), 
+            lambda: self.new_page(Meanings), 
+            lambda: self.new_page(FlagSen), 
+            lambda: self.new_page(SenFlag),]
         }
+
+        self.start()
+    
+    def start(self):
+        self.previous_widgets = self.winfo_children()
+        Util.AppPage.start(self)
+        self.main_menu()
     
     def main_menu(self):
         # self.bind("<Configure>", change_scale_size)
-        previous_widgets = self.winfo_children()
         self.update()
-
-        self.breadcrumb = BreadcrumbTrail(self,
-            page_names=["Start"],
-            page_functions=[None]
-        )
-        self.breadcrumb.pack(anchor="nw")
 
         self.main_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.main_frame.lower()
-        self.main_frame.place(relwidth=1, relheight=1)
+        self.main_frame.pack(fill="both", expand=True)
 
         self.title_frame = ctk.CTkFrame(self.main_frame, fg_color='transparent')
-        self.title_frame.pack(pady=(20, 0))
+        self.title_frame.pack(pady=(10, 0))
         self.welcome_to = ctk.CTkLabel(self.title_frame, text='Witamy w ', 
                                        font=ctk.CTkFont(size=int(self.winfo_width()*0.017)), fg_color='transparent')
         self.welcome_to.pack(side="left")
@@ -69,10 +69,8 @@ class MainWindow(ctk.CTk):
             else:
                 self.about_window.focus()
         
-        self.about = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.about.place(anchor="ne", rely=0, relx=1)
-        self.about.button = ctk.CTkButton(self.about, text='O aplikacji', font = ctk.CTkFont(size=int(self.winfo_width()*0.013)), width=0, command=open_about_window)
-        self.about.button.pack(padx=5)
+        self.about = ctk.CTkButton(self.top_menu, text='O aplikacji', font = ctk.CTkFont(size=int(self.winfo_width()*0.013)), width=0, command=open_about_window)
+        self.about.pack(side="right", padx=5)
 
         self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         self.button_frame.pack(fill="both", expand=True, padx=10, pady=10,)
@@ -80,9 +78,9 @@ class MainWindow(ctk.CTk):
         buttonNames = ["Nauka\n\nPoznaj flagi i co oznaczają",
                  "Testy\n\nSprawdź się!",
                  "Stwórz zdjęcie\n\nZłóż własny komunikat za pomocą flag"]
-        commands = [lambda: self.new_menu(Flashcards),
+        commands = [lambda: self.new_page(Flashcards),
                     lambda: self.submenu(**self.tests_submenu),
-                    lambda: self.new_menu(MakeImage)]
+                    lambda: self.new_page(MakeImage)]
         self.button = [None] * len(buttonNames)
         for i in range(len(buttonNames)):
             self.button_frame.grid_columnconfigure(i, weight=1, uniform="yes")
@@ -92,7 +90,7 @@ class MainWindow(ctk.CTk):
             self.button[i].grid(row=0, column=i, padx=10, pady=10, sticky="nsew")
         
         self.update()
-        for widget in previous_widgets:
+        for widget in self.previous_widgets:
             widget.destroy()
 
     def submenu(self, buttonNames: list[str], commands: list):
@@ -118,7 +116,7 @@ class MainWindow(ctk.CTk):
         self.update()
         self.main_frame.destroy()
 
-    def new_menu(self, menu_callback):
+    def new_page(self, menu_callback):
         previous_widgets = self.winfo_children()
         self.new_frame = menu_callback(self, fg_color="transparent")
         self.new_frame.lower()
@@ -127,3 +125,6 @@ class MainWindow(ctk.CTk):
         self.update()
         for widget in previous_widgets:
             widget.destroy()
+    
+    def exit(self, to_class: Util.AppPage):
+        pass

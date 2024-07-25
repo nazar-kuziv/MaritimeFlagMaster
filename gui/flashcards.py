@@ -5,15 +5,16 @@ from custom_hovertip import CustomTooltipLabel
 from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
-from .util_functions import *
+import gui.util_functions as Util
 
-class Flashcards(ctk.CTkFrame):
+class Flashcards(ctk.CTkFrame, Util.AppPage):
     def __init__(self, master, **kwargs):
         """Class for initializing the flashcards screen
 
         To draw the flashcard, call show_flashcard_front or show_flashcard_back AFTER making this frame visible with the place/pack/grid functions
         """
-        super().__init__(master, **kwargs)
+        ctk.CTkFrame.__init__(self, master, **kwargs)
+        Util.AppPage.__init__(self, "Flashcards")
         print("Initializing flashcards frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
@@ -25,16 +26,15 @@ class Flashcards(ctk.CTkFrame):
         # self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         # self.exit_button.pack(side="top", anchor="nw", ipadx=10, ipady=10, padx=10, pady=10)
 
-        self.breadcrumb = BreadcrumbTrail(self,
-            page_names=["Start", "Fiszki"],
-            page_functions=[lambda: self.exit(self.master.main_menu), None]
-        )
-        self.breadcrumb.pack(side="top", anchor="nw")
+        # self.breadcrumb = Util.BreadcrumbTrail(self)
+        # self.breadcrumb.pack(side="top", anchor="nw")
 
         self.flag_index = 0
         self.create_flashcard(self.flag_list[self.flag_index])
 
-    def start(self): self.show_flashcard_front()
+    def start(self):
+        self.show_flashcard_front()
+        Util.AppPage.start(self)
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard with the FLAG
@@ -157,7 +157,8 @@ class Flashcards(ctk.CTkFrame):
         """
         self.change_flag_index(index=self.flag_index + number)
     
-    def exit(self, function):
-        function()
+    def exit(self, to_class: Util.AppPage):
+        print("exiting flashcards page...")
+        to_class.start()
         self.destroy()
 

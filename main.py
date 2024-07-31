@@ -1,8 +1,12 @@
 from gui.main_window import *
+import gui.util_functions as Util
 
 # Set up the Tkinter window
 app = MainWindow()
-main_menu = MainMenu(app, fg_color="transparent")
-main_menu.pack()
+app.update()
+print(f"MAIN WINDOW WIDTH: {app.winfo_width()}")
+main_menu = Util.new_page(MainMenu(app, fg_color="transparent"), "Start")
+# main_menu = MainMenu(app, fg_color="transparent")
+# main_menu.pack()
 
 app.mainloop()

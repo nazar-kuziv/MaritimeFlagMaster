@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from typing import Dict, Callable
 
 from .about import AboutWindow
 from .flashcards import Flashcards
@@ -22,34 +23,9 @@ class MainWindow(ctk.CTk):
         self.minsize(800, 400)
         # self.state('zoomed')
 
-        
-    def submenu(self, buttonNames: list[str], commands: list):
-
-        self.sub_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.sub_frame.lower(self.main_frame)
-        self.sub_frame.place(relwidth=1, relheight=1)
-
-        self.exit_button = ctk.CTkButton(self.sub_frame, text="Wróć", width=0, font=ctk.CTkFont(size=int(self.winfo_width()*0.015)), fg_color="orange red", command=self.main_menu)
-        self.exit_button.pack(side="top", anchor="nw", ipadx=10, ipady=10, padx=10, pady=(10, 0))
-
-        self.button_frame = ctk.CTkFrame(self.sub_frame, fg_color="transparent")
-        self.button_frame.pack(fill="both", expand=True, padx=10, pady=10,)
-        self.button_frame.grid_rowconfigure(0, weight=1)
-        self.button = [None] * len(buttonNames)
-        for i in range(len(buttonNames)):
-            self.button_frame.grid_columnconfigure(i, weight=1, uniform="yes")
-            self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], 
-                                           font=ctk.CTkFont(size=int(self.button_frame.winfo_width()*0.013)), command=commands[i])
-            self.button[i]._text_label.configure(wraplength=int(self.winfo_width()*0.13))
-            self.button[i].grid(row=0, column=i, padx=10, pady=10, sticky="nsew")
-        
-        self.update()
-        self.main_frame.destroy()
-
-class MainMenu(ctk.CTkFrame, Util.AppPage):
+class MainMenu(Util.AppPage):
     def __init__(self, master, **kwargs):
-        ctk.CtkFrame.__init__(self, master, **kwargs)
-        Util.AppPage.__init__(self, "Start")
+        super().__init__(master, **kwargs)
 
         self.tests_submenu = {
             "buttonNames": ["Słowo kodowe\n\nDopasuj słowo kodowe MKS do flagi", 
@@ -63,30 +39,23 @@ class MainMenu(ctk.CTkFrame, Util.AppPage):
         }
 
         self.about_window = None
-        self.previous_widgets = self.winfo_children()
-        Util.AppPage.start(self)
-        self.main_menu()
     
-    # def start(self):
-    #     self.previous_widgets = self.winfo_children()
-    #     Util.AppPage.start(self)
-    #     self.main_menu()
+    def draw(self):
+        super().draw()
+        self.main_menu()
     
     def main_menu(self):
         # self.bind("<Configure>", change_scale_size)
         self.update()
+        # print(f"CURRENT WIDTH: {self.winfo_toplevel().winfo_width()}")
 
-        self.main_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.main_frame.lower()
-        self.main_frame.pack(fill="both", expand=True)
-
-        self.title_frame = ctk.CTkFrame(self.main_frame, fg_color='transparent')
+        self.title_frame = ctk.CTkFrame(self, fg_color='transparent')
         self.title_frame.pack(pady=(10, 0))
         self.welcome_to = ctk.CTkLabel(self.title_frame, text='Witamy w ', 
-                                       font=ctk.CTkFont(size=int(self.winfo_width()*0.017)), fg_color='transparent')
+                                       font=ctk.CTkFont(size=int(self.winfo_width()*0.022)), fg_color='transparent')
         self.welcome_to.pack(side="left")
         self.maritime_flag_master = ctk.CTkLabel(self.title_frame, text='Maritime Flag Master!', 
-                                                 font = ctk.CTkFont(size=int(self.winfo_width()*0.017), weight='bold'), fg_color='transparent')
+                                                 font = ctk.CTkFont(size=int(self.winfo_width()*0.022), weight='bold'), fg_color='transparent')
         self.maritime_flag_master.pack(side="left")
 
         def open_about_window():
@@ -96,39 +65,60 @@ class MainMenu(ctk.CTkFrame, Util.AppPage):
             else:
                 self.about_window.focus()
         
-        self.about = ctk.CTkButton(self.top_menu, text='O aplikacji', font = ctk.CTkFont(size=int(self.winfo_width()*0.013)), width=0, command=open_about_window)
+        self.about = ctk.CTkButton(self._top_menu, text='O aplikacji', font = ctk.CTkFont(size=int(self.winfo_width()*0.013)), width=0, command=open_about_window)
         self.about.pack(side="right", padx=5)
 
-        self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(fill="both", expand=True, padx=10, pady=10,)
         self.button_frame.grid_rowconfigure(0, weight=1)
+        self.update_idletasks()
         buttonNames = ["Nauka\n\nPoznaj flagi i co oznaczają",
                  "Testy\n\nSprawdź się!",
                  "Stwórz zdjęcie\n\nZłóż własny komunikat za pomocą flag"]
-        commands = [lambda: self.new_page(Flashcards),
-                    lambda: self.submenu(**self.tests_submenu),
-                    lambda: self.new_page(MakeImage)]
+        commands = [lambda: Util.new_page(Flashcards(self.winfo_toplevel(), fg_color="transparent"), "Flashcards"),
+                    lambda: Util.new_page(Submenu(self.winfo_toplevel(), self.tests_submenu, fg_color="transparent"), "Testy"),
+                    lambda: Util.new_page(MakeImage(self.winfo_toplevel(), fg_color="transparent"), "Zdjęcie")]
         self.button = [None] * len(buttonNames)
         for i in range(len(buttonNames)):
             self.button_frame.grid_columnconfigure(i, weight=1, uniform="yes")
             self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], 
-                                           font=ctk.CTkFont(size=int(self.button_frame.winfo_width()*0.013)), command=commands[i])
-            self.button[i]._text_label.configure(wraplength=int(self.winfo_width()*0.13))
+                                           font=ctk.CTkFont(size=int(self.winfo_width()*0.02)), command=commands[i])
             self.button[i].grid(row=0, column=i, padx=10, pady=10, sticky="nsew")
-        
-        self.update()
-        for widget in self.previous_widgets:
-            widget.destroy()
+            self.update_idletasks()
+            self.button[i]._text_label.configure(wraplength=int(self.winfo_width()*0.81/len(buttonNames)))
 
     def new_page(self, menu_callback):
-        previous_widgets = self.winfo_children()
+        # previous_widgets = self.winfo_children()
         self.new_frame = menu_callback(self, fg_color="transparent")
         self.new_frame.lower()
-        self.new_frame.pack(fill="both", expand=True)
-        self.new_frame.start()
+        # for widget in previous_widgets:
+        #     widget.destroy()
+        self.destroy()
         self.update()
-        for widget in previous_widgets:
-            widget.destroy()
+        self.new_frame.pack(fill="both", expand=True)
+        self.new_frame.draw()
+
+class Submenu(Util.AppPage):
+    def __init__(self, master, menu: Dict[list[str], list[Callable]], **kwargs):
+        """
+        :param menu: Dictionary with a list "buttonNames" and a list "commands"
+        :type menu: Dict[list[str], list[Callable]]
+        """
+        super().__init__(master, **kwargs)
+        self.menu = menu
     
-    def exit(self, to_class: Util.AppPage):
-        pass
+    def draw(self):
+        super().draw()
+        self.submenu(self.menu["buttonNames"], self.menu["commands"])
+    
+    def submenu(self, buttonNames: list[str], commands: list):
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame.pack(fill="both", expand=True, padx=10, pady=10,)
+        self.button_frame.grid_rowconfigure(0, weight=1)
+        self.button = [None] * len(buttonNames)
+        for i in range(len(buttonNames)):
+            self.button_frame.grid_columnconfigure(i, weight=1, uniform="yes")
+            self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], 
+                                           font=ctk.CTkFont(size=int(self.winfo_width()*0.02)), command=commands[i])
+            self.button[i]._text_label.configure(wraplength=int(self.winfo_width()*0.81/len(buttonNames)))
+            self.button[i].grid(row=0, column=i, padx=10, pady=10, sticky="nsew")

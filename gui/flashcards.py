@@ -7,15 +7,14 @@ from logic.flags import *
 from logic.alphabet import Alphabet
 import gui.util_functions as Util
 
-class Flashcards(ctk.CTkFrame, Util.AppPage):
+class Flashcards(Util.AppPage):
     def __init__(self, master, **kwargs):
         """Class for initializing the flashcards screen
 
         To draw the flashcard, call show_flashcard_front or show_flashcard_back AFTER making this frame visible with the place/pack/grid functions
         """
-        ctk.CTkFrame.__init__(self, master, **kwargs)
-        Util.AppPage.__init__(self, "Flashcards")
-        print("Initializing flashcards frame")
+        super().__init__(master, **kwargs)
+        # print("Initializing flashcards frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
         self.flag_list = Alphabet.get_all_flags()
@@ -32,9 +31,9 @@ class Flashcards(ctk.CTkFrame, Util.AppPage):
         self.flag_index = 0
         self.create_flashcard(self.flag_list[self.flag_index])
 
-    def start(self):
+    def draw(self):
+        Util.AppPage.draw(self)
         self.show_flashcard_front()
-        Util.AppPage.start(self)
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard with the FLAG
@@ -85,17 +84,19 @@ class Flashcards(ctk.CTkFrame, Util.AppPage):
         for i, flag in enumerate(self.flags):
             self.flashcard.grid_columnconfigure(i, weight=1)
             if (self.flashcard.winfo_height() < self.flashcard.winfo_width() * len(self.flags)):
-                print("height smaller than width")
+                # print("height smaller than width")
+                # print(self.flashcard.winfo_height())
                 img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletoheight=int(self.flashcard.winfo_height()*0.9/len(self.flags)))
             else:
-                print("height bigger than width")
+                # print("height bigger than width")
+                # print(self.flashcard.winfo_width())
                 img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
             label.grid(row=0, column=i, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_back)
 
             self.images.append(label)
-        print(f"Front flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
+        # print(f"Front flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
     
     def show_flashcard_back(self, event=None):
         """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions
@@ -107,7 +108,7 @@ class Flashcards(ctk.CTkFrame, Util.AppPage):
         self.flashcard.rowconfigure(1, weight=3)
         self.flashcard.rowconfigure(2, weight=1, uniform="yes")
         self.flashcard.columnconfigure(0, weight=1)
-        print(f"Back flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
+        # print(f"Back flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
 
         self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), wraplength=int(self.flashcard.winfo_width()*0.75), justify="left")
         self.flashcard.meaning.grid(row=1, column=0, sticky='w', padx=10)
@@ -156,9 +157,4 @@ class Flashcards(ctk.CTkFrame, Util.AppPage):
         """Adjust the flag index by the given number
         """
         self.change_flag_index(index=self.flag_index + number)
-    
-    def exit(self, to_class: Util.AppPage):
-        print("exiting flashcards page...")
-        new_page = to_class(self.winfo_toplevel(), fg_color="transparent")
-        self.destroy()
 

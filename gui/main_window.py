@@ -27,15 +27,17 @@ class MainMenu(Util.AppPage):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
+        self.window = self.winfo_toplevel()
+
         self.tests_submenu = {
             "buttonNames": ["Słowo kodowe\n\nDopasuj słowo kodowe MKS do flagi", 
             "Znaczenie\n\nDopasuj flagi do komunikatu", 
             "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
             "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
-            "commands": [lambda: self.new_page(Codewords), 
-            lambda: self.new_page(Meanings), 
-            lambda: self.new_page(FlagSen), 
-            lambda: self.new_page(SenFlag),]
+            "commands": [lambda: Util.new_page(Codewords(self.window, fg_color="transparent"), "Słowo kodowe"), 
+            lambda: Util.new_page(Meanings(self.window, fg_color="transparent"), "Znaczenie"), 
+            lambda: Util.new_page(FlagSen(self.window, fg_color="transparent"), "Flagi→Zdanie"), 
+            lambda: Util.new_page(SenFlag(self.window, fg_color="transparent"), "Zdanie → Flagi"),]
         }
 
         self.about_window = None
@@ -75,9 +77,9 @@ class MainMenu(Util.AppPage):
         buttonNames = ["Nauka\n\nPoznaj flagi i co oznaczają",
                  "Testy\n\nSprawdź się!",
                  "Stwórz zdjęcie\n\nZłóż własny komunikat za pomocą flag"]
-        commands = [lambda: Util.new_page(Flashcards(self.winfo_toplevel(), fg_color="transparent"), "Flashcards"),
-                    lambda: Util.new_page(Submenu(self.winfo_toplevel(), self.tests_submenu, fg_color="transparent"), "Testy"),
-                    lambda: Util.new_page(MakeImage(self.winfo_toplevel(), fg_color="transparent"), "Zdjęcie")]
+        commands = [lambda: Util.new_page(Flashcards(self.window, fg_color="transparent"), "Flashcards"),
+                    lambda: Util.new_page(Submenu(self.window, self.tests_submenu, fg_color="transparent"), "Testy", menu=self.tests_submenu),
+                    lambda: Util.new_page(MakeImage(self.window, fg_color="transparent"), "Zdjęcie")]
         self.button = [None] * len(buttonNames)
         for i in range(len(buttonNames)):
             self.button_frame.grid_columnconfigure(i, weight=1, uniform="yes")

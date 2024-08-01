@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from abc import ABC, abstractmethod
-from typing import Self, Type
+from typing import Any, Type
 
 # def change_scale_size(event):
 #     if event.widget == event.widget.winfo_toplevel():
@@ -47,8 +47,9 @@ def loading_widget(master):
 
 _page_names: list[str] = []
 _page_class: list[Type[AppPage]] = []
+_page_kwargs: list[dict[str, Any] | None] = []
 
-def add_breadcrumb(name: str, to_class: Type[AppPage]):
+def add_breadcrumb(name: str, to_class: Type[AppPage], **kwargs):
     """Add a page (frame) breadcrumb for the breadcrumb trail widget
 
     :param name: the name of the button visible in the GUI
@@ -59,6 +60,7 @@ def add_breadcrumb(name: str, to_class: Type[AppPage]):
     # print(f"Adding breadcrumb {name} of class {to_class}")
     _page_names.append(name)
     _page_class.append(to_class)
+    _page_kwargs.append(kwargs)
 
 def delete_breadcrumb():
     """Delete the last breadcrumb from the breadcrumb trail widget
@@ -86,22 +88,11 @@ class BreadcrumbTrailWidget(ctk.CTkFrame):
             if (i < len(_page_names) - 1):
                 arrow = ctk.CTkLabel(self, text='〉', font=ctk.CTkFont(size=int(master.winfo_toplevel().winfo_width()*0.018), weight='bold'), fg_color='transparent')
                 arrow.pack(side="left")
-    
-    # def change_page(self, index: int):
-    #     """Changes the page (frame) and calls the exit function of the current one
-
-    #     :param index: index of the page in the trail that is going to be shown (from 0)
-    #     :type index: int
-    #     """
-    #     # print("Breadcrumb Change page called by", inspect.stack()[1])
-    #     for i in range(index + 1, len(_page_class)):
-    #         delete_breadcrumb()
-    #     self.master.exit(_page_class[index])
 
 _current_page: ctk.CTkBaseClass = None
 
 def _change_page(page: AppPage) -> ctk.CTkBaseClass:
-    """Creates and shows an app page; internal use only
+    """Creates and shows an app page with double buffering; internal use only
 
     :return: the page object
     :rtype: ctk.CTkBaseClass
@@ -119,17 +110,17 @@ def _change_page(page: AppPage) -> ctk.CTkBaseClass:
     _current_page = page
     return _current_page
 
-def new_page(page: AppPage, breadcrumb_name: str) -> ctk.CTkBaseClass:
+def new_page(page: AppPage, breadcrumb_name: str, **kwargs) -> ctk.CTkBaseClass:
     """Creates and shows a new app page not clicked from a breadcrumb
     
     :return: the new page object
     :rtype: ctk.CTkBaseClass
     """
     # print(f"Adding new page {page.__class__} to breadcrumb trail")
-    add_breadcrumb(breadcrumb_name, page.__class__)
+    add_breadcrumb(breadcrumb_name, page.__class__, **kwargs)
     return _change_page(page)
 
 def previous_page(master: ctk.CTkBaseClass, index: int) -> ctk.CTkBaseClass:
     for i in range(index + 1, len(_page_class)):
             delete_breadcrumb()
-    return _change_page(_page_class[index](master))
+    return _change_page(_page_class[index](master, **_page_kwargs[index]))

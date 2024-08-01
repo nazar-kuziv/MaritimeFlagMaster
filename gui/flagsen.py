@@ -5,9 +5,9 @@ from logic.constants import *
 from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
-from gui.util_functions import *
+import gui.util_functions as Util
 
-class FlagSen(ctk.CTkFrame):
+class FlagSen(Util.AppPage):
     def __init__(self, master, **kwargs):
         """Class for initializing the Flags-sentence screen
 
@@ -18,20 +18,22 @@ class FlagSen(ctk.CTkFrame):
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         
         self.question_widgets = []
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure(1, weight=3)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=3)
-        self.grid_columnconfigure(2, weight=0)
-
-        self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        self.exit_button.grid(row=0, column=0, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
     
-    def start(self): self.show_choice()
+    def draw(self):
+        super().draw()
+        self.container_menu = ctk.CTkFrame(self, fg_color="transparent")
+        self.container_menu.pack(fill="both", expand=True)
+        self.container_menu.grid_rowconfigure(0, weight=0)
+        self.container_menu.grid_rowconfigure(1, weight=3)
+        self.container_menu.grid_rowconfigure(2, weight=1)
+        self.container_menu.grid_columnconfigure(0, weight=1)
+        self.container_menu.grid_columnconfigure(1, weight=3)
+        self.container_menu.grid_columnconfigure(2, weight=0)
+
+        self.show_choice()
 
     def show_choice(self):
-        self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
+        self.choice_menu = ctk.CTkFrame(self.container_menu, fg_color="transparent")
         self.choice_menu.grid(row=1, column=0, columnspan=2)
         self.question_widgets.append(self.choice_menu)
 
@@ -62,7 +64,7 @@ class FlagSen(ctk.CTkFrame):
         self.get_flag_sentence_method = method
         message = self.get_new_sentence()
         if (message is not None):
-            error_message = ctk.CTkLabel(self, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
+            error_message = ctk.CTkLabel(self.container_menu, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
             error_message.grid(row=0, column=1, rowspan=2)
             return
         self.show_question()
@@ -87,7 +89,7 @@ class FlagSen(ctk.CTkFrame):
     def show_question(self):
         """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
         """
-        loading_label = loading_widget(self.master)
+        loading_label = Util.loading_widget(self.winfo_toplevel())
         for widget in self.question_widgets:
             widget.destroy()
         self.update()
@@ -96,14 +98,14 @@ class FlagSen(ctk.CTkFrame):
 
         def save_image():
             if (Alphabet.saveFlagSentencePNG(self.sentence.flags, suggest_file_name=self.is_answered)):
-                label = ctk.CTkLabel(self, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
+                label = ctk.CTkLabel(self.container_menu, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
                 label.grid(column=1, row=0, sticky="e", pady=10)
                 label.after(4000, lambda: label.destroy())
         
-        self.save_image = ctk.CTkButton(self, text='Zapisz obecne jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
+        self.save_image = ctk.CTkButton(self.container_menu, text='Zapisz obecne jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
         self.save_image.grid(column=2, row=0, sticky="ne", ipadx=10, ipady=10, padx=10, pady=10)
 
-        self.flag_sentence = ctk.CTkFrame(self, fg_color=None)
+        self.flag_sentence = ctk.CTkFrame(self.container_menu, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
         self.flag_sentence.flags = []
 
@@ -126,22 +128,25 @@ class FlagSen(ctk.CTkFrame):
         
         self.question_widgets.append(self.flag_sentence)
 
-        self.answer_cell = ctk.CTkFrame(self, fg_color="transparent")
-        self.answer_cell.grid(row=2, column=0, columnspan=3, pady=10)
+        self.answer_cell = ctk.CTkFrame(self.container_menu, fg_color="transparent")
+        self.answer_cell.grid(row=2, column=0, columnspan=3, sticky="ew", pady=10)
         self.question_widgets.append(self.answer_cell)
+        self.answer_cell.grid_columnconfigure(0, weight=1)
+        self.answer_cell.grid_columnconfigure(1, weight=0)
+        self.answer_cell.grid_columnconfigure(2, weight=1)
 
         validate_command = self.register(self.validate_answer)
         self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=int(self.master.scale_size*0.6), font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), 
                                               validate="key", validatecommand=(validate_command,'%P'))
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
 
-        self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.sentence.cleaned_sentence)}", fg_color='transparent')
-        self.text_length.pack(side="left", padx=10)
-        self.answer_cell.entry.pack(side="left")
+        self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.sentence.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
+        self.text_length.grid(row=0, column=0, sticky="e", padx=10)
+        self.answer_cell.entry.grid(row=0, column=1)
         self.answer_cell.entry.focus()
         
-        self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', width=0, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
-        self.answer_cell.submit_button.pack(side="left", padx=5)
+        self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
+        self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
         self.update_idletasks()
         loading_label.destroy()
 
@@ -158,13 +163,13 @@ class FlagSen(ctk.CTkFrame):
         
         if (not self.sentence.check_sentence(self.answer_cell.entry.get())):
             print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self.container_menu, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)
             self.question_widgets.append(self.answer_response)
         else:
             print("Correct answer!")
             self.is_answered = True
-            self.answer_response = ctk.CTkLabel(self, text='Poprawnie!', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self.container_menu, text='Poprawnie!', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)
             self.question_widgets.append(self.answer_response)
 
@@ -176,15 +181,11 @@ class FlagSen(ctk.CTkFrame):
             if (message == "Błąd czytania z pliku."):
                 return
             elif (message is not None):
-                error_message = ctk.CTkLabel(self, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
+                error_message = ctk.CTkLabel(self.container_menu, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
                 error_message.grid(row=0, column=1, rowspan=2)
                 return
             
             # next button
-            self.next_button = ctk.CTkButton(self, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=self.show_question)
+            self.next_button = ctk.CTkButton(self.container_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=self.show_question)
             self.next_button.grid(row=2, column=2, sticky="e", padx=10)
             self.question_widgets.append(self.next_button)
-    
-    def exit(self):
-        self.master.main_menu()
-        self.destroy()

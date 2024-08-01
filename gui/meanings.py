@@ -5,11 +5,10 @@ import random
 from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
-from gui.util_functions import *
+import gui.util_functions as Util
 from logic.modes.meanings_session import MeaningsSession
 
-
-class Meanings(ctk.CTkFrame):
+class Meanings(Util.AppPage):
     def __init__(self, master, **kwargs):
         """Class for initializing the meanings screen
 
@@ -23,6 +22,17 @@ class Meanings(ctk.CTkFrame):
         # self.flag_list = [Alphabet._characters['C'], Alphabet._characters['B'], Alphabet._characters['A']] # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
         # self.flag_list = [Alphabet._allFlags[7]]
+        self.meaning_frame = None
+
+        self.alphabet = Alphabet.get_single_flags_shuffled()
+        self.flag_images = []
+        self.selected_flags = []
+        self.flag_index = 0
+        self.flag = self.meaning_session.get_flag()
+        self.images = []
+    
+    def draw(self):
+        super().draw()
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
@@ -33,25 +43,15 @@ class Meanings(ctk.CTkFrame):
         self.top_menu.grid_columnconfigure(4, weight=1, uniform="yes")
         self.top_menu.grid_columnconfigure(5, weight=1, uniform="yes")
         self.top_menu.grid_columnconfigure(6, weight=1, uniform="yes")
-
-        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        self.top_menu.exit_button.grid(row=0, column=0, sticky="w", ipadx=10, ipady=10)
         self.top_menu.dict = {}
-        self.meaning_frame = None
-
-        self.alphabet = Alphabet.get_single_flags_shuffled()
-        self.flag_images = []
-        self.selected_flags = []
-        # self.flag_index = 0
-        self.flag = self.meaning_session.get_flag()
-        self.images = []
-    
-    def start(self): self.show_question()
+        
+        self.show_question()
     
     def show_question(self):
         """Make sure to first make the main Meanings frame visible with the place/pack/grid functions
         """
-        loading_label = loading_widget(self.master)
+        loading_label = Util.loading_widget(self.winfo_toplevel())
+
         for widget in self.flag_images:
             widget.destroy()
         self.flag_images = []
@@ -78,7 +78,7 @@ class Meanings(ctk.CTkFrame):
         self.top_menu.dict["check_button"] = check_button
 
         clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.clear_checked_flags, state="disabled")
-        clear_button.grid(row=0, column=4, ipadx=10, ipady=10)
+        clear_button.grid(row=0, column=0, sticky="w", ipadx=10, ipady=10)
         self.top_menu.dict["clear_button"] = clear_button
 
         self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -205,6 +205,7 @@ class Meanings(ctk.CTkFrame):
         self.flag = self.meaning_session.get_flag()
         self.show_question()
 
-    def exit(self):
-        self.master.main_menu()
-        self.destroy()
+    def increment_question(self, event=None, number: int = 1):
+        """Adjust the flag index by the given number
+        """
+        self.change_question(index=self.flag_index + number)

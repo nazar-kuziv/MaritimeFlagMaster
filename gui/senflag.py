@@ -6,9 +6,9 @@ from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.constants import *
-from gui.util_functions import *
+import gui.util_functions as Util
 
-class SenFlag(ctk.CTkFrame):
+class SenFlag(Util.AppPage):
     def __init__(self, master, **kwargs):
         """Class for initializing the Sentence-Flags screen
 
@@ -18,17 +18,18 @@ class SenFlag(ctk.CTkFrame):
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        self.top_menu = ctk.CTkFrame(self)
-        self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
-        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
-        self.top_menu.list = {}
 
         self.alphabet = Alphabet.get_characters_flags_shuffled()
         self.flag_index = 0
         self.images = []
     
-    def start(self): self.show_choice()
+    def draw(self):
+        super().draw()
+        self.top_menu = ctk.CTkFrame(self, height=0)
+        self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
+        self.top_menu.list = {}
+
+        self.show_choice()
 
     def show_choice(self):
         self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
@@ -86,7 +87,7 @@ class SenFlag(ctk.CTkFrame):
     def show_question(self):
         """Make sure to first make the main SenFlags frame visible with the place/pack/grid functions
         """
-        loading_label = loading_widget(self.master)
+        loading_label = Util.loading_widget(self.master)
         self.flag_images = []
         self.answer_flags = []
         self.input_flags = []
@@ -258,8 +259,3 @@ class SenFlag(ctk.CTkFrame):
             self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.show_question)
             self.next_button.pack(side="right", fill='y')
             self.top_menu.list["new_sentence"] = self.next_button
-    
-    def exit(self):
-        self.master.unbind("<BackSpace>")
-        self.master.main_menu()
-        self.destroy()

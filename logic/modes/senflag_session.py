@@ -1,10 +1,10 @@
 from logic.alphabet import Alphabet
-from logic.flags import FlagSentence
+from logic.flags import FlagSentence, Flag
 
 
-class FlagsenSession:
+class SenflagSession:
     def __init__(self, mode: str, number_of_sentences: int = 50):
-        """Initializes the FlagsenSession object
+        """Initializes the SenflagSession object
 
         :raise ValueError: If the mode is not 'default', 'internet' or 'file'
         :raise NoFileSelectedException: If the mode is 'file' and the user has not selected a file
@@ -36,9 +36,9 @@ class FlagsenSession:
         self.number_of_correct_answers = 0
         self.next_sentence()
 
-    def get_sentence(self) -> FlagSentence:
+    def get_sentence(self) -> str:
         """Returns the current sentence"""
-        return self.sentence
+        return self.sentence.cleaned_sentence
 
     def next_sentence(self):
         """Moves to the next sentence. If there are no more sentences, returns False, otherwise returns True.
@@ -58,16 +58,16 @@ class FlagsenSession:
         self.number_of_current_sentence += 1
         return True
 
-    def check_answer(self, answer: str) -> bool:
+    def check_answer(self, answer: list[Flag | None]) -> bool:
         """Checks the answer and returns True if the answer is correct, otherwise returns False
 
         :param answer: The answer to be checked
         """
-        if self.sentence.check_sentence(answer):
+        if self.sentence.check_flags(answer):
             self.number_of_correct_answers += 1
             return True
         return False
 
-    def get_correct_answer(self) -> str:
+    def get_correct_answer(self) -> FlagSentence:
         """Returns the correct answers"""
-        return self.sentence.cleaned_sentence
+        return self.sentence

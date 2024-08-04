@@ -2,8 +2,8 @@ import customtkinter as ctk
 import tksvg
 
 from logic.environment import Environment
-from logic.flags import *
-from logic.alphabet import Alphabet
+from logic.modes.codewords_session import CodewordsSession
+
 
 class Codewords(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -17,7 +17,7 @@ class Codewords(ctk.CTkFrame):
 
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
-        self.flag_list = Alphabet.get_characters_flags_shuffled()
+        self.codewords_session = CodewordsSession(10)
         self.question_widgets = []
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=3)
@@ -29,8 +29,8 @@ class Codewords(ctk.CTkFrame):
         self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         self.exit_button.grid(row=0, column=0, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
 
-        self.flag_index = 0
-        self.flag = self.flag_list[0]
+        # self.flag_index = 0
+        self.flag = self.codewords_session.get_flag()
     
     def start(self): self.show_question()
 
@@ -66,7 +66,7 @@ class Codewords(ctk.CTkFrame):
         except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
-        if (not self.flag.check_code_word(self.answer_cell.entry.get())):
+        if (not self.codewords_session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)
@@ -80,23 +80,19 @@ class Codewords(ctk.CTkFrame):
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(state="disabled")
             self.answer_cell.entry.unbind("<Return>")
-            self.master.bind("<Return>", lambda x: self.increment_question())
 
             # next button
-            if (self.flag_index < len(self.flag_list)-1):
+            if (self.codewords_session.next_flag()):
+                self.master.bind("<Return>", lambda x: self.change_question())
                 self.next_button = ctk.CTkButton(self, text="Następny", font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
-                                                 height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=self.increment_question)
+                                                 height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=self.change_question)
                 self.next_button.grid(row=1, column=2)
                 self.question_widgets.append(self.next_button)
     
-    def change_question(self, index):
+    def change_question(self):
         self.master.unbind("<Return>")
-        self.flag_index = index
-        self.flag = self.flag_list[self.flag_index]
+        self.flag = self.codewords_session.get_flag()
         self.show_question()
-
-    def increment_question(self, number: int = 1):
-        self.change_question(self.flag_index + number)
     
     def exit(self):
         self.master.main_menu()

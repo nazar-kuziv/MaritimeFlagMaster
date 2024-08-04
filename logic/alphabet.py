@@ -125,7 +125,7 @@ class Alphabet:
                                    'Potrzebuję lekarza; mam ofiary promieniowania'),
                       FlagMultiple([_characters['E'], _characters['L']], 'Powtórz pozycję niebezpieczeństwa'),
                       FlagMultiple([_characters['E'], _characters['L'], _characters['1']],
-                                   'Jaką jest pozycja statku w niebezpieczeństwie?'),
+                                   'Jaka jest pozycja statku w niebezpieczeństwie?'),
                       FlagMultiple([_characters['G'], _characters['M']], 'Nie mogę uratować mojego statku'),
                       FlagMultiple([_characters['G'], _characters['N']], 'Powinieneś zabrać osoby z pokładu'),
                       FlagMultiple([_characters['G'], _characters['N'], _characters['1']],

@@ -69,7 +69,7 @@ class Flag:
         elif self.code_word == 'Bissotwo':
             return '2'
         elif self.code_word == 'Terrathree':
-            return  '3'
+            return '3'
         elif self.code_word == 'Kartefour':
             return '4'
         elif self.code_word == 'Pantafive':
@@ -82,7 +82,7 @@ class Flag:
             return '8'
         elif self.code_word == 'Novenine':
             return '9'
-        else :
+        else:
             return self.code_word[0].upper()
 
 

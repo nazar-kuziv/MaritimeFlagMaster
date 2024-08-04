@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - develop
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  Build:
+    name: Build
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12
+
+      - name: Create virtual environment
+        run: python -m venv .venv
+
+      - name: Install dependencies
+        run: .venv/Scripts/pip install -r .github/requirements.txt
+
+      - name: Build with pyinstaller
+        run: .venv/Scripts/pyinstaller --noconfirm --onefile --windowed --add-data ".venv/Lib/site-packages/tksvg;tksvg\." --add-data "static;static\." main.py
+
+      - name: Deploy artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: app
+          path: dist/main*
+          if-no-files-found: error

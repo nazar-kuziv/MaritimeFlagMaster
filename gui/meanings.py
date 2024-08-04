@@ -6,6 +6,8 @@ from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 from gui.util_functions import *
+from logic.modes.meanings_session import MeaningsSession
+
 
 class Meanings(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -17,7 +19,7 @@ class Meanings(ctk.CTkFrame):
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        self.flag_list = Alphabet.get_all_flags_with_meaning()
+        self.meaning_session = MeaningsSession()
         # self.flag_list = [Alphabet._characters['C'], Alphabet._characters['B'], Alphabet._characters['A']] # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
         # self.flag_list = [Alphabet._allFlags[7]]
@@ -40,8 +42,8 @@ class Meanings(ctk.CTkFrame):
         self.alphabet = Alphabet.get_single_flags_shuffled()
         self.flag_images = []
         self.selected_flags = []
-        self.flag_index = 0
-        self.flag = self.flag_list[0]
+        # self.flag_index = 0
+        self.flag = self.meaning_session.get_flag()
         self.images = []
     
     def start(self): self.show_question()
@@ -164,31 +166,17 @@ class Meanings(ctk.CTkFrame):
     def check_answer(self):
         print(f"Checking, {self.flag}, {len(self.selected_flags)}")
         print(f"Selected list is {self.selected_flags}")
-        if (len(self.selected_flags) == 1):
-            print("Flag")
-            if (not isinstance(self.flag, Flag)):
-                print("Incorrect Flag")
-                self.show_answer(False)
-                return
-            print(self.alphabet[self.selected_flags[0]].meaning)
-            if (self.flag.check_flag(self.alphabet[self.selected_flags[0]])):
-                print("Correct Flag")
-                self.show_answer(True)
-            else:
-                print("Incorrect Flag")
-                self.show_answer(False)
+
+        if len(self.selected_flags) == 0:
+            self.show_answer(False)
+            return
+        elif len(self.selected_flags) > 3:
+            self.show_answer(False)
+            return
+        elif len(self.selected_flags) == 1:
+            self.show_answer(self.meaning_session.check_answer(self.alphabet[self.selected_flags[0]]))
         else:
-            print("FlagMultiple")
-            if (not isinstance(self.flag, FlagMultiple)):
-                print("Incorrect FlagMultiple")
-                self.show_answer(False)
-                return
-            if (self.flag.check_flags([self.alphabet[i] for i in self.selected_flags])):
-                print("Correct FlagMultiple")
-                self.show_answer(True)
-            else:
-                print("Incorrect FlagMultiple")
-                self.show_answer(False)
+            self.show_answer(self.meaning_session.check_answer([self.alphabet[i] for i in self.selected_flags]))
     
     def show_answer(self, isCorrect: bool):
         try:
@@ -207,22 +195,16 @@ class Meanings(ctk.CTkFrame):
                 f.flag.configure(cursor='')
             
             self.selected_flags = []
-            next_button = ctk.CTkButton(self.top_menu, text='Następny', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.increment_question)
+            next_button = ctk.CTkButton(self.top_menu, text='Następny', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.change_question)
             next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
             self.top_menu.dict["next_button"] = next_button
 
-    def change_question(self, event=None, index: int = 0):
-        if (index not in range(0, len(self.flag_list))):
+    def change_question(self):
+        if not self.meaning_session.next_flag():
             raise IndexError("Index out of range")
-        self.flag_index = index
-        self.flag = self.flag_list[index]
+        self.flag = self.meaning_session.get_flag()
         self.show_question()
 
-    def increment_question(self, event=None, number: int = 1):
-        """Adjust the flag index by the given number
-        """
-        self.change_question(index=self.flag_index + number)
-    
     def exit(self):
         self.master.main_menu()
         self.destroy()

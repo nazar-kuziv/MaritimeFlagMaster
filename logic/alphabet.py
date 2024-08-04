@@ -125,7 +125,7 @@ class Alphabet:
                                    'Potrzebuję lekarza; mam ofiary promieniowania'),
                       FlagMultiple([_characters['E'], _characters['L']], 'Powtórz pozycję niebezpieczeństwa'),
                       FlagMultiple([_characters['E'], _characters['L'], _characters['1']],
-                                   'Jaką jest pozycja statku w niebezpieczeństwie?'),
+                                   'Jaka jest pozycja statku w niebezpieczeństwie?'),
                       FlagMultiple([_characters['G'], _characters['M']], 'Nie mogę uratować mojego statku'),
                       FlagMultiple([_characters['G'], _characters['N']], 'Powinieneś zabrać osoby z pokładu'),
                       FlagMultiple([_characters['G'], _characters['N'], _characters['1']],
@@ -263,11 +263,10 @@ class Alphabet:
         return None
 
     @staticmethod
-    def load_default_sentences() -> bool:
+    def load_default_sentences():
         """Loads sentences from default set.
 
-        :return: True if everything is ok, False if something went wrong
-        :rtype: bool
+        :raise CantLoadDefaultSentencesException: If there is a problem with loading default sentences
         """
         filename = Environment.resource_path('static/files/default_sentences.txt')
         Alphabet._default_sentences = []
@@ -279,34 +278,37 @@ class Alphabet:
                     cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._default_sentences.append(FlagSentence(flags, sentence_str, cleaned_sentence))
-            return True
         except Exception:
-            return False
+            raise CantLoadDefaultSentencesException()
 
     @staticmethod
-    def get_flag_sentence_from_api() -> FlagSentence | str:
-        """Returns random sentence created from flags, if everything is ok.
-        Returs NO_INTERNET_CONNECTION if there is no internet connection.
-        Returs REQUEST_LIMIT_EXCEEDED if requests limit has been exceeded.
+    def get_number_of_default_sentences() -> int:
+        """Returns the number of default sentences.
 
-        :rtype: FlagSentence | str
+        :rtype: int
+        """
+        return len(Alphabet._default_sentences)
+
+    @staticmethod
+    def get_flag_sentence_from_api() -> FlagSentence:
+        """Returns random sentence created from flags, if everything is ok.
+
+        :raise NoInternetConnectionException if there is no internet connection.
+        :raise RequestLimitExceededException if requests limit has been exceeded.
+        :rtype FlagSentence
         """
         sentence = Alphabet._get_random_sentence()
         print(sentence)
-        match sentence:
-            case constants.REQUEST_LIMIT_EXCEEDED | constants.NO_INTERNET_CONNECTION:
-                return sentence
-            case _:
-                cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence).upper().strip()
-                flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
-                return FlagSentence(flags, sentence, cleaned_sentence)
+        cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence).upper().strip()
+        flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
+        return FlagSentence(flags, sentence, cleaned_sentence)
 
     @staticmethod
     def get_sentence_from_user_file() -> FlagSentence | None:
         """Returns random sentence from user's file created from flags, if everything is ok.
         Returs None if there is no file selected, or if there is no sentence.
 
-        :rtype: FlagSentence | None
+        :rtype FlagSentence | None
         """
         if len(Alphabet._sentences_from_user_file) > 0:
             sentence = random.choice(Alphabet._sentences_from_user_file)
@@ -315,17 +317,17 @@ class Alphabet:
         return None
 
     @staticmethod
-    def load_sentences_from_user_file() -> bool | None:
+    def load_sentences_from_user_file():
         """Loads sentences from user's file.
 
-        :return: True if everything is ok, False if something went wrong, None if user not selected file
-        :rtype: bool | None
+        :raise NoFileSelectedException: If there is no file selected
+        :raise SmthWrongWithFileException: If there is a problem with loading sentences from user's file
         """
         Alphabet._sentences_from_user_file = []
         filename = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
         try:
             if not filename:
-                return None
+                raise NoFileSelectedException()
             with open(filename, 'r') as file:
                 sentences_str = [line.strip() for line in file]
                 print(sentences_str)
@@ -333,9 +335,16 @@ class Alphabet:
                     cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._sentences_from_user_file.append(FlagSentence(flags, sentence_str, cleaned_sentence))
-            return True
         except Exception:
-            return False
+            raise SmthWrongWithFileException()
+
+    @staticmethod
+    def get_number_of_sentences_from_user_file() -> int:
+        """Returns the number of sentences from user's file.
+
+        :rtype: int
+        """
+        return len(Alphabet._sentences_from_user_file)
 
     @staticmethod
     def saveFlagSentencePNG(sentence: list[Flag | None], background: str = 'grey',
@@ -469,8 +478,8 @@ class Alphabet:
     @staticmethod
     def _get_random_sentence() -> str:
         """Returns a random sentence from zenquotes.io if everything is ok.
-        Returs NO_INTERNET_CONNECTION if there is no internet connection.
-        Returs REQUEST_LIMIT_EXCEEDED if requests limit has been exceeded.
+        raise NoInternetConnectionException if there is no internet connection.
+        raise RequestLimitExceededException if requests limit has been exceeded.
 
         Function need internet connection to work.
 
@@ -487,12 +496,12 @@ class Alphabet:
                         if int(sentence['c']) <= 50:
                             return f"{sentence_text}"
                     except KeyError:
-                        return constants.REQUEST_LIMIT_EXCEEDED
+                        raise RequestLimitExceededException()
                 Alphabet._get_random_sentence()
             else:
                 return f"Error: {response.status_code}"
         except requests.exceptions.RequestException:
-            return constants.NO_INTERNET_CONNECTION
+            raise NoInternetConnectionException()
 
     @staticmethod
     def _translate_sentence_to_flags(sentence: str) -> list[Flag | None]:
@@ -512,3 +521,30 @@ class Alphabet:
             else:
                 flags.append(None)
         return flags
+
+class NoInternetConnectionException(Exception):
+    def __init__(self):
+        self.message = 'No internet connection'
+        super().__init__(self.message)
+
+class RequestLimitExceededException(Exception):
+    def __init__(self):
+        self.message = 'Request limit exceeded'
+        super().__init__(self.message)
+
+class NoFileSelectedException(Exception):
+    def __init__(self):
+        self.message = 'No file selected'
+        super().__init__(self.message)
+
+
+class SmthWrongWithFileException(Exception):
+    def __init__(self):
+        self.message = 'Something wrong with the file'
+        super().__init__(self.message)
+
+
+class CantLoadDefaultSentencesException(Exception):
+    def __init__(self):
+        self.message = 'Can\'t load default sentences'
+        super().__init__(self.message)

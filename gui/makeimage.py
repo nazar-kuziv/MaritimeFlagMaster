@@ -1,24 +1,18 @@
 import customtkinter as ctk
 from tkinter import Event
 import tksvg
-import random
 
 from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.constants import *
-from gui import util_functions
+import gui.util_functions as Util
 
-class MakeImage(ctk.CTkFrame):
+class MakeImage(Util.AppPage):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-
-        self.top_menu = ctk.CTkFrame(self, fg_color="transparent")
-        self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
-        self.top_menu.exit_button = ctk.CTkButton(self.top_menu, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        self.top_menu.exit_button.pack(side="left", ipadx=10, ipady=10)
 
         self.alphabet = Alphabet.get_single_flags()
         self.flag_index = 0
@@ -28,10 +22,12 @@ class MakeImage(ctk.CTkFrame):
         self.answer_flags = []
         self.input_images = []
     
-    def start(self): self.show_question()
+    def draw(self):
+        super().draw()
+        self.show_question()
     
     def show_question(self):
-        loading_label = util_functions.loading_widget(self.master)
+        loading_label = Util.loading_widget(self.master)
         # for widget in self.flag_images:
         #     widget.destroy()
         # print(self.top_menu.list.keys())
@@ -63,6 +59,9 @@ class MakeImage(ctk.CTkFrame):
                     inputChar = "SPACJA" if char == " " else ord(char) - 65
                     self.flag_input_handler(None, inputChar, i)
 
+        self.top_menu = ctk.CTkFrame(self, fg_color="transparent")
+        self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
+        
         self.top_menu.input_text = ctk.CTkTextbox(self.top_menu, width=400, height=0)
         self.top_menu.input_text.pack(side="left", fill="y", padx=10)
         self.top_menu.input_text.bind("<KeyRelease>", textbox_callback)

@@ -2,12 +2,15 @@ import copy
 import random
 import re
 import requests
+import logic.exceptions as exceptions
+
 from customtkinter import filedialog
 
 from PIL import Image as PILImage
 
 from logic import constants
 from logic.environment import Environment
+
 from logic.flags import Flag, FlagMultiple, FlagSentence
 
 
@@ -279,7 +282,7 @@ class Alphabet:
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._default_sentences.append(FlagSentence(flags, sentence_str, cleaned_sentence))
         except Exception:
-            raise CantLoadDefaultSentencesException()
+            raise exceptions.CantLoadDefaultSentencesException()
 
     @staticmethod
     def get_number_of_default_sentences() -> int:
@@ -327,7 +330,7 @@ class Alphabet:
         filename = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
         try:
             if not filename:
-                raise NoFileSelectedException()
+                raise exceptions.NoFileSelectedException()
             with open(filename, 'r') as file:
                 sentences_str = [line.strip() for line in file]
                 print(sentences_str)
@@ -336,7 +339,7 @@ class Alphabet:
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._sentences_from_user_file.append(FlagSentence(flags, sentence_str, cleaned_sentence))
         except Exception:
-            raise SmthWrongWithFileException()
+            raise exceptions.SmthWrongWithFileException()
 
     @staticmethod
     def get_number_of_sentences_from_user_file() -> int:
@@ -496,12 +499,12 @@ class Alphabet:
                         if int(sentence['c']) <= 50:
                             return f"{sentence_text}"
                     except KeyError:
-                        raise RequestLimitExceededException()
+                        raise exceptions.RequestLimitExceededException()
                 Alphabet._get_random_sentence()
             else:
                 return f"Error: {response.status_code}"
         except requests.exceptions.RequestException:
-            raise NoInternetConnectionException()
+            raise exceptions.NoInternetConnectionException()
 
     @staticmethod
     def _translate_sentence_to_flags(sentence: str) -> list[Flag | None]:
@@ -521,30 +524,3 @@ class Alphabet:
             else:
                 flags.append(None)
         return flags
-
-class NoInternetConnectionException(Exception):
-    def __init__(self):
-        self.message = 'No internet connection'
-        super().__init__(self.message)
-
-class RequestLimitExceededException(Exception):
-    def __init__(self):
-        self.message = 'Request limit exceeded'
-        super().__init__(self.message)
-
-class NoFileSelectedException(Exception):
-    def __init__(self):
-        self.message = 'No file selected'
-        super().__init__(self.message)
-
-
-class SmthWrongWithFileException(Exception):
-    def __init__(self):
-        self.message = 'Something wrong with the file'
-        super().__init__(self.message)
-
-
-class CantLoadDefaultSentencesException(Exception):
-    def __init__(self):
-        self.message = 'Can\'t load default sentences'
-        super().__init__(self.message)

@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from abc import ABC, abstractmethod
-from typing import Any, Type
+from typing import Any, Type, Callable
 
 # def change_scale_size(event):
 #     if event.widget == event.widget.winfo_toplevel():
@@ -80,7 +80,7 @@ class BreadcrumbTrailWidget(ctk.CTkFrame):
         # print(f"Creating breadcrumb trail of {len(_page_names)}, master {master}")
 
         for i, page in enumerate(_page_names):
-            button = ctk.CTkButton(self, text=page, font=ctk.CTkFont(size=int(master.winfo_toplevel().winfo_width()*0.013)), text_color=("gray10", "#DCE4EE"), fg_color="transparent", width=0, command=lambda index = i: previous_page(self.winfo_toplevel(), index), **kwargs)
+            button = ctk.CTkButton(self, text=page, font=ctk.CTkFont(size=int(master.winfo_toplevel().winfo_width()*0.013)), text_color=("gray10", "#DCE4EE"), fg_color="transparent", width=0, command=lambda index = i: previous_page(index), **kwargs)
             if (_page_class[i] is None or i >= len(_page_class) - 1):
                 button.configure(state="disabled")
             button.pack(side="left", padx=5)
@@ -110,17 +110,18 @@ def _change_page(page: AppPage) -> ctk.CTkBaseClass:
     _current_page = page
     return _current_page
 
-def new_page(page: AppPage, breadcrumb_name: str, **kwargs) -> ctk.CTkBaseClass:
+def new_page(page: Type[AppPage], breadcrumb_name: str, **kwargs) -> ctk.CTkBaseClass:
     """Creates and shows a new app page not clicked from a breadcrumb
     
     :return: the new page object
     :rtype: ctk.CTkBaseClass
     """
     # print(f"Adding new page {page.__class__} to breadcrumb trail")
+    page = page(**kwargs)
     add_breadcrumb(breadcrumb_name, page.__class__, **kwargs)
     return _change_page(page)
 
-def previous_page(master: ctk.CTkBaseClass, index: int) -> ctk.CTkBaseClass:
+def previous_page(index: int) -> ctk.CTkBaseClass:
     for i in range(index + 1, len(_page_class)):
             delete_breadcrumb()
-    return _change_page(_page_class[index](master, **_page_kwargs[index]))
+    return _change_page(_page_class[index](**_page_kwargs[index]))

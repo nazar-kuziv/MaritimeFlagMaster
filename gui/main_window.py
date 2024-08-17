@@ -34,10 +34,10 @@ class MainMenu(Util.AppPage):
             "Znaczenie\n\nDopasuj flagi do komunikatu", 
             "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
             "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
-            "commands": [lambda: Util.new_page(Codewords(self.window, fg_color="transparent"), "Słowo kodowe"), 
-            lambda: Util.new_page(Meanings(self.window, fg_color="transparent"), "Znaczenie"), 
-            lambda: Util.new_page(FlagSen(self.window, fg_color="transparent"), "Flagi→Zdanie"), 
-            lambda: Util.new_page(SenFlag(self.window, fg_color="transparent"), "Zdanie → Flagi"),]
+            "commands": [lambda: Util.new_page(Codewords, "Słowo kodowe", master=self.window, fg_color="transparent"), 
+            lambda: Util.new_page(Meanings, "Znaczenie", master=self.window, fg_color="transparent"), 
+            lambda: Util.new_page(FlagSen, "Flagi→Zdanie", master=self.window, fg_color="transparent"), 
+            lambda: Util.new_page(SenFlag, "Zdanie → Flagi", master=self.window, fg_color="transparent"),]
         }
 
         self.about_window = None
@@ -48,7 +48,6 @@ class MainMenu(Util.AppPage):
     
     def main_menu(self):
         # self.bind("<Configure>", change_scale_size)
-        self.update()
         # print(f"CURRENT WIDTH: {self.winfo_toplevel().winfo_width()}")
 
         self.title_frame = ctk.CTkFrame(self, fg_color='transparent')
@@ -73,20 +72,18 @@ class MainMenu(Util.AppPage):
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(fill="both", expand=True, padx=10, pady=10,)
         self.button_frame.grid_rowconfigure(0, weight=1)
-        self.update_idletasks()
         buttonNames = ["Nauka\n\nPoznaj flagi i co oznaczają",
                  "Testy\n\nSprawdź się!",
                  "Stwórz zdjęcie\n\nZłóż własny komunikat za pomocą flag"]
-        commands = [lambda: Util.new_page(Flashcards(self.window, fg_color="transparent"), "Flashcards"),
-                    lambda: Util.new_page(Submenu(self.window, self.tests_submenu, fg_color="transparent"), "Testy", menu=self.tests_submenu),
-                    lambda: Util.new_page(MakeImage(self.window, fg_color="transparent"), "Zdjęcie")]
+        commands = [lambda: Util.new_page(Flashcards, "Flashcards", master=self.window, fg_color="transparent"),
+                    lambda: Util.new_page(Submenu, "Testy", master=self.window, menu=self.tests_submenu, fg_color="transparent"),
+                    lambda: Util.new_page(MakeImage, "Zdjęcie", master=self.window, fg_color="transparent")]
         self.button = [None] * len(buttonNames)
         for i in range(len(buttonNames)):
             self.button_frame.grid_columnconfigure(i, weight=1, uniform="yes")
             self.button[i] = ctk.CTkButton(self.button_frame, text=buttonNames[i], 
                                            font=ctk.CTkFont(size=int(self.winfo_width()*0.02)), command=commands[i])
             self.button[i].grid(row=0, column=i, padx=10, pady=10, sticky="nsew")
-            self.update_idletasks()
             self.button[i]._text_label.configure(wraplength=int(self.winfo_width()*0.81/len(buttonNames)))
 
     def new_page(self, menu_callback):
@@ -96,7 +93,6 @@ class MainMenu(Util.AppPage):
         # for widget in previous_widgets:
         #     widget.destroy()
         self.destroy()
-        self.update()
         self.new_frame.pack(fill="both", expand=True)
         self.new_frame.draw()
 

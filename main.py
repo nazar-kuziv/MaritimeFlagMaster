@@ -5,7 +5,7 @@ import gui.util_functions as Util
 app = MainWindow()
 app.update()
 print(f"MAIN WINDOW WIDTH: {app.winfo_width()}")
-main_menu = Util.new_page(MainMenu(app, fg_color="transparent"), "Start")
+main_menu = Util.new_page(MainMenu, "Start", master=app, fg_color="transparent")
 # main_menu = MainMenu(app, fg_color="transparent")
 # main_menu.pack()
 

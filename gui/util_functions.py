@@ -36,14 +36,21 @@ class AppPage(ABC, ctk.CTkFrame):
         self.breadcrumb = BreadcrumbTrailWidget(self._top_menu)
         self.breadcrumb.pack(side="left")
 
-def loading_widget(master):
+def loading_widget(master, isFill: bool = False):
     """Shows some loading text in the middle of the screen
+
+    :param isFill: should this widget cover up the whole window
+    :type isFill: bool
     :return: the placed label with the text
     :rtype: CTkLabel
     """
-    loading = ctk.CTkLabel(master, text='Ładowanie...', font=ctk.CTkFont(size=int(master.winfo_width()*0.03)), fg_color='transparent')
+    size = int(master.winfo_width()*0.03)
+    if (isFill):
+        master = ctk.CTkFrame(master, fg_color="transparent")
+        master.place(relwidth=1, relheight=1)
+    loading = ctk.CTkLabel(master, text='Ładowanie...', font=ctk.CTkFont(size=size), fg_color='transparent')
     loading.place(relx=0.5, rely=0.5, anchor="center")
-    return loading
+    return master if isFill else loading
 
 _page_names: list[str] = []
 _page_class: list[Type[AppPage]] = []
@@ -98,15 +105,14 @@ def _change_page(page: AppPage) -> ctk.CTkBaseClass:
     :rtype: ctk.CTkBaseClass
     """
     global _current_page
-    if (_current_page is None): # (29.07.2024) Pylance thinks the code below is unreachable lol
-        _current_page = ctk.CTkFrame(page.winfo_toplevel(), fg_color="transparent")
-        _current_page.place(relwidth=1, relheight=1)
-    page.lower(_current_page)
-    page.place(relwidth=1, relheight=1)
-    page.draw()
-    page.update()
+    def page_function():
+        page.place(relwidth=1, relheight=1)
+        page.draw()
+    
+    double_buffer_frame(page, _current_page, page_function)
 
-    _current_page.destroy()
+    if (_current_page is not None):
+        _current_page.destroy()
     _current_page = page
     return _current_page
 
@@ -125,3 +131,13 @@ def previous_page(index: int) -> ctk.CTkBaseClass:
     for i in range(index + 1, len(_page_class)):
             delete_breadcrumb()
     return _change_page(_page_class[index](**_page_kwargs[index]))
+
+def double_buffer_frame(frame: ctk.CTkBaseClass | None, buffer_frame: ctk.CTkBaseClass | None, frame_function: Callable):
+    if (buffer_frame is None):
+        buffer_frame = ctk.CTkFrame(frame.winfo_toplevel(), fg_color="transparent")
+        buffer_frame.place(relwidth=1, relheight=1)
+    frame.lower(buffer_frame)
+    frame_function()
+    
+    frame.update_idletasks()
+    buffer_frame.destroy()

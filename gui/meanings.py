@@ -167,13 +167,10 @@ class Meanings(Util.AppPage):
         print(f"Checking, {self.flag}, {len(self.selected_flags)}")
         print(f"Selected list is {self.selected_flags}")
 
-        if len(self.selected_flags) == 0:
+        if (len(self.selected_flags) == 0 or len(self.selected_flags) > 3):
             self.show_answer(False)
             return
-        elif len(self.selected_flags) > 3:
-            self.show_answer(False)
-            return
-        elif len(self.selected_flags) == 1:
+        elif (len(self.selected_flags) == 1):
             self.show_answer(self.meaning_session.check_answer(self.alphabet[self.selected_flags[0]]))
         else:
             self.show_answer(self.meaning_session.check_answer([self.alphabet[i] for i in self.selected_flags]))

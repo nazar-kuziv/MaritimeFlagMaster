@@ -1,8 +1,9 @@
 from logic.alphabet import Alphabet
 from logic.flags import FlagSentence
+from logic.modes.session import Session
 
 
-class FlagsenSession:
+class FlagsenSession(Session):
     def __init__(self, mode: str, number_of_sentences: int = 50):
         """Initializes the FlagsenSession object
 
@@ -19,21 +20,18 @@ class FlagsenSession:
         if (mode != 'default') and (mode != 'internet') and (mode != 'file'):
             raise ValueError('Invalid mode')
 
-        self.mode = mode
-        self.number_of_sentences = number_of_sentences
-
-        match self.mode:
+        match mode:
             case 'default':
                 Alphabet.load_default_sentences()
-                if self.number_of_sentences > Alphabet.get_number_of_default_sentences():
-                    self.number_of_sentences = Alphabet.get_number_of_default_sentences()
+                if number_of_sentences > Alphabet.get_number_of_default_sentences():
+                    number_of_sentences = Alphabet.get_number_of_default_sentences()
             case 'file':
                 Alphabet.load_sentences_from_user_file()
-                if self.number_of_sentences > Alphabet.get_number_of_sentences_from_user_file():
-                    self.number_of_sentences = Alphabet.get_number_of_sentences_from_user_file()
+                if number_of_sentences > Alphabet.get_number_of_sentences_from_user_file():
+                    number_of_sentences = Alphabet.get_number_of_sentences_from_user_file()
 
-        self.number_of_current_sentence = -1
-        self.number_of_correct_answers = 0
+        super().__init__(number_of_sentences)
+        self.mode = mode
         self.next_sentence()
 
     def get_sentence(self) -> FlagSentence:
@@ -46,7 +44,7 @@ class FlagsenSession:
         :raise NoInternetConnectionException: If the mode is 'internet' and there is no internet connection
         :raise RequestLimitExceededException: If the mode is 'internet' and the request limit has been exceeded
         """
-        if self.number_of_current_sentence >= self.number_of_sentences:
+        if self.current_question > self.number_of_questions:
             return False
         match self.mode:
             case 'default':
@@ -55,7 +53,7 @@ class FlagsenSession:
                 self.sentence = Alphabet.get_flag_sentence_from_api()
             case 'file':
                 self.sentence = Alphabet.get_sentence_from_user_file()
-        self.number_of_current_sentence += 1
+        self.current_question += 1
         return True
 
     def check_answer(self, answer: str) -> bool:

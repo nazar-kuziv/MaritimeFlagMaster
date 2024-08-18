@@ -1,19 +1,18 @@
 from logic.alphabet import Alphabet
 from logic.flags import Flag
+from logic.modes.session import Session
 
 
-class CodewordsSession:
+class CodewordsSession(Session):
     def __init__(self, number_of_flags: int = 36):
-        self.number_of_flags = number_of_flags
         if number_of_flags < 1 or number_of_flags > 36:
-            self.number_of_flags = 36
+            number_of_flags = 36
+        super().__init__(number_of_flags)
         self.flags = Alphabet.get_characters_flags_shuffled(number_of_flags)
-        self.flag_index = 0
-        self.number_of_correct_answers = 0
 
     def get_flag(self) -> Flag:
         """Returns the current flag"""
-        return self.flags[self.flag_index]
+        return self.flags[self.current_question]
 
     def check_answer(self, answer: str) -> bool:
         """Checks if the answer is correct and updates the number of correct answers if it is"""
@@ -24,8 +23,8 @@ class CodewordsSession:
 
     def next_flag(self):
         """Moves to the next flag"""
-        self.flag_index += 1
-        if self.flag_index >= self.number_of_flags:
+        self.current_question += 1
+        if self.current_question >= self.number_of_questions:
             return False
         return True
 

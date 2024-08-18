@@ -210,7 +210,7 @@ class SenFlag(Util.AppPage):
         except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
-        if (not self.senflag_session.check_answer(self.answer_cell.entry.get())):
+        if (not self.senflag_session.check_answer(self.answer_flags)):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self.top_menu, text="Źle", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)

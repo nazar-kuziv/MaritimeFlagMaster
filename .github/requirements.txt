@@ -32,3 +32,4 @@ urllib3==2.2.2
 whichcraft==0.6.1
 zope.event==5.0
 zope.interface==6.4.post2
+matplotlib==3.9.2

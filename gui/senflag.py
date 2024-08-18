@@ -75,8 +75,8 @@ class SenFlag(Util.AppPage):
         """
         # loading_label = Util.loading_widget(self.master)
         self.flag_images = []
-        self.answer_flags = []
-        self.input_flags = []
+        self.input_flag_objects = []
+        self.input_flag_labels = []
         for widget in self.flag_images:
             widget.destroy()
         print(self.top_menu.list.keys())
@@ -167,7 +167,7 @@ class SenFlag(Util.AppPage):
     def flag_input_handler(self, event=None, index: int | str = -1):
         """Handler function for clicking on flags.
         """
-        if (len(self.input_flags) >= len(self.sentence.cleaned_sentence)):
+        if (len(self.input_flag_labels) >= len(self.sentence.cleaned_sentence)):
             return
         print(f"New flag {index}")
         if ((isinstance(index, str) and index != "SPACJA") or (isinstance(index, int) and index < 0)):
@@ -176,16 +176,16 @@ class SenFlag(Util.AppPage):
         if (index == "SPACJA"):
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='␣', font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
             new_input_flag.pack(side="left", padx=1)
-            self.input_flags.append(new_input_flag)
-            self.answer_flags.append(None)
+            self.input_flag_labels.append(new_input_flag)
+            self.input_flag_objects.append(None)
         else:
             input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[index].img_path), scaletoheight=int(self.master.scale_size*0.04))
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
             new_input_flag.pack(side="left", padx=1)
-            self.input_flags.append(new_input_flag)
-            self.answer_flags.append(self.alphabet[index])
+            self.input_flag_labels.append(new_input_flag)
+            self.input_flag_objects.append(self.alphabet[index])
         
-        self.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
+        self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
         self.top_menu.list["check_button"].configure(state="enabled", cursor="hand2")
         try:
             self.answer_response.destroy()
@@ -194,12 +194,12 @@ class SenFlag(Util.AppPage):
     
     def delete_input_flag(self, event = None):
         print("Backspace fired")
-        if (len(self.input_flags) > 0):
-            flag = self.input_flags.pop()
+        if (len(self.input_flag_labels) > 0):
+            flag = self.input_flag_labels.pop()
             flag.destroy()
-            self.answer_flags.pop()
-            self.text_length.configure(text=f"{len(self.input_flags)}/{len(self.sentence.cleaned_sentence)}")
-            if (len(self.input_flags) <= 0):
+            self.input_flag_objects.pop()
+            self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
+            if (len(self.input_flag_labels) <= 0):
                 self.top_menu.list["check_button"].configure(state="disabled", cursor='')
             if (self.answer_response is not None):
                 self.answer_response.destroy()
@@ -210,7 +210,7 @@ class SenFlag(Util.AppPage):
         except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
-        if (not self.senflag_session.check_answer(self.answer_cell.entry.get())):
+        if (not self.senflag_session.check_answer(self.input_flag_objects)):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self.top_menu, text="Źle", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)

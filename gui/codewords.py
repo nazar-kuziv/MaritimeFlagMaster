@@ -27,7 +27,6 @@ class Codewords(Util.AppPage):
         self.grid_columnconfigure(2, weight=1, uniform="side")
 
         self.flag_index = 0
-        self.flag = self.flag_list[0]
         self.flag = self.codewords_session.get_flag()
     
     def draw(self):

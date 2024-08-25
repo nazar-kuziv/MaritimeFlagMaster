@@ -2,10 +2,10 @@ import customtkinter as ctk
 import tksvg
 
 from logic.environment import Environment
+import gui.util_functions as Util
 from logic.modes.codewords_session import CodewordsSession
 
-
-class Codewords(ctk.CTkFrame):
+class Codewords(Util.AppPage):
     def __init__(self, master, **kwargs):
         """Class for initializing the codewords screen
 
@@ -26,13 +26,22 @@ class Codewords(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=3)
         self.grid_columnconfigure(2, weight=1, uniform="side")
 
-        self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        self.exit_button.grid(row=0, column=0, sticky="nw", ipadx=10, ipady=10, padx=10, pady=10)
-
-        # self.flag_index = 0
+        self.flag_index = 0
         self.flag = self.codewords_session.get_flag()
     
-    def start(self): self.show_question()
+    def draw(self):
+        super().draw()
+
+        self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.container_frame.pack(fill="both", expand=True)
+        self.container_frame.grid_rowconfigure(0, weight=1)
+        self.container_frame.grid_rowconfigure(1, weight=3)
+        self.container_frame.grid_rowconfigure(2, weight=1)
+        self.container_frame.grid_columnconfigure(0, weight=1, uniform="side")
+        self.container_frame.grid_columnconfigure(1, weight=3)
+        self.container_frame.grid_columnconfigure(2, weight=1, uniform="side")
+        
+        self.show_question()
 
     def show_question(self):
         """Make sure to first make the main Codewords frame visible with the place/pack/grid functions
@@ -43,11 +52,11 @@ class Codewords(ctk.CTkFrame):
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         
         img = tksvg.SvgImage(file=Environment.resource_path(self.flag.img_path), scaletoheight=int(self.master.scale_size*0.5))
-        self.image = ctk.CTkLabel(self, text='', image=img)
+        self.image = ctk.CTkLabel(self.container_frame, text='', image=img)
         self.image.grid(row=1, column=0, columnspan=3, sticky="n")
         self.question_widgets.append(self.image)
 
-        self.answer_cell = ctk.CTkFrame(self, fg_color="transparent")
+        self.answer_cell = ctk.CTkFrame(self.container_frame, fg_color="transparent")
         self.answer_cell.grid(row=2, column=1, pady=10)
         self.question_widgets.append(self.answer_cell)
 
@@ -68,23 +77,22 @@ class Codewords(ctk.CTkFrame):
         
         if (not self.codewords_session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self.container_frame, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)
             self.question_widgets.append(self.answer_response)
         else:
             print("Correct answer!")
-            self.answer_response = ctk.CTkLabel(self, text='Poprawnie!', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
+            self.answer_response = ctk.CTkLabel(self.container_frame, text='Poprawnie!', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
             self.answer_response.grid(row=0, column=1)
             self.question_widgets.append(self.answer_response)
 
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(state="disabled")
-            self.answer_cell.entry.unbind("<Return>")
 
             # next button
             if (self.codewords_session.next_flag()):
                 self.master.bind("<Return>", lambda x: self.change_question())
-                self.next_button = ctk.CTkButton(self, text="Następny", font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
+                self.next_button = ctk.CTkButton(self.container_frame, text="Następny", font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
                                                  height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=self.change_question)
                 self.next_button.grid(row=1, column=2)
                 self.question_widgets.append(self.next_button)
@@ -93,7 +101,6 @@ class Codewords(ctk.CTkFrame):
         self.master.unbind("<Return>")
         self.flag = self.codewords_session.get_flag()
         self.show_question()
-    
-    def exit(self):
-        self.master.main_menu()
-        self.destroy()
+        
+    def increment_question(self, number: int = 1):
+        self.change_question(self.flag_index + number)

@@ -36,9 +36,9 @@ class SenflagSession:
         self.number_of_correct_answers = 0
         self.next_sentence()
 
-    def get_sentence(self) -> str:
+    def get_sentence(self) -> FlagSentence:
         """Returns the current sentence"""
-        return self.sentence.cleaned_sentence
+        return self.sentence
 
     def next_sentence(self):
         """Moves to the next sentence. If there are no more sentences, returns False, otherwise returns True.

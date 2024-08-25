@@ -5,16 +5,16 @@ from custom_hovertip import CustomTooltipLabel
 from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
-from .util_functions import *
+import gui.util_functions as Util
 
-class Flashcards(ctk.CTkFrame):
+class Flashcards(Util.AppPage):
     def __init__(self, master, **kwargs):
         """Class for initializing the flashcards screen
 
         To draw the flashcard, call show_flashcard_front or show_flashcard_back AFTER making this frame visible with the place/pack/grid functions
         """
         super().__init__(master, **kwargs)
-        print("Initializing flashcards frame")
+        # print("Initializing flashcards frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
         self.flag_list = Alphabet.get_all_flags()
@@ -25,16 +25,15 @@ class Flashcards(ctk.CTkFrame):
         # self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
         # self.exit_button.pack(side="top", anchor="nw", ipadx=10, ipady=10, padx=10, pady=10)
 
-        self.breadcrumb = BreadcrumbTrail(self,
-            page_names=["Start", "Fiszki"],
-            page_functions=[lambda: self.exit(self.master.main_menu), None]
-        )
-        self.breadcrumb.pack(side="top", anchor="nw")
+        # self.breadcrumb = Util.BreadcrumbTrail(self)
+        # self.breadcrumb.pack(side="top", anchor="nw")
 
         self.flag_index = 0
         self.create_flashcard(self.flag_list[self.flag_index])
 
-    def start(self): self.show_flashcard_front()
+    def draw(self):
+        Util.AppPage.draw(self)
+        self.show_flashcard_front()
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard with the FLAG
@@ -85,17 +84,19 @@ class Flashcards(ctk.CTkFrame):
         for i, flag in enumerate(self.flags):
             self.flashcard.grid_columnconfigure(i, weight=1)
             if (self.flashcard.winfo_height() < self.flashcard.winfo_width() * len(self.flags)):
-                print("height smaller than width")
+                # print("height smaller than width")
+                # print(self.flashcard.winfo_height())
                 img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletoheight=int(self.flashcard.winfo_height()*0.9/len(self.flags)))
             else:
-                print("height bigger than width")
+                # print("height bigger than width")
+                # print(self.flashcard.winfo_width())
                 img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
             label.grid(row=0, column=i, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_back)
 
             self.images.append(label)
-        print(f"Front flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
+        # print(f"Front flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
     
     def show_flashcard_back(self, event=None):
         """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions
@@ -107,7 +108,7 @@ class Flashcards(ctk.CTkFrame):
         self.flashcard.rowconfigure(1, weight=3)
         self.flashcard.rowconfigure(2, weight=1, uniform="yes")
         self.flashcard.columnconfigure(0, weight=1)
-        print(f"Back flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
+        # print(f"Back flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
 
         self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), wraplength=int(self.flashcard.winfo_width()*0.75), justify="left")
         self.flashcard.meaning.grid(row=1, column=0, sticky='w', padx=10)
@@ -156,8 +157,4 @@ class Flashcards(ctk.CTkFrame):
         """Adjust the flag index by the given number
         """
         self.change_flag_index(index=self.flag_index + number)
-    
-    def exit(self, function):
-        function()
-        self.destroy()
 

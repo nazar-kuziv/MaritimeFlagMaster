@@ -31,30 +31,31 @@ class FlagSen(Util.AppPage):
         self.container_menu.grid_columnconfigure(1, weight=3)
         self.container_menu.grid_columnconfigure(2, weight=0)
 
-        self.show_choice()
+        self.show_options()
 
-    def show_choice(self):
-        self.choice_menu = ctk.CTkFrame(self.container_menu, fg_color="transparent")
-        self.choice_menu.grid(row=1, column=0, columnspan=2)
-        self.question_widgets.append(self.choice_menu)
-        self.questions_amount = 10
+    def show_options(self):
+        self.options = Util.options_menu(self, self.establish_session)
+        # self.choice_menu = ctk.CTkFrame(self.container_menu, fg_color="transparent")
+        # self.choice_menu.grid(row=1, column=0, columnspan=2)
+        # self.question_widgets.append(self.choice_menu)
+        # self.questions_amount = 10
 
-        self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                                  command=lambda: self.establish_session("default"))
-        self.default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+        # self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+        #                                           command=lambda: self.establish_session("default"))
+        # self.default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
 
-        self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                                  command=lambda: self.establish_session("internet"))
-        self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+        # self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+        #                                           command=lambda: self.establish_session("internet"))
+        # self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
         
-        self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                              command=lambda: self.establish_session("file"))
-        self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+        # self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+        #                                       command=lambda: self.establish_session("file"))
+        # self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
     
-    def establish_session(self, mode: str):
+    def establish_session(self, mode: str, questions_amount: int = 10):
         error_text = ""
         try:
-            self.flagsen_session = FlagsenSession(mode, self.questions_amount)
+            self.flagsen_session = FlagsenSession(mode, questions_amount)
         except NoInternetConnectionException:
             error_text = "Brak połączenia z internetem."
         except RequestLimitExceededException:
@@ -171,6 +172,7 @@ class FlagSen(Util.AppPage):
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
         self.update_idletasks()
         loading_label.destroy()
+        self.options.destroy()
 
     def validate_answer(self, new_text):
         if (len(new_text) > len(self.sentence.cleaned_sentence)): return False

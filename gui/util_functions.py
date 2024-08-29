@@ -133,6 +133,13 @@ def previous_page(index: int) -> ctk.CTkBaseClass:
     return _change_page(_page_class[index](**_page_kwargs[index]))
 
 def double_buffer_frame(frame: ctk.CTkBaseClass | None, buffer_frame: ctk.CTkBaseClass | None, frame_function: Callable):
+    """Double-buffers the provided frame
+
+    :param buffer_frame: frame to mask the new one with, normally should be the previous page, None creates a blank one
+    :type buffer_frame: ctk.CTkBaseClass | None
+    :param frame_function: called between raising and destroying the double-buffer frame
+    :type frame_function: Callable
+    """
     if (buffer_frame is None):
         buffer_frame = ctk.CTkFrame(frame.winfo_toplevel(), fg_color="transparent")
         buffer_frame.place(relwidth=1, relheight=1)
@@ -141,3 +148,56 @@ def double_buffer_frame(frame: ctk.CTkBaseClass | None, buffer_frame: ctk.CTkBas
     
     frame.update_idletasks()
     buffer_frame.destroy()
+
+def options_menu(master: ctk.CTkBaseClass, session_function: Callable | None = None):
+    menu = ctk.CTkFrame(master, fg_color="transparent")
+    menu.place(relwidth=1, relheight=1)
+    menu.grid_columnconfigure(0, weight=1)
+    menu.grid_columnconfigure(1, weight=1)
+    menu.grid_rowconfigure(0, weight=1)
+    menu.grid_rowconfigure(1, weight=0)
+    menu.grid_rowconfigure(2, weight=1)
+    questions_amount = 10
+    time_minutes = 5
+
+    amount_label = ctk.CTkLabel(menu, text='Liczba pytań', fg_color='transparent')
+    amount_label.grid(column=0, row=0, padx=5, pady=5, sticky="se")
+    amount_var = ctk.StringVar(value='10')
+    def optionmenu_callback(choice):
+        nonlocal questions_amount
+        print('optionmenu dropdown clicked:', choice)
+        questions_amount = int(choice)
+    amount_options = ctk.CTkOptionMenu(menu, values=['5', '10'],
+                                        command=optionmenu_callback,
+                                        variable=amount_var)
+    amount_options.grid(column=1, row=0, padx=5, pady=5, sticky="sw")
+
+    time_label = ctk.CTkLabel(menu, text='Limit czasu (minuty)', width=40, height=28, fg_color='transparent')
+    time_label.grid(column=0, row=1, padx=5, pady=5, sticky="ne")
+    time_var = ctk.StringVar(value='5')
+    def optionmenu_callback(choice):
+        nonlocal time_minutes
+        print('optionmenu dropdown clicked:', choice)
+        time_minutes = int(choice)
+    time_options = ctk.CTkOptionMenu(menu ,values=['5', '10'],
+                                             command=optionmenu_callback,
+                                             variable=time_var)
+    time_options.grid(column=1, row=1, padx=5, pady=5, sticky="nw")
+
+    if (session_function is None): return
+
+    source_select_frame = ctk.CTkFrame(menu, fg_color="transparent")
+    source_select_frame.grid(column=0, row=2, columnspan=2, pady=5, sticky="n")
+    default_mode_button = ctk.CTkButton(source_select_frame, text='Wbudowane', font=ctk.CTkFont(size=int(master.winfo_width()*0.015)), 
+                                                command=lambda: session_function("default", questions_amount))
+    default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+
+    internet_mode_button = ctk.CTkButton(source_select_frame, text='Z internetu', font=ctk.CTkFont(size=int(master.winfo_width()*0.015)), 
+                                                command=lambda: session_function("internet", questions_amount))
+    internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+    
+    file_mode_button = ctk.CTkButton(source_select_frame, text='Z pliku...', font=ctk.CTkFont(size=int(master.winfo_width()*0.015)), 
+                                            command=lambda: session_function("file", questions_amount))
+    file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+    
+    return menu

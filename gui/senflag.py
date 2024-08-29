@@ -30,9 +30,9 @@ class SenFlag(Util.AppPage):
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
         self.top_menu.list = {}
 
-        self.show_choice()
+        self.show_options()
 
-    def show_choice(self):
+    def show_options(self):
         self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
         self.choice_menu.pack(side="bottom", fill="y", expand=True)
         self.top_menu.list["choice_menu"] = self.choice_menu

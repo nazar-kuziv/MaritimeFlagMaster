@@ -150,6 +150,11 @@ def double_buffer_frame(frame: ctk.CTkBaseClass | None, buffer_frame: ctk.CTkBas
     buffer_frame.destroy()
 
 def options_menu(master: ctk.CTkBaseClass, session_function: Callable | None = None):
+    """Frame for selecting various options for the picked mode
+
+    :param session_function: if provided, buttons for source selection will appear and use this function as callback, defaults to None
+    :type session_function: Callable | None, optional
+    """
     menu = ctk.CTkFrame(master, fg_color="transparent")
     menu.place(relwidth=1, relheight=1)
     menu.grid_columnconfigure(0, weight=1)
@@ -157,16 +162,17 @@ def options_menu(master: ctk.CTkBaseClass, session_function: Callable | None = N
     menu.grid_rowconfigure(0, weight=1)
     menu.grid_rowconfigure(1, weight=0)
     menu.grid_rowconfigure(2, weight=1)
-    questions_amount = 10
-    time_minutes = 5
+
+    menu.questions_amount = 10
+    menu.time_minutes = 5
 
     amount_label = ctk.CTkLabel(menu, text='Liczba pytań', fg_color='transparent')
     amount_label.grid(column=0, row=0, padx=5, pady=5, sticky="se")
     amount_var = ctk.StringVar(value='10')
     def optionmenu_callback(choice):
-        nonlocal questions_amount
+        nonlocal menu
         print('optionmenu dropdown clicked:', choice)
-        questions_amount = int(choice)
+        menu.questions_amount = int(choice)
     amount_options = ctk.CTkOptionMenu(menu, values=['5', '10'],
                                         command=optionmenu_callback,
                                         variable=amount_var)
@@ -176,9 +182,9 @@ def options_menu(master: ctk.CTkBaseClass, session_function: Callable | None = N
     time_label.grid(column=0, row=1, padx=5, pady=5, sticky="ne")
     time_var = ctk.StringVar(value='5')
     def optionmenu_callback(choice):
-        nonlocal time_minutes
+        nonlocal menu
         print('optionmenu dropdown clicked:', choice)
-        time_minutes = int(choice)
+        menu.time_minutes = int(choice)
     time_options = ctk.CTkOptionMenu(menu ,values=['5', '10'],
                                              command=optionmenu_callback,
                                              variable=time_var)
@@ -189,15 +195,15 @@ def options_menu(master: ctk.CTkBaseClass, session_function: Callable | None = N
     source_select_frame = ctk.CTkFrame(menu, fg_color="transparent")
     source_select_frame.grid(column=0, row=2, columnspan=2, pady=5, sticky="n")
     default_mode_button = ctk.CTkButton(source_select_frame, text='Wbudowane', font=ctk.CTkFont(size=int(master.winfo_width()*0.015)), 
-                                                command=lambda: session_function("default", questions_amount))
+                                                command=lambda: session_function("default"))
     default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
 
     internet_mode_button = ctk.CTkButton(source_select_frame, text='Z internetu', font=ctk.CTkFont(size=int(master.winfo_width()*0.015)), 
-                                                command=lambda: session_function("internet", questions_amount))
+                                                command=lambda: session_function("internet"))
     internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
     
     file_mode_button = ctk.CTkButton(source_select_frame, text='Z pliku...', font=ctk.CTkFont(size=int(master.winfo_width()*0.015)), 
-                                            command=lambda: session_function("file", questions_amount))
+                                            command=lambda: session_function("file"))
     file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
     
     return menu

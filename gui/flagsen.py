@@ -52,10 +52,10 @@ class FlagSen(Util.AppPage):
         #                                       command=lambda: self.establish_session("file"))
         # self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
     
-    def establish_session(self, mode: str, questions_amount: int = 10):
+    def establish_session(self, mode: str):
         error_text = ""
         try:
-            self.flagsen_session = FlagsenSession(mode, questions_amount)
+            self.flagsen_session = FlagsenSession(mode, self.options.questions_amount)
         except NoInternetConnectionException:
             error_text = "Brak połączenia z internetem."
         except RequestLimitExceededException:

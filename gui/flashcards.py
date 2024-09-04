@@ -32,8 +32,11 @@ class Flashcards(Util.AppPage):
         self.create_flashcard(self.flag_list[self.flag_index])
 
     def draw(self):
-        Util.AppPage.draw(self)
-        self.show_flashcard_front()
+        super().draw()
+        self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.container_frame.pack(fill="both", expand=True)
+
+        self.options = Util.options_menu(self.container_frame, self.start_flashcard_draw)
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard with the FLAG
@@ -44,32 +47,43 @@ class Flashcards(Util.AppPage):
         else:
             self.flags = flag.flags
     
+    def start_flashcard_draw(self):
+        self.flashcard_frame = ctk.CTkFrame(self.container_frame, fg_color="transparent")
+        self.flashcard_frame.place(relwidth=1, relheight=1)
+        
+        Util.double_buffer_frame(self.flashcard_frame, self.options, self.show_flashcard_front)
+
     def show_flashcard_base(self):
         try:
             self.flashcard.destroy()
         except AttributeError: pass
-        self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         
-        self.flashcard = ctk.CTkFrame(self, cursor="hand2")
-        self.flashcard.place(relx=0.5, rely=0.5, anchor="center", relheight=0.5, relwidth=0.5)
+        self.flashcard_frame.grid_columnconfigure(0, weight=1, uniform="side")
+        self.flashcard_frame.grid_columnconfigure(1, weight=1)
+        self.flashcard_frame.grid_columnconfigure(2, weight=1, uniform="side")
+        self.flashcard_frame.grid_rowconfigure(0, weight=1)
+        
+        self.flashcard = ctk.CTkFrame(self.flashcard_frame, cursor="hand2")
+        self.flashcard.grid(row=0, column=1, ipady=50, ipadx=50, sticky="ew")
 
         # next button
         try:
             self.next_button.destroy()
         except AttributeError: pass
         if (self.flag_index < len(self.flag_list)-1):
-            self.next_button = ctk.CTkButton(self, text="〉", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=self.increment_flag_index)
-            self.next_button.place(relx=0.98, rely=0.5, anchor="e", relheight=0.2, relwidth=0.1)
+            self.next_button = ctk.CTkButton(self.flashcard_frame, text="〉", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=self.increment_flag_index)
+            self.next_button.grid(row=0, column=2)
         
         # back button
         try:
             self.back_button.destroy()
         except AttributeError: pass
         if (self.flag_index > 0):
-            self.back_button = ctk.CTkButton(self, text="〈", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=lambda: self.increment_flag_index(number=-1))
-            self.back_button.place(relx=0.02, rely=0.5, anchor="w", relheight=0.2, relwidth=0.1)
+            self.back_button = ctk.CTkButton(self.flashcard_frame, text="〈", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=lambda: self.increment_flag_index(number=-1))
+            self.back_button.grid(row=0, column=0)
         
+        self.flashcard.grid_propagate(False)
         self.update_idletasks()
 
 
@@ -92,7 +106,7 @@ class Flashcards(Util.AppPage):
                 # print(self.flashcard.winfo_width())
                 img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
-            label.grid(row=0, column=i, sticky="nsew")
+            label.grid(row=0, column=i, padx=5, pady=5, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_back)
 
             self.images.append(label)

@@ -165,29 +165,40 @@ def options_menu(master: ctk.CTkBaseClass, forward_function: Callable, select_so
     menu.grid_rowconfigure(1, weight=0)
     menu.grid_rowconfigure(2, weight=1)
 
-    menu.questions_amount = questions_amount_def_ind
-    menu.time_minutes = time_minutes_def_ind
+    menu.questions_amount = questions_amount_choices[questions_amount_def_ind]
+    menu.time_minutes = time_minutes_choices[time_minutes_def_ind]
 
+    def numbers_to_labels(nums: list):
+        labels = []
+        for n in nums:
+            if (n <= -1):
+                labels.append("Bez limitu")
+            else:
+                labels.append(str(n))
+        return labels
+
+    amounts = numbers_to_labels(questions_amount_choices)
     amount_label = ctk.CTkLabel(menu, text='Liczba pytań', fg_color='transparent')
     amount_label.grid(column=0, row=0, padx=5, pady=5, sticky="se")
-    amount_var = ctk.StringVar(value=str(questions_amount_choices[menu.questions_amount]))
+    amount_var = ctk.StringVar(value=amounts[questions_amount_def_ind])
     def optionmenu_callback(choice):
         nonlocal menu
         print('optionmenu dropdown clicked:', choice)
         menu.questions_amount = int(choice)
-    amount_options = ctk.CTkOptionMenu(menu, values=list(map(str, questions_amount_choices)),
+    amount_options = ctk.CTkOptionMenu(menu, values=amounts,
                                         command=optionmenu_callback,
                                         variable=amount_var)
     amount_options.grid(column=1, row=0, padx=5, pady=5, sticky="sw")
 
+    times = numbers_to_labels(time_minutes_choices)
     time_label = ctk.CTkLabel(menu, text='Limit czasu (minuty)', width=40, height=28, fg_color='transparent')
     time_label.grid(column=0, row=1, padx=5, pady=5, sticky="ne")
-    time_var = ctk.StringVar(value=str(time_minutes_choices[menu.time_minutes]))
+    time_var = ctk.StringVar(value=times[time_minutes_def_ind])
     def optionmenu_callback(choice):
         nonlocal menu
         print('optionmenu dropdown clicked:', choice)
         menu.time_minutes = int(choice)
-    time_options = ctk.CTkOptionMenu(menu, values=list(map(str, time_minutes_choices)),
+    time_options = ctk.CTkOptionMenu(menu, values=times,
                                              command=optionmenu_callback,
                                              variable=time_var)
     time_options.grid(column=1, row=1, padx=5, pady=5, sticky="nw")

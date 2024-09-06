@@ -17,7 +17,6 @@ class Flashcards(Util.AppPage):
         # print("Initializing flashcards frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        self.flag_list = Alphabet.get_all_flags()
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
         # self.flag_list = [Alphabet._allFlags[7]]
@@ -29,14 +28,13 @@ class Flashcards(Util.AppPage):
         # self.breadcrumb.pack(side="top", anchor="nw")
 
         self.flag_index = 0
-        self.create_flashcard(self.flag_list[self.flag_index])
 
     def draw(self):
         super().draw()
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.container_frame.pack(fill="both", expand=True)
 
-        self.options = Util.options_menu(self.container_frame, self.start_flashcard_draw)
+        self.options = Util.options_menu(self.container_frame, self.start_flashcard_draw, time_minutes_choices=[-1, 5, 10], time_minutes_def_ind=0)
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard with the FLAG
@@ -48,6 +46,12 @@ class Flashcards(Util.AppPage):
             self.flags = flag.flags
     
     def start_flashcard_draw(self):
+        self.questions_amount = self.options.questions_amount
+        self.time_minutes = self.options.time_minutes
+
+        self.flag_list = Alphabet.get_all_flags()[:self.questions_amount]
+        self.create_flashcard(self.flag_list[self.flag_index])
+
         self.flashcard_frame = ctk.CTkFrame(self.container_frame, fg_color="transparent")
         self.flashcard_frame.place(relwidth=1, relheight=1)
         

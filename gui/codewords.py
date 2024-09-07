@@ -41,11 +41,15 @@ class Codewords(Util.AppPage):
         self.container_frame.grid_columnconfigure(1, weight=3)
         self.container_frame.grid_columnconfigure(2, weight=1, uniform="side")
         
-        self.show_question()
+        self.options = Util.options_menu(self.container_frame, self.show_question, time_minutes_choices=[5, 10, -1], time_minutes_def_ind=0)
+        # self.show_question()
 
     def show_question(self):
         """Make sure to first make the main Codewords frame visible with the place/pack/grid functions
         """
+        try:
+            self.options.destroy()
+        except AttributeError: pass
         for widget in self.question_widgets:
             widget.destroy()
         self.update_idletasks()

@@ -2,11 +2,6 @@ import customtkinter as ctk
 from abc import ABC, abstractmethod
 from typing import Any, Type, Callable
 
-# def change_scale_size(event):
-#     if event.widget == event.widget.winfo_toplevel():
-#         event.widget.scale_size = event.height if event.height < event.width else event.width
-#         print(event.widget.scale_size)
-
 def get_scale_size(widget: ctk.CTkBaseClass) -> int:
     """Calculates and returns the scaling size to which to adjust element sizes
 

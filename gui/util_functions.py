@@ -93,7 +93,7 @@ class BreadcrumbTrailWidget(ctk.CTkFrame):
 
 _current_page: ctk.CTkBaseClass = None
 
-def _change_page(page: AppPage) -> ctk.CTkBaseClass:
+def change_page(page: AppPage) -> ctk.CTkBaseClass:
     """Creates and shows an app page with double buffering; internal use only
 
     :return: the page object
@@ -120,12 +120,12 @@ def new_page(page: Type[AppPage], breadcrumb_name: str, **kwargs) -> ctk.CTkBase
     # print(f"Adding new page {page.__class__} to breadcrumb trail")
     page = page(**kwargs)
     add_breadcrumb(breadcrumb_name, page.__class__, **kwargs)
-    return _change_page(page)
+    return change_page(page)
 
 def previous_page(index: int) -> ctk.CTkBaseClass:
     for i in range(index + 1, len(_page_class)):
             delete_breadcrumb()
-    return _change_page(_page_class[index](**_page_kwargs[index]))
+    return change_page(_page_class[index](**_page_kwargs[index]))
 
 def double_buffer_frame(frame: ctk.CTkBaseClass, buffer_frame: ctk.CTkBaseClass | None, draw_function: Callable):
     """Double-buffers the provided frame

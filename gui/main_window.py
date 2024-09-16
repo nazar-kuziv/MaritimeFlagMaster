@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from typing import Dict, Callable
 
+from .options_menu import OptionsMenu
 from .about import AboutWindow
 from .flashcards import Flashcards
 from .codewords import Codewords
@@ -34,7 +35,7 @@ class MainMenu(Util.AppPage):
             "Znaczenie\n\nDopasuj flagi do komunikatu", 
             "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
             "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
-            "commands": [lambda: Util.new_page(Codewords, "Słowo kodowe", master=self.window, fg_color="transparent"), 
+            "commands": [lambda: Util.new_page(OptionsMenu, "Słowo kodowe", master=self.window, next_page=Codewords), 
             lambda: Util.new_page(Meanings, "Znaczenie", master=self.window, fg_color="transparent"), 
             lambda: Util.new_page(FlagSen, "Flagi→Zdanie", master=self.window, fg_color="transparent"), 
             lambda: Util.new_page(SenFlag, "Zdanie → Flagi", master=self.window, fg_color="transparent"),]
@@ -75,7 +76,7 @@ class MainMenu(Util.AppPage):
         buttonNames = ["Nauka\n\nPoznaj flagi i co oznaczają",
                  "Testy\n\nSprawdź się!",
                  "Stwórz zdjęcie\n\nZłóż własny komunikat za pomocą flag"]
-        commands = [lambda: Util.new_page(Flashcards, "Flashcards", master=self.window, fg_color="transparent"),
+        commands = [lambda: Util.new_page(OptionsMenu, "Flashcards", master=self.window, next_page=Flashcards, time_minutes_choices=[-1, 5, 10],  time_minutes_def_ind=0),
                     lambda: Util.new_page(Submenu, "Testy", master=self.window, menu=self.tests_submenu, fg_color="transparent"),
                     lambda: Util.new_page(MakeImage, "Zdjęcie", master=self.window, fg_color="transparent")]
         self.button = [None] * len(buttonNames)

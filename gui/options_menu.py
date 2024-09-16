@@ -1,10 +1,10 @@
 import customtkinter as ctk
 import gui.util_functions as Util
-from typing import Callable
+from typing import Type
 
 class OptionsMenu(Util.AppPage):
 
-    def __init__(self, forward_function: Callable, select_source: bool = False, questions_amount_choices: list[int] = [5, 10], questions_amount_def_ind: int = 1, time_minutes_choices: list[int] = [5, 10], time_minutes_def_ind: int = 0):
+    def __init__(self, master, next_page: Type[Util.AppPage], select_source: bool = False, questions_amount_choices: list[int] = [5, 10, 20], questions_amount_def_ind: int = 1, time_minutes_choices: list[int] = [5, 10, -1], time_minutes_def_ind: int = 0):
         """Frame for selecting various options for the picked mode
 
         :param forward_function: function used by the start button/source selection buttons
@@ -12,8 +12,8 @@ class OptionsMenu(Util.AppPage):
         :param select_source: if True shows 3 source select buttons instead of a simple Start button, defaults to False
         :type select_source: bool, optional
         """
-        super().__init__()
-        self.forward_function = forward_function
+        super().__init__(master, fg_color="transparent")
+        self.next_page = next_page
         self.select_source = select_source
         self.questions_amount_choices = questions_amount_choices
         self.questions_amount_def_ind = questions_amount_def_ind
@@ -36,7 +36,7 @@ class OptionsMenu(Util.AppPage):
         def numbers_to_labels(nums: list):
             labels = []
             for n in nums:
-                if (n <= -1):
+                if (n <= 0):
                     labels.append("Bez limitu")
                 else:
                     labels.append(str(n))
@@ -68,21 +68,30 @@ class OptionsMenu(Util.AppPage):
                                                 variable=time_var)
         time_options.grid(column=1, row=1, padx=5, pady=5, sticky="nw")
 
-        if (not self.select_source):        
-            start_button = ctk.CTkButton(menu, text='Start', font=ctk.CTkFont(size=int(self.winfo_width()*0.015)), command=self.forward_function)
+        if (not self.select_source):
+            start_button = ctk.CTkButton(menu, text='Start', font=ctk.CTkFont(size=int(self.winfo_width()*0.015)), command=self.create_next_page)
             start_button.grid(column=0, row=2, columnspan=2, pady=5, sticky="n")
             return
 
         source_select_frame = ctk.CTkFrame(menu, fg_color="transparent")
         source_select_frame.grid(column=0, row=2, columnspan=2, pady=5, sticky="n")
         default_mode_button = ctk.CTkButton(source_select_frame, text='Wbudowane', font=ctk.CTkFont(size=int(self.winfo_width()*0.015)), 
-                                                    command=lambda: self.forward_function("default"))
+                                                    command=lambda: self.create_next_page(source="default"))
         default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
 
         internet_mode_button = ctk.CTkButton(source_select_frame, text='Z internetu', font=ctk.CTkFont(size=int(self.winfo_width()*0.015)), 
-                                                    command=lambda: self.forward_function("internet"))
+                                                    command=lambda: self.create_next_page(source="internet"))
         internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
         
         file_mode_button = ctk.CTkButton(source_select_frame, text='Z pliku...', font=ctk.CTkFont(size=int(self.winfo_width()*0.015)), 
-                                                command=lambda: self.forward_function("file"))
+                                                command=lambda: self.create_next_page(source="file"))
         file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+
+    def create_next_page(self, **kwargs):
+        page = self.next_page(self.master, fg_color="transparent", **kwargs)
+        Util.change_page(page)
+        # Util.current_page = page
+        # page.place(relwidth=1, relheight=1)
+        # Util.double_buffer_frame(page, self, page.draw)
+        # page.draw()
+        # self.destroy()

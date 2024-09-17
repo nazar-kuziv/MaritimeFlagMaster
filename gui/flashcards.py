@@ -19,31 +19,20 @@ class Flashcards(Util.AppPage):
         self.questions_amount = questions_amount
         self.time_minutes = time_minutes
 
-        # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
-        # self.flag_list = [Alphabet._characters['6']]
-        # self.flag_list = [Alphabet._allFlags[7]]
-
-        # self.exit_button = ctk.CTkButton(self, text="Wyjdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="orange red", command=self.exit)
-        # self.exit_button.pack(side="top", anchor="nw", ipadx=10, ipady=10, padx=10, pady=10)
-
-        # self.breadcrumb = Util.BreadcrumbTrail(self)
-        # self.breadcrumb.pack(side="top", anchor="nw")
-
+        self.flag_list = Alphabet.get_all_flags()[:self.questions_amount] if self.questions_amount > 0 else Alphabet.get_all_flags()
         self.flag_index = 0
 
     def draw(self):
         super().draw()
-        self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.container_frame.pack(fill="both", expand=True)
+        # self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
+        # self.container_frame.pack(fill="both", expand=True)
 
-        self.flag_list = Alphabet.get_all_flags()[:self.questions_amount] if self.questions_amount > 0 else Alphabet.get_all_flags()
         self.create_flashcard(self.flag_list[self.flag_index])
 
-        self.flashcard_frame = ctk.CTkFrame(self.container_frame, fg_color="transparent")
-        self.flashcard_frame.place(relwidth=1, relheight=1)
+        self.flashcard_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.flashcard_frame.pack(fill="both", expand=True)
         
         self.show_flashcard_front()
-        # Util.double_buffer_frame(self.flashcard_frame, self.options, self.show_flashcard_front)
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard with the FLAG
@@ -53,16 +42,6 @@ class Flashcards(Util.AppPage):
             self.flags = [flag]
         else:
             self.flags = flag.flags
-    
-    def start_flashcard_draw(self):
-
-        self.flag_list = Alphabet.get_all_flags()[:self.questions_amount]
-        self.create_flashcard(self.flag_list[self.flag_index])
-
-        self.flashcard_frame = ctk.CTkFrame(self.container_frame, fg_color="transparent")
-        self.flashcard_frame.place(relwidth=1, relheight=1)
-        
-        Util.double_buffer_frame(self.flashcard_frame, self.options, self.show_flashcard_front)
 
     def show_flashcard_base(self):
         try:

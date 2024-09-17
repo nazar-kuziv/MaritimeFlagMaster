@@ -94,7 +94,7 @@ class BreadcrumbTrailWidget(ctk.CTkFrame):
 _current_page: ctk.CTkBaseClass = None
 
 def change_page(page: AppPage) -> ctk.CTkBaseClass:
-    """Creates and shows an app page with double buffering; internal use only
+    """Shows an app page with double buffering
 
     :return: the page object
     :rtype: ctk.CTkBaseClass

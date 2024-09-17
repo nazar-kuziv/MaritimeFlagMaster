@@ -46,42 +46,6 @@ class FlagSen(Util.AppPage):
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
         Util.double_buffer_frame(self.container_frame, self.options, self.show_question)
 
-    # def get_file_sentence(self, method, next_method):
-    #     print("loading file sentence...")
-    #     isLoaded = method()
-    #     if (isLoaded is None):
-    #         pass
-    #     elif (not isLoaded):
-    #         self.flag_sentence_mode_method(lambda: "Didn't load")
-    #     else:
-    #         self.flag_sentence_mode_method(next_method)
-
-    # def flag_sentence_mode_method(self, method):
-    #     self.get_flag_sentence_method = method
-    #     message = self.get_new_sentence()
-    #     if (message is not None):
-    #         error_message = ctk.CTkLabel(self.container_menu, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
-    #         error_message.grid(row=0, column=1, rowspan=2)
-    #         return
-    #     self.show_question()
-    
-    # def get_new_sentence(self):
-    #     error_text = None
-    #     self.sentence = self.get_flag_sentence_method()
-    #     # self.sentence = NO_INTERNET_CONNECTION
-
-    #     if (isinstance(self.sentence, str) or self.sentence is None):
-    #         print("Didn't get new sentence, ", self.sentence)
-    #         if (self.sentence == REQUEST_LIMIT_EXCEEDED):
-    #             error_text = "Limit zapytań cytatów został osiągnięty, prosimy chwilę poczekać."
-    #         elif (self.sentence == NO_INTERNET_CONNECTION):
-    #             error_text = "Brak połączenia z internetem."
-    #         else:
-    #             error_text = "Błąd czytania z pliku."
-    #         return error_text
-
-    #     print(self.sentence.cleaned_sentence)
-
     def show_question(self):
         """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
         """

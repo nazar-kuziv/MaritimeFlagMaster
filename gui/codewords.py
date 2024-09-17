@@ -6,7 +6,7 @@ import gui.util_functions as Util
 from logic.modes.codewords_session import CodewordsSession
 
 class Codewords(Util.AppPage):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, questions_amount: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the codewords screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -14,17 +14,12 @@ class Codewords(Util.AppPage):
         super().__init__(master, **kwargs)
         print("Initializing codewords frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
+        self.questions_amount = questions_amount
+        self.time_minutes = time_minutes
 
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
-        self.codewords_session = CodewordsSession()
-        self.question_widgets = []
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=3)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1, uniform="side")
-        self.grid_columnconfigure(1, weight=3)
-        self.grid_columnconfigure(2, weight=1, uniform="side")
+        self.codewords_session = CodewordsSession(questions_amount) if questions_amount > 0 else CodewordsSession()
 
         self.flag_index = 0
         self.flag = self.codewords_session.get_flag()
@@ -32,6 +27,7 @@ class Codewords(Util.AppPage):
     def draw(self):
         super().draw()
 
+        self.question_widgets = []
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.container_frame.pack(fill="both", expand=True)
         self.container_frame.grid_rowconfigure(0, weight=1)
@@ -41,8 +37,8 @@ class Codewords(Util.AppPage):
         self.container_frame.grid_columnconfigure(1, weight=3)
         self.container_frame.grid_columnconfigure(2, weight=1, uniform="side")
         
-        self.options = Util.options_menu(self.container_frame, self.show_question, time_minutes_choices=[5, 10, -1], time_minutes_def_ind=0)
-        # self.show_question()
+        # self.options = Util.options_menu(self.container_frame, self.show_question, time_minutes_choices=[5, 10, -1], time_minutes_def_ind=0)
+        self.show_question()
 
     def show_question(self):
         """Make sure to first make the main Codewords frame visible with the place/pack/grid functions

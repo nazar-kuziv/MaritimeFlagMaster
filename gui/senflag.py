@@ -10,7 +10,7 @@ import gui.util_functions as Util
 from logic.modes.senflag_session import SenflagSession
 
 class SenFlag(Util.AppPage):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, source: str = "default", questions_amount: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Sentence-Flags screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -18,7 +18,9 @@ class SenFlag(Util.AppPage):
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-
+        self.source = source
+        self.questions_amount = questions_amount
+        self.time_minutes = time_minutes
 
         self.alphabet = Alphabet.get_characters_flags_shuffled()
         self.flag_index = 0
@@ -30,26 +32,27 @@ class SenFlag(Util.AppPage):
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
         self.top_menu.list = {}
 
-        self.show_options()
+        # self.show_options()
+        self.establish_session(self.source)
 
-    def show_options(self):
-        self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
-        self.choice_menu.pack(side="bottom", fill="y", expand=True)
-        self.top_menu.list["choice_menu"] = self.choice_menu
-        self.questions_amount = 10
+    # def show_options(self):
+    #     self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
+    #     self.choice_menu.pack(side="bottom", fill="y", expand=True)
+    #     self.top_menu.list["choice_menu"] = self.choice_menu
+    #     self.questions_amount = 10
 
 
-        self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                                  command=lambda: self.establish_session("default"))
-        self.default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+    #     self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+    #                                               command=lambda: self.establish_session("default"))
+    #     self.default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
 
-        self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                                  command=lambda: self.establish_session("internet"))
-        self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+    #     self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+    #                                               command=lambda: self.establish_session("internet"))
+    #     self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
         
-        self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                              command=lambda: self.establish_session("file"))
-        self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+    #     self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
+    #                                           command=lambda: self.establish_session("file"))
+    #     self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
 
     def establish_session(self, mode: str):
         error_text = ""

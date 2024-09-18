@@ -36,8 +36,8 @@ class MainMenu(Util.AppPage):
             "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
             "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
             "commands": [lambda: Util.new_page(OptionsMenu, "Słowo kodowe", master=self.window, next_page=Codewords), 
-            lambda: Util.new_page(Meanings, "Znaczenie", master=self.window, fg_color="transparent"), 
-            lambda: Util.new_page(FlagSen, "Flagi→Zdanie", master=self.window, fg_color="transparent"), 
+            lambda: Util.new_page(OptionsMenu, "Znaczenie", master=self.window, next_page=Meanings), 
+            lambda: Util.new_page(OptionsMenu, "Flagi→Zdanie", master=self.window, next_page=FlagSen), 
             lambda: Util.new_page(SenFlag, "Zdanie → Flagi", master=self.window, fg_color="transparent"),]
         }
 

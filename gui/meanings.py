@@ -9,7 +9,7 @@ import gui.util_functions as Util
 from logic.modes.meanings_session import MeaningsSession
 
 class Meanings(Util.AppPage):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, questions_amount: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the meanings screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -17,7 +17,10 @@ class Meanings(Util.AppPage):
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-        self.meaning_session = MeaningsSession()
+        self.questions_amount = questions_amount
+        self.time_minutes = time_minutes
+        self.meaning_session = MeaningsSession(questions_amount) if questions_amount > 0 else MeaningsSession()
+
         # self.flag_list = [Alphabet._characters['C'], Alphabet._characters['B'], Alphabet._characters['A']] # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
         # self.flag_list = [Alphabet._allFlags[7]]

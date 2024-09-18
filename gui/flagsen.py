@@ -9,7 +9,7 @@ import gui.util_functions as Util
 from logic.modes.flagsen_session import FlagsenSession
 
 class FlagSen(Util.AppPage):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, source: str = "default", questions_amount: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Flags-sentence screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -17,18 +17,22 @@ class FlagSen(Util.AppPage):
         super().__init__(master, **kwargs)
         print("Initializing codewords frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
+        self.source = source
+        self.questions_amount = questions_amount
+        self.time_minutes = time_minutes
         
         self.question_widgets = []
     
     def draw(self):
         super().draw()
 
-        self.options = Util.options_menu(self, self.establish_session)
+        # self.options = Util.options_menu(self, self.establish_session)
+        self.establish_session(self.source)
 
-    def establish_session(self, mode: str):
+    def establish_session(self, source: str):
         error_text = ""
         try:
-            self.flagsen_session = FlagsenSession(mode, self.options.questions_amount)
+            self.flagsen_session = FlagsenSession(source, self.questions_amount)
         except NoInternetConnectionException:
             error_text = "Brak połączenia z internetem."
         except RequestLimitExceededException:
@@ -43,8 +47,8 @@ class FlagSen(Util.AppPage):
             error_message.place(relx=0.5, rely=0.5)
             return
         
-        self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
-        Util.double_buffer_frame(self.container_frame, self.options, self.show_question)
+        # Util.double_buffer_frame(self.container_frame, self.options, self.show_question)
+        self.show_question()
 
     def show_question(self):
         """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
@@ -58,6 +62,7 @@ class FlagSen(Util.AppPage):
         self.sentence = self.flagsen_session.get_sentence()
         print(self.sentence.cleaned_sentence)
 
+        self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.container_frame.pack(fill="both", expand=True)
         self.container_frame.grid_rowconfigure(0, weight=0)
         self.container_frame.grid_rowconfigure(1, weight=3)

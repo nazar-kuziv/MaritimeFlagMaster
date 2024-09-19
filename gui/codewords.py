@@ -6,7 +6,7 @@ import gui.util_functions as Util
 from logic.modes.codewords_session import CodewordsSession
 
 class Codewords(Util.AppPage):
-    def __init__(self, master, questions_amount: int = 0, time_minutes: int = 0, **kwargs):
+    def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the codewords screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -14,12 +14,13 @@ class Codewords(Util.AppPage):
         super().__init__(master, **kwargs)
         print("Initializing codewords frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-        self.questions_amount = questions_amount
+        self.questions_number = questions_number
         self.time_minutes = time_minutes
+        print(f"Questions number: {questions_number}, time: {time_minutes}")
 
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
-        self.codewords_session = CodewordsSession(questions_amount) if questions_amount > 0 else CodewordsSession()
+        self.codewords_session = CodewordsSession(questions_number) if questions_number > 0 else CodewordsSession()
 
         self.flag_index = 0
         self.flag = self.codewords_session.get_flag()
@@ -50,6 +51,10 @@ class Codewords(Util.AppPage):
             widget.destroy()
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
+
+        self.answer_response = ctk.CTkLabel(self.container_frame, text='', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
+        self.answer_response.grid(row=0, column=1)
+        self.question_widgets.append(self.answer_response)
         
         img = tksvg.SvgImage(file=Environment.resource_path(self.flag.img_path), scaletoheight=int(self.master.scale_size*0.5))
         self.image = ctk.CTkLabel(self.container_frame, text='', image=img)
@@ -70,21 +75,13 @@ class Codewords(Util.AppPage):
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
 
     def enter_answer(self, event=None):
-        try:
-            self.answer_response.destroy()
-        except AttributeError: pass
-        # correct_answer = self.flag.letter[0].upper()
         
         if (not self.codewords_session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self.container_frame, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
-            self.answer_response.grid(row=0, column=1)
-            self.question_widgets.append(self.answer_response)
+            self.answer_response.configure(text='Źle')
         else:
             print("Correct answer!")
-            self.answer_response = ctk.CTkLabel(self.container_frame, text='Poprawnie!', font=ctk.CTkFont(size=int(self.master.scale_size*0.04)), fg_color='transparent')
-            self.answer_response.grid(row=0, column=1)
-            self.question_widgets.append(self.answer_response)
+            self.answer_response.configure(text='Poprawnie!')
 
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(state="disabled")
@@ -101,6 +98,3 @@ class Codewords(Util.AppPage):
         self.master.unbind("<Return>")
         self.flag = self.codewords_session.get_flag()
         self.show_question()
-        
-    def increment_question(self, number: int = 1):
-        self.change_question(self.flag_index + number)

@@ -9,7 +9,7 @@ import gui.util_functions as Util
 from logic.modes.meanings_session import MeaningsSession
 
 class Meanings(Util.AppPage):
-    def __init__(self, master, questions_amount: int = 0, time_minutes: int = 0, **kwargs):
+    def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the meanings screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -17,9 +17,10 @@ class Meanings(Util.AppPage):
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-        self.questions_amount = questions_amount
+        self.questions_number = questions_number
         self.time_minutes = time_minutes
-        self.meaning_session = MeaningsSession(questions_amount) if questions_amount > 0 else MeaningsSession()
+        print(f"Questions number: {questions_number}, time: {time_minutes}")
+        self.meaning_session = MeaningsSession(questions_number) if questions_number > 0 else MeaningsSession()
 
         # self.flag_list = [Alphabet._characters['C'], Alphabet._characters['B'], Alphabet._characters['A']] # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
@@ -194,17 +195,12 @@ class Meanings(Util.AppPage):
                 f.flag.configure(cursor='')
             
             self.selected_flags = []
+            if not self.meaning_session.next_flag():
+                return
             next_button = ctk.CTkButton(self.top_menu, text='Następny', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.change_question)
             next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
             self.top_menu.dict["next_button"] = next_button
 
     def change_question(self):
-        if not self.meaning_session.next_flag():
-            raise IndexError("Index out of range")
         self.flag = self.meaning_session.get_flag()
         self.show_question()
-
-    def increment_question(self, event=None, number: int = 1):
-        """Adjust the flag index by the given number
-        """
-        self.change_question(index=self.flag_index + number)

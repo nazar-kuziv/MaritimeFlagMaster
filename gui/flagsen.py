@@ -9,7 +9,7 @@ import gui.util_functions as Util
 from logic.modes.flagsen_session import FlagsenSession
 
 class FlagSen(Util.AppPage):
-    def __init__(self, master, source: str = "default", questions_amount: int = 0, time_minutes: int = 0, **kwargs):
+    def __init__(self, master, source: str = "default", questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Flags-sentence screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -18,13 +18,32 @@ class FlagSen(Util.AppPage):
         print("Initializing codewords frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.source = source
-        self.questions_amount = questions_amount
+        self.questions_number = questions_number
         self.time_minutes = time_minutes
+        print(f"Questions number: {questions_number}, time: {time_minutes}")
         
         self.question_widgets = []
     
     def draw(self):
         super().draw()
+
+        self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.container_frame.pack(fill="both", expand=True)
+        self.container_frame.grid_rowconfigure(0, weight=0)
+        self.container_frame.grid_rowconfigure(1, weight=3)
+        self.container_frame.grid_rowconfigure(2, weight=1)
+        self.container_frame.grid_columnconfigure(0, weight=1)
+        self.container_frame.grid_columnconfigure(1, weight=3)
+        self.container_frame.grid_columnconfigure(2, weight=0)
+
+        def save_image():
+            if (Alphabet.saveFlagSentencePNG(self.sentence.flags, suggest_file_name=self.is_answered)):
+                label = ctk.CTkLabel(self.container_frame, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
+                label.grid(column=1, row=0, sticky="e", pady=10)
+                label.after(4000, lambda: label.destroy())
+        
+        self.save_image = ctk.CTkButton(self.container_frame, text='Zapisz obecne jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
+        self.save_image.grid(column=2, row=0, sticky="ne", ipadx=10, ipady=10, padx=10, pady=10)
 
         # self.options = Util.options_menu(self, self.establish_session)
         self.establish_session(self.source)
@@ -32,7 +51,7 @@ class FlagSen(Util.AppPage):
     def establish_session(self, source: str):
         error_text = ""
         try:
-            self.flagsen_session = FlagsenSession(source, self.questions_amount)
+            self.flagsen_session = FlagsenSession(source, self.questions_number)
         except NoInternetConnectionException:
             error_text = "Brak połączenia z internetem."
         except RequestLimitExceededException:
@@ -61,24 +80,6 @@ class FlagSen(Util.AppPage):
         self.is_answered = False
         self.sentence = self.flagsen_session.get_sentence()
         print(self.sentence.cleaned_sentence)
-
-        self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.container_frame.pack(fill="both", expand=True)
-        self.container_frame.grid_rowconfigure(0, weight=0)
-        self.container_frame.grid_rowconfigure(1, weight=3)
-        self.container_frame.grid_rowconfigure(2, weight=1)
-        self.container_frame.grid_columnconfigure(0, weight=1)
-        self.container_frame.grid_columnconfigure(1, weight=3)
-        self.container_frame.grid_columnconfigure(2, weight=0)
-
-        def save_image():
-            if (Alphabet.saveFlagSentencePNG(self.sentence.flags, suggest_file_name=self.is_answered)):
-                label = ctk.CTkLabel(self.container_frame, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
-                label.grid(column=1, row=0, sticky="e", pady=10)
-                label.after(4000, lambda: label.destroy())
-        
-        self.save_image = ctk.CTkButton(self.container_frame, text='Zapisz obecne jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
-        self.save_image.grid(column=2, row=0, sticky="ne", ipadx=10, ipady=10, padx=10, pady=10)
 
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
@@ -139,13 +140,13 @@ class FlagSen(Util.AppPage):
         if (not self.flagsen_session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self.container_frame, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
-            self.answer_response.grid(row=0, column=1)
+            self.answer_response.grid(row=0, column=0, columnspan=3)
             self.question_widgets.append(self.answer_response)
         else:
             print("Correct answer!")
             self.is_answered = True
             self.answer_response = ctk.CTkLabel(self.container_frame, text='Poprawnie!', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
-            self.answer_response.grid(row=0, column=1)
+            self.answer_response.grid(row=0, column=0, columnspan=3)
             self.question_widgets.append(self.answer_response)
 
             self.answer_cell.entry.configure(state="disabled")

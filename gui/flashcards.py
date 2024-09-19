@@ -8,7 +8,7 @@ from logic.alphabet import Alphabet
 import gui.util_functions as Util
 
 class Flashcards(Util.AppPage):
-    def __init__(self, master, questions_amount: int = 0, time_minutes: int = 0, **kwargs):
+    def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the flashcards screen
 
         To draw the flashcard, call show_flashcard_front or show_flashcard_back AFTER making this frame visible with the place/pack/grid functions
@@ -16,10 +16,11 @@ class Flashcards(Util.AppPage):
         super().__init__(master, **kwargs)
         # print("Initializing flashcards frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-        self.questions_amount = questions_amount
+        self.questions_number = questions_number
         self.time_minutes = time_minutes
+        print(f"Questions number: {questions_number}, time: {time_minutes}")
 
-        self.flag_list = Alphabet.get_all_flags()[:self.questions_amount] if self.questions_amount > 0 else Alphabet.get_all_flags()
+        self.flag_list = Alphabet.get_all_flags()[:self.questions_number] if self.questions_number > 0 else Alphabet.get_all_flags()
         self.flag_index = 0
 
     def draw(self):

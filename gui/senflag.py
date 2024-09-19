@@ -10,7 +10,7 @@ import gui.util_functions as Util
 from logic.modes.senflag_session import SenflagSession
 
 class SenFlag(Util.AppPage):
-    def __init__(self, master, source: str = "default", questions_amount: int = 0, time_minutes: int = 0, **kwargs):
+    def __init__(self, master, source: str = "default", questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Sentence-Flags screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -19,8 +19,9 @@ class SenFlag(Util.AppPage):
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.source = source
-        self.questions_amount = questions_amount
+        self.questions_number = questions_number
         self.time_minutes = time_minutes
+        print(f"Questions number: {questions_number}, time: {time_minutes}")
 
         self.alphabet = Alphabet.get_characters_flags_shuffled()
         self.flag_index = 0
@@ -39,7 +40,7 @@ class SenFlag(Util.AppPage):
     #     self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
     #     self.choice_menu.pack(side="bottom", fill="y", expand=True)
     #     self.top_menu.list["choice_menu"] = self.choice_menu
-    #     self.questions_amount = 10
+    #     self.questions_number = 10
 
 
     #     self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
@@ -57,7 +58,7 @@ class SenFlag(Util.AppPage):
     def establish_session(self, mode: str):
         error_text = ""
         try:
-            self.senflag_session = SenflagSession(mode, self.questions_amount)
+            self.senflag_session = SenflagSession(mode, self.questions_number)
         except NoInternetConnectionException:
             error_text = "Brak połączenia z internetem."
         except RequestLimitExceededException:

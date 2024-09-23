@@ -38,7 +38,6 @@ class FlagsenSession:
 
         self.number_of_current_sentence = 0
         self.number_of_correct_answers = 0
-        self.next_sentence()
 
     def get_sentence(self) -> FlagSentence:
         """Returns the current sentence"""
@@ -50,7 +49,7 @@ class FlagsenSession:
         :raise NoInternetConnectionException: If the mode is 'internet' and there is no internet connection
         :raise RequestLimitExceededException: If the mode is 'internet' and the request limit has been exceeded
         """
-        if self.number_of_current_sentence >= self.number_of_sentences:
+        if self.number_of_current_sentence >= self.number_of_sentences - 1:
             return False
         match self.mode:
             case 'default':

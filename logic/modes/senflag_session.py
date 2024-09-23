@@ -38,7 +38,6 @@ class SenflagSession:
 
         self.number_of_current_sentence = 0
         self.number_of_correct_answers = 0
-        self.next_sentence()
 
     def get_sentence(self) -> FlagSentence:
         """Returns the current sentence"""
@@ -50,7 +49,8 @@ class SenflagSession:
         :raise NoInternetConnectionException: If the mode is 'internet' and there is no internet connection
         :raise RequestLimitExceededException: If the mode is 'internet' and the request limit has been exceeded
         """
-        if self.number_of_current_sentence >= self.number_of_sentences:
+        print(f"SENTENCE {self.number_of_current_sentence} OF {self.number_of_sentences}")
+        if self.number_of_current_sentence >= self.number_of_sentences - 1:
             return False
         match self.mode:
             case 'default':
@@ -60,6 +60,7 @@ class SenflagSession:
             case 'file':
                 self.sentence = Alphabet.get_sentence_from_user_file()
         self.number_of_current_sentence += 1
+        print(f"SENTENCE {self.number_of_current_sentence} OF {self.number_of_sentences}")
         return True
 
     def check_answer(self, answer: list[Flag | None]) -> bool:

@@ -27,12 +27,16 @@ class SenflagSession:
                 Alphabet.load_default_sentences()
                 if self.number_of_sentences > Alphabet.get_number_of_default_sentences():
                     self.number_of_sentences = Alphabet.get_number_of_default_sentences()
+                self.sentence = Alphabet.get_default_sentence()
             case 'file':
                 Alphabet.load_sentences_from_user_file()
                 if self.number_of_sentences > Alphabet.get_number_of_sentences_from_user_file():
                     self.number_of_sentences = Alphabet.get_number_of_sentences_from_user_file()
+                self.sentence = Alphabet.get_sentence_from_user_file()
+            case 'internet':
+                self.sentence = Alphabet.get_flag_sentence_from_api()
 
-        self.number_of_current_sentence = -1
+        self.number_of_current_sentence = 0
         self.number_of_correct_answers = 0
         self.next_sentence()
 

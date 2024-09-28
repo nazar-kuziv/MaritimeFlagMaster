@@ -4,6 +4,7 @@ import tksvg
 from logic.environment import Environment
 import gui.util_functions as Util
 from logic.modes.codewords_session import CodewordsSession
+from gui.countdown import Countdown
 
 class Codewords(Util.AppPage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
@@ -27,6 +28,12 @@ class Codewords(Util.AppPage):
     
     def draw(self):
         super().draw()
+
+        if (self.time_minutes > 0):
+            print("Countdown set")
+            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
+                                       fg_color="transparent")
+            self.countdown.pack(side="right", padx=10, pady=5)
 
         self.question_widgets = []
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -74,7 +81,11 @@ class Codewords(Util.AppPage):
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
 
-    def enter_answer(self, event=None):
+        try:
+            self.countdown.startCountdown()
+        except AttributeError: pass
+
+    def enter_answer(self):
         
         if (not self.codewords_session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")

@@ -30,6 +30,9 @@ class AppPage(ABC, ctk.CTkFrame):
         self.update_idletasks()
         self.breadcrumb = BreadcrumbTrailWidget(self._top_menu)
         self.breadcrumb.pack(side="left")
+    
+    def finish(self):
+        pass
 
 def loading_widget(master, isFill: bool = False):
     """Shows some loading text in the middle of the screen

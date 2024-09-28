@@ -1,10 +1,8 @@
 import customtkinter as ctk
-import tkinter as tk
 import gui.util_functions as Util
 from typing import Type
 
 class OptionsMenu(Util.AppPage):
-
     def __init__(self, master, next_page: Type[Util.AppPage], select_source: bool = False, questions_number_choices: list[int] = [5, 10, 20], questions_number_def_ind: int = 1, time_minutes_choices: list[int] = [5, 10, 0], time_minutes_def_ind: int = 0):
         """Frame for selecting various options for the picked mode
 

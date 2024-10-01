@@ -6,7 +6,7 @@ import gui.util_functions as Util
 from logic.modes.codewords_session import CodewordsSession
 from gui.countdown import Countdown
 
-class Codewords(Util.AppPage):
+class Codewords(Util.AppQuizPage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the codewords screen
 
@@ -31,7 +31,9 @@ class Codewords(Util.AppPage):
 
         if (self.time_minutes > 0):
             print("Countdown set")
-            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
+            # self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
+            #                            fg_color="transparent")
+            self.countdown = Countdown(self._top_menu, '00:05', self.finish,
                                        fg_color="transparent")
             self.countdown.pack(side="right", padx=10, pady=5)
 

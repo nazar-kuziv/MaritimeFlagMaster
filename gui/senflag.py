@@ -9,7 +9,7 @@ from logic.exceptions import *
 import gui.util_functions as Util
 from logic.modes.senflag_session import SenflagSession
 
-class SenFlag(Util.AppPage):
+class SenFlag(Util.AppQuizPage):
     def __init__(self, master, source: str = "default", questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Sentence-Flags screen
 

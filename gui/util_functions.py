@@ -16,10 +16,10 @@ def get_scale_size(widget: ctk.CTkBaseClass) -> int:
 class AppPage(ABC, ctk.CTkFrame):
     """Abstract class of every CTkFrame that acts as a new application page (e.g. for breadcrumbs)
     """
-    @abstractmethod
     def __init__(self, master: ctk.CTkBaseClass, **kwargs):
         super().__init__(master, **kwargs)
 
+    @abstractmethod
     def draw(self):
         """Draws GUI elements
 
@@ -29,10 +29,13 @@ class AppPage(ABC, ctk.CTkFrame):
         self._top_menu.pack(fill="x")
         self.update_idletasks()
         self.breadcrumb = BreadcrumbTrailWidget(self._top_menu)
-        self.breadcrumb.pack(side="left")
-    
-    def finish(self):
-        pass
+        self.breadcrumb.pack(side="left", anchor="nw")
+
+import gui.results as Results # here to avoid circular import
+class AppQuizPage(AppPage):
+    def finish(self, **kwargs):
+        page = Results.Results(self.master, fg_color="transparent", **kwargs)
+        change_page(page)
 
 def loading_widget(master, isFill: bool = False):
     """Shows some loading text in the middle of the screen

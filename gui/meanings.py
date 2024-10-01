@@ -8,7 +8,7 @@ from logic.alphabet import Alphabet
 import gui.util_functions as Util
 from logic.modes.meanings_session import MeaningsSession
 
-class Meanings(Util.AppPage):
+class Meanings(Util.AppQuizPage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the meanings screen
 

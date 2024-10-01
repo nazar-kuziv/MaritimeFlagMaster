@@ -7,7 +7,7 @@ from logic.flags import *
 from logic.alphabet import Alphabet
 import gui.util_functions as Util
 
-class Flashcards(Util.AppPage):
+class Flashcards(Util.AppQuizPage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the flashcards screen
 

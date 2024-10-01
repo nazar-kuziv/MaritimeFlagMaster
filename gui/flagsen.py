@@ -8,7 +8,7 @@ from logic.exceptions import *
 import gui.util_functions as Util
 from logic.modes.flagsen_session import FlagsenSession
 
-class FlagSen(Util.AppPage):
+class FlagSen(Util.AppQuizPage):
     def __init__(self, master, source: str = "default", questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Flags-sentence screen
 

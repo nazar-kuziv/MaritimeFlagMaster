@@ -6,6 +6,7 @@ from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.exceptions import *
 import gui.util_functions as Util
+from gui.countdown import Countdown
 from logic.modes.flagsen_session import FlagsenSession
 
 class FlagSen(Util.AppQuizPage):
@@ -26,6 +27,14 @@ class FlagSen(Util.AppQuizPage):
     
     def draw(self):
         super().draw()
+
+        if (self.time_minutes > 0):
+            print("Countdown set")
+            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
+                                       fg_color="transparent")
+            # self.countdown = Countdown(self._top_menu, '00:05', self.finish,
+            #                            fg_color="transparent")
+            self.countdown.pack(side="right", padx=10, pady=5)
 
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.container_frame.pack(fill="both", expand=True)
@@ -123,7 +132,11 @@ class FlagSen(Util.AppQuizPage):
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
+
         self.update_idletasks()
+        try:
+            self.countdown.startCountdown()
+        except AttributeError: pass
         loading_label.destroy()
 
     def validate_answer(self, new_text):
@@ -161,9 +174,16 @@ class FlagSen(Util.AppQuizPage):
             #     error_message.grid(row=0, column=1, rowspan=2)
             #     return
             
+            self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
-            if (not self.flagsen_session.next_sentence()):
-                return
-            self.next_button = ctk.CTkButton(self.container_frame, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=self.show_question)
+            next_exists = self.flagsen_session.next_sentence()
+            next_command = self.show_question if next_exists else self.finish
+            next_text = "Nowe zdanie" if next_exists else "Wyniki"
+            if (not next_exists):
+                try:
+                    self.countdown.pause()
+                except AttributeError: pass
+            
+            self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=next_command)
             self.next_button.grid(row=2, column=2, sticky="e", padx=10)
             self.question_widgets.append(self.next_button)

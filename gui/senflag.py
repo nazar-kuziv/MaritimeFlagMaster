@@ -7,6 +7,7 @@ from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.exceptions import *
 import gui.util_functions as Util
+from gui.countdown import Countdown
 from logic.modes.senflag_session import SenflagSession
 
 class SenFlag(Util.AppQuizPage):
@@ -29,6 +30,15 @@ class SenFlag(Util.AppQuizPage):
     
     def draw(self):
         super().draw()
+
+        if (self.time_minutes > 0):
+            print("Countdown set")
+            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
+                                       fg_color="transparent")
+            # self.countdown = Countdown(self._top_menu, '00:05', self.finish,
+            #                            fg_color="transparent")
+            self.countdown.pack(side="right", padx=10, pady=5)
+        
         self.top_menu = ctk.CTkFrame(self, height=0)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
         self.top_menu.list = {}
@@ -139,6 +149,9 @@ class SenFlag(Util.AppQuizPage):
             self.images, self.alphabet = zip(*temp)
         
         self.place_input_flags()
+        try:
+            self.countdown.startCountdown()
+        except AttributeError: pass
         # self.update_idletasks()
         # loading_label.destroy()
 
@@ -247,9 +260,16 @@ class SenFlag(Util.AppQuizPage):
             #     error_message.grid(row=0, column=1, rowspan=2)
             #     return
             
+            self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
-            if (not self.senflag_session.next_sentence()):
-                return
-            self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.show_question)
+            next_exists = self.flagsen_session.next_sentence()
+            next_command = self.show_question if next_exists else self.finish
+            next_text = "Nowe zdanie" if next_exists else "Wyniki"
+            if (not next_exists):
+                try:
+                    self.countdown.pause()
+                except AttributeError: pass
+            
+            self.next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=next_command)
             self.next_button.pack(side="right", fill='y')
             self.top_menu.list["new_sentence"] = self.next_button

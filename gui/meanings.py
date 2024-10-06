@@ -6,6 +6,7 @@ from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 import gui.util_functions as Util
+from gui.countdown import Countdown
 from logic.modes.meanings_session import MeaningsSession
 
 class Meanings(Util.AppQuizPage):
@@ -36,6 +37,14 @@ class Meanings(Util.AppQuizPage):
     
     def draw(self):
         super().draw()
+
+        if (self.time_minutes > 0):
+            print("Countdown set")
+            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
+                                       fg_color="transparent")
+            # self.countdown = Countdown(self._top_menu, '00:05', self.finish,
+            #                            fg_color="transparent")
+            self.countdown.pack(side="right", padx=10, pady=5)
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
@@ -110,7 +119,11 @@ class Meanings(Util.AppQuizPage):
             kwargs = { "scaletoheight":int(self.master.scale_size*0.8/self.input_columns) } if (self.master.winfo_height() < self.master.winfo_width()) else { "scaletowidth":int(self.master.scale_size*0.8/self.input_columns) }
             f.configure(**kwargs)
         self.place_input_flags()
+
         self.update_idletasks()
+        try:
+            self.countdown.startCountdown()
+        except AttributeError: pass
         loading_label.destroy()
 
     def place_input_flags(self):
@@ -195,9 +208,17 @@ class Meanings(Util.AppQuizPage):
                 f.flag.configure(cursor='')
             
             self.selected_flags = []
-            if not self.meaning_session.next_flag():
-                return
-            next_button = ctk.CTkButton(self.top_menu, text='Następny', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.change_question)
+
+            #next button
+            next_exists = self.meaning_session.next_flag()
+            next_command = self.change_question if next_exists else self.finish
+            next_text = "Następny" if next_exists else "Wyniki"
+            if (not next_exists):
+                try:
+                    self.countdown.pause()
+                except AttributeError: pass
+
+            next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=next_command)
             next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
             self.top_menu.dict["next_button"] = next_button
 

@@ -3,8 +3,8 @@ import tksvg
 
 from logic.environment import Environment
 import gui.util_functions as Util
-from logic.modes.codewords_session import CodewordsSession
 from gui.countdown import Countdown
+from logic.modes.codewords_session import CodewordsSession
 
 class Codewords(Util.AppQuizPage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
@@ -31,10 +31,10 @@ class Codewords(Util.AppQuizPage):
 
         if (self.time_minutes > 0):
             print("Countdown set")
-            # self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
-            #                            fg_color="transparent")
-            self.countdown = Countdown(self._top_menu, '00:05', self.finish,
+            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
                                        fg_color="transparent")
+            # self.countdown = Countdown(self._top_menu, '00:05', self.finish,
+            #                            fg_color="transparent")
             self.countdown.pack(side="right", padx=10, pady=5)
 
         self.question_widgets = []
@@ -76,7 +76,7 @@ class Codewords(Util.AppQuizPage):
 
         print(self.flag.code_word)
         self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), width=int(self.master.scale_size*0.3), validate="key")
-        self.answer_cell.entry.bind("<Return>", self.enter_answer)
+        self.answer_cell.entry.bind("<Return>", lambda x: self.enter_answer())
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
         
@@ -88,7 +88,6 @@ class Codewords(Util.AppQuizPage):
         except AttributeError: pass
 
     def enter_answer(self):
-        
         if (not self.codewords_session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response.configure(text='Źle')
@@ -100,12 +99,20 @@ class Codewords(Util.AppQuizPage):
             self.answer_cell.submit_button.configure(state="disabled")
 
             # next button
-            if (self.codewords_session.next_flag()):
-                self.master.bind("<Return>", lambda x: self.change_question())
-                self.next_button = ctk.CTkButton(self.container_frame, text="Następny", font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
-                                                 height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=self.change_question)
-                self.next_button.grid(row=1, column=2)
-                self.question_widgets.append(self.next_button)
+            next_exists = self.codewords_session.next_flag()
+            next_command = self.change_question if next_exists else self.finish
+            next_text = "Następny" if next_exists else "Wyniki"
+            if (not next_exists):
+                try:
+                    self.countdown.pause()
+                except AttributeError: pass
+
+            self.master.bind("<Return>", lambda x: next_command())
+            self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
+                                                height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=next_command)
+            self.update()
+            self.next_button.grid(row=1, column=2)
+            self.question_widgets.append(self.next_button)
     
     def change_question(self):
         self.master.unbind("<Return>")

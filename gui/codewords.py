@@ -31,9 +31,9 @@ class Codewords(Util.AppQuizPage):
 
         if (self.time_minutes > 0):
             print("Countdown set")
-            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
+            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", lambda: self.finish("Czas minął, oto twój wynik:"),
                                        fg_color="transparent")
-            # self.countdown = Countdown(self._top_menu, '00:05', self.finish,
+            # self.countdown = Countdown(self._top_menu, '00:05', lambda: self.finish("Czas minął, oto twój wynik:"),
             #                            fg_color="transparent")
             self.countdown.pack(side="right", padx=10, pady=5)
 

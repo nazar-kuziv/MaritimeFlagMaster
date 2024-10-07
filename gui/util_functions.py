@@ -33,7 +33,9 @@ class AppPage(ABC, ctk.CTkFrame):
 
 import gui.results as Results # here to avoid circular import
 class AppQuizPage(AppPage):
-    def finish(self, **kwargs):
+    def finish(self, message: str = None, **kwargs):
+        if (message is not None):
+            kwargs["message"] = message
         page = Results.Results(self.master, fg_color="transparent", **kwargs)
         change_page(page)
 

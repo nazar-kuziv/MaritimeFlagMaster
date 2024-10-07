@@ -33,7 +33,7 @@ class SenFlag(Util.AppQuizPage):
 
         if (self.time_minutes > 0):
             print("Countdown set")
-            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", self.finish,
+            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", lambda: self.finish("Czas minął, oto twój wynik:"),
                                        fg_color="transparent")
             # self.countdown = Countdown(self._top_menu, '00:05', self.finish,
             #                            fg_color="transparent")
@@ -45,25 +45,6 @@ class SenFlag(Util.AppQuizPage):
 
         # self.show_options()
         self.establish_session(self.source)
-
-    # def show_options(self):
-    #     self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
-    #     self.choice_menu.pack(side="bottom", fill="y", expand=True)
-    #     self.top_menu.list["choice_menu"] = self.choice_menu
-    #     self.questions_number = 10
-
-
-    #     self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-    #                                               command=lambda: self.establish_session("default"))
-    #     self.default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
-
-    #     self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-    #                                               command=lambda: self.establish_session("internet"))
-    #     self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
-        
-    #     self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-    #                                           command=lambda: self.establish_session("file"))
-    #     self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
 
     def establish_session(self, mode: str):
         error_text = ""

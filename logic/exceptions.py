@@ -24,3 +24,8 @@ class CantLoadDefaultSentencesException(Exception):
     def __init__(self):
         self.message = 'Can\'t load default sentences'
         super().__init__(self.message)
+
+class InputCharacterException(Exception):
+    def __init__(self):
+        self.message = 'The entered character is not supported'
+        super().__init__(self.message)

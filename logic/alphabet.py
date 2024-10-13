@@ -1,16 +1,13 @@
 import copy
 import random
 import re
-import requests
-import logic.exceptions as exceptions
 
+import requests
+from PIL import Image as PILImage
 from customtkinter import filedialog
 
-from PIL import Image as PILImage
-
-from logic import constants
+import logic.exceptions as exceptions
 from logic.environment import Environment
-
 from logic.flags import Flag, FlagMultiple, FlagSentence
 
 
@@ -234,8 +231,8 @@ class Alphabet:
     def get_flag_using_character(character: str) -> Flag | None | str:
         """Returns a Flag object using a character.
         Returns None if space character is passed.
-        Returns constants.INPUT_CHARACTER_ERROR if character is not found.
 
+        :raise InputCharacterException if character is not found.
         :param character: Character to search for
         :rtype: Flag|None|str
         """
@@ -250,7 +247,10 @@ class Alphabet:
         elif character == ' ':
             return None
         else:
-            return Alphabet._characters.get(character.upper(), constants.INPUT_CHARACTER_ERROR)
+            flag = Alphabet._characters.get(character.upper())
+            if flag:
+                return flag
+            raise exceptions.InputCharacterException()
 
     @staticmethod
     def get_default_sentence() -> FlagSentence | None:

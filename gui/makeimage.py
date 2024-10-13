@@ -1,12 +1,12 @@
-import customtkinter as ctk
 from tkinter import Event
+
+import customtkinter as ctk
 import tksvg
 
-from logic.environment import Environment
-from logic.flags import *
-from logic.alphabet import Alphabet
-from logic.constants import *
 import gui.util_functions as Util
+from logic.alphabet import Alphabet
+from logic.environment import Environment
+
 
 class MakeImage(Util.AppPage):
     def __init__(self, master, **kwargs):

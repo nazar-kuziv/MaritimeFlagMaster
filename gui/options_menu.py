@@ -42,7 +42,7 @@ class OptionsMenu(Util.AppPage):
             return labels
 
         numbers = numbers_to_labels(self.questions_number_choices)
-        number_label = ctk.CTkLabel(menu, text='Liczba pytań', fg_color='transparent')
+        number_label = ctk.CTkLabel(menu, text='Liczba pytań', font=ctk.CTkFont(size=int(self.winfo_width()*0.015)), fg_color='transparent')
         number_label.grid(column=0, row=0, padx=5, pady=5, sticky="se")
         number_var = ctk.StringVar(value=numbers[self.questions_number_def_ind])
         def optionmenu_callback(choice):
@@ -53,12 +53,12 @@ class OptionsMenu(Util.AppPage):
             except ValueError: menu.questions_number = 0
         # self.number_options = tk.OptionMenu(menu, number_var, *numbers)
         self.number_options = ctk.CTkOptionMenu(menu, values=numbers,
-                                            command=optionmenu_callback,
+                                            command=optionmenu_callback, font=ctk.CTkFont(size=int(self.winfo_width()*0.015)),
                                             variable=number_var)
         self.number_options.grid(column=1, row=0, padx=5, pady=5, sticky="sw")
 
         times = numbers_to_labels(self.time_minutes_choices)
-        time_label = ctk.CTkLabel(menu, text='Limit czasu (minuty)', width=40, height=28, fg_color='transparent')
+        time_label = ctk.CTkLabel(menu, text='Limit czasu (minuty)', font=ctk.CTkFont(size=int(self.winfo_width()*0.015)), fg_color='transparent')
         time_label.grid(column=0, row=1, padx=5, pady=5, sticky="ne")
         time_var = ctk.StringVar(value=times[self.time_minutes_def_ind])
         def optionmenu_callback(choice):
@@ -69,7 +69,7 @@ class OptionsMenu(Util.AppPage):
             except ValueError: menu.time_minutes = 0
         # self.time_options = tk.OptionMenu(menu, time_var, *times)
         self.time_options = ctk.CTkOptionMenu(menu, values=times,
-                                                command=optionmenu_callback,
+                                                command=optionmenu_callback, font=ctk.CTkFont(size=int(self.winfo_width()*0.015)),
                                                 variable=time_var)
         self.time_options.grid(column=1, row=1, padx=5, pady=5, sticky="nw")
 

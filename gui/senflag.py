@@ -94,7 +94,7 @@ class SenFlag(Util.AppQuizPage):
         meaning_label.pack(side="left", padx=10)
         self.top_menu.list["meaning_label"] = meaning_label
 
-        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
+        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer)
         check_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list["check_button"] = check_button
 
@@ -174,6 +174,7 @@ class SenFlag(Util.AppQuizPage):
         if (index == "SPACJA"):
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='␣', font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
             new_input_flag.pack(side="left", padx=1)
+            self.update()
             self.input_flag_labels.append(new_input_flag)
             self.input_flag_objects.append(None)
         else:
@@ -184,7 +185,8 @@ class SenFlag(Util.AppQuizPage):
             self.input_flag_objects.append(self.alphabet[index])
         
         self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
-        self.top_menu.list["check_button"].configure(state="enabled", cursor="hand2")
+        # if (len(self.input_flag_labels) == 1):
+        #     self.top_menu.list["check_button"].configure(state="normal")
         try:
             self.answer_response.destroy()
         except AttributeError: pass
@@ -197,8 +199,8 @@ class SenFlag(Util.AppQuizPage):
             flag.destroy()
             self.input_flag_objects.pop()
             self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
-            if (len(self.input_flag_labels) <= 0):
-                self.top_menu.list["check_button"].configure(state="disabled", cursor='')
+            # if (len(self.input_flag_labels) <= 0):
+            #     self.top_menu.list["check_button"].configure(state="disabled")
             if (self.answer_response is not None):
                 self.answer_response.destroy()
 
@@ -243,7 +245,7 @@ class SenFlag(Util.AppQuizPage):
             
             self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
-            next_exists = self.flagsen_session.next_sentence()
+            next_exists = self.senflag_session.next_sentence()
             next_command = self.show_question if next_exists else self.finish
             next_text = "Nowe zdanie" if next_exists else "Wyniki"
             if (not next_exists):

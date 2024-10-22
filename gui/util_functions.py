@@ -2,11 +2,6 @@ import customtkinter as ctk
 from abc import ABC, abstractmethod
 from typing import Any, Type, Callable
 
-# def change_scale_size(event):
-#     if event.widget == event.widget.winfo_toplevel():
-#         event.widget.scale_size = event.height if event.height < event.width else event.width
-#         print(event.widget.scale_size)
-
 def get_scale_size(widget: ctk.CTkBaseClass) -> int:
     """Calculates and returns the scaling size to which to adjust element sizes
 
@@ -21,10 +16,10 @@ def get_scale_size(widget: ctk.CTkBaseClass) -> int:
 class AppPage(ABC, ctk.CTkFrame):
     """Abstract class of every CTkFrame that acts as a new application page (e.g. for breadcrumbs)
     """
-    @abstractmethod
     def __init__(self, master: ctk.CTkBaseClass, **kwargs):
         super().__init__(master, **kwargs)
 
+    @abstractmethod
     def draw(self):
         """Draws GUI elements
 
@@ -34,7 +29,15 @@ class AppPage(ABC, ctk.CTkFrame):
         self._top_menu.pack(fill="x")
         self.update_idletasks()
         self.breadcrumb = BreadcrumbTrailWidget(self._top_menu)
-        self.breadcrumb.pack(side="left")
+        self.breadcrumb.pack(side="left", anchor="nw")
+
+import gui.results as Results # here to avoid circular import
+class AppQuizPage(AppPage):
+    def finish(self, message: str = None, **kwargs):
+        if (message is not None):
+            kwargs["message"] = message
+        page = Results.Results(self.master, fg_color="transparent", **kwargs)
+        change_page(page)
 
 def loading_widget(master, isFill: bool = False):
     """Shows some loading text in the middle of the screen
@@ -98,8 +101,8 @@ class BreadcrumbTrailWidget(ctk.CTkFrame):
 
 _current_page: ctk.CTkBaseClass = None
 
-def _change_page(page: AppPage) -> ctk.CTkBaseClass:
-    """Creates and shows an app page with double buffering; internal use only
+def change_page(page: AppPage) -> ctk.CTkBaseClass:
+    """Shows an app page with double buffering
 
     :return: the page object
     :rtype: ctk.CTkBaseClass
@@ -125,19 +128,26 @@ def new_page(page: Type[AppPage], breadcrumb_name: str, **kwargs) -> ctk.CTkBase
     # print(f"Adding new page {page.__class__} to breadcrumb trail")
     page = page(**kwargs)
     add_breadcrumb(breadcrumb_name, page.__class__, **kwargs)
-    return _change_page(page)
+    return change_page(page)
 
 def previous_page(index: int) -> ctk.CTkBaseClass:
     for i in range(index + 1, len(_page_class)):
             delete_breadcrumb()
-    return _change_page(_page_class[index](**_page_kwargs[index]))
+    return change_page(_page_class[index](**_page_kwargs[index]))
 
-def double_buffer_frame(frame: ctk.CTkBaseClass | None, buffer_frame: ctk.CTkBaseClass | None, frame_function: Callable):
+def double_buffer_frame(frame: ctk.CTkBaseClass, buffer_frame: ctk.CTkBaseClass | None, draw_function: Callable):
+    """Double-buffers the provided frame
+
+    :param buffer_frame: frame to mask the new one with, normally should be the previous frame, None creates a blank one
+    :type buffer_frame: ctk.CTkBaseClass
+    :param draw_function: called between raising and destroying the double-buffer frame
+    :type draw_function: Callable
+    """
     if (buffer_frame is None):
-        buffer_frame = ctk.CTkFrame(frame.winfo_toplevel(), fg_color="transparent")
+        buffer_frame = ctk.CTkFrame(frame.master, fg_color="transparent")
         buffer_frame.place(relwidth=1, relheight=1)
     frame.lower(buffer_frame)
-    frame_function()
+    draw_function()
     
     frame.update_idletasks()
     buffer_frame.destroy()

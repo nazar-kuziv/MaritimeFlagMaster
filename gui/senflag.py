@@ -7,10 +7,11 @@ from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.exceptions import *
 import gui.util_functions as Util
+from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.senflag_session import SenflagSession
 
-class SenFlag(Util.AppPage):
-    def __init__(self, master, **kwargs):
+class SenFlag(Util.AppQuizPage):
+    def __init__(self, master, source: str = "default", questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Sentence-Flags screen
 
         To draw the question, call show_question AFTER making this frame visible with the place/pack/grid functions
@@ -18,7 +19,10 @@ class SenFlag(Util.AppPage):
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-
+        self.source = source
+        self.questions_number = questions_number
+        self.time_minutes = time_minutes
+        print(f"Questions number: {questions_number}, time: {time_minutes}")
 
         self.alphabet = Alphabet.get_characters_flags_shuffled()
         self.flag_index = 0
@@ -26,35 +30,21 @@ class SenFlag(Util.AppPage):
     
     def draw(self):
         super().draw()
+
+        if (self.time_minutes > 0):
+            self.countdown = add_countdown_timer_to_top_menu(self)
+        
         self.top_menu = ctk.CTkFrame(self, height=0)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
         self.top_menu.list = {}
 
-        self.show_choice()
-
-    def show_choice(self):
-        self.choice_menu = ctk.CTkFrame(self, fg_color="transparent")
-        self.choice_menu.pack(side="bottom", fill="y", expand=True)
-        self.top_menu.list["choice_menu"] = self.choice_menu
-        self.questions_amount = 10
-
-
-        self.default_mode_button = ctk.CTkButton(self.choice_menu, text='Wbudowane', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                                  command=lambda: self.establish_session("default"))
-        self.default_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
-
-        self.internet_mode_button = ctk.CTkButton(self.choice_menu, text='Z internetu', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                                  command=lambda: self.establish_session("internet"))
-        self.internet_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
-        
-        self.file_mode_button = ctk.CTkButton(self.choice_menu, text='Z pliku...', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), 
-                                              command=lambda: self.establish_session("file"))
-        self.file_mode_button.pack(side="left", expand=True, ipadx=10, ipady=10, padx=5)
+        # self.show_options()
+        self.establish_session(self.source)
 
     def establish_session(self, mode: str):
         error_text = ""
         try:
-            self.senflag_session = SenflagSession(mode, self.questions_amount)
+            self.senflag_session = SenflagSession(mode, self.questions_number)
         except NoInternetConnectionException:
             error_text = "Brak połączenia z internetem."
         except RequestLimitExceededException:
@@ -99,7 +89,7 @@ class SenFlag(Util.AppPage):
         meaning_label.pack(side="left", padx=10)
         self.top_menu.list["meaning_label"] = meaning_label
 
-        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
+        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer)
         check_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.list["check_button"] = check_button
 
@@ -135,6 +125,9 @@ class SenFlag(Util.AppPage):
             self.images, self.alphabet = zip(*temp)
         
         self.place_input_flags()
+        try:
+            self.countdown.startCountdown()
+        except AttributeError: pass
         # self.update_idletasks()
         # loading_label.destroy()
 
@@ -176,6 +169,7 @@ class SenFlag(Util.AppPage):
         if (index == "SPACJA"):
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='␣', font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
             new_input_flag.pack(side="left", padx=1)
+            self.update()
             self.input_flag_labels.append(new_input_flag)
             self.input_flag_objects.append(None)
         else:
@@ -186,7 +180,8 @@ class SenFlag(Util.AppPage):
             self.input_flag_objects.append(self.alphabet[index])
         
         self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
-        self.top_menu.list["check_button"].configure(state="enabled", cursor="hand2")
+        # if (len(self.input_flag_labels) == 1):
+        #     self.top_menu.list["check_button"].configure(state="normal")
         try:
             self.answer_response.destroy()
         except AttributeError: pass
@@ -199,8 +194,8 @@ class SenFlag(Util.AppPage):
             flag.destroy()
             self.input_flag_objects.pop()
             self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
-            if (len(self.input_flag_labels) <= 0):
-                self.top_menu.list["check_button"].configure(state="disabled", cursor='')
+            # if (len(self.input_flag_labels) <= 0):
+            #     self.top_menu.list["check_button"].configure(state="disabled")
             if (self.answer_response is not None):
                 self.answer_response.destroy()
 
@@ -221,7 +216,7 @@ class SenFlag(Util.AppPage):
             self.answer_response.pack(side="left", padx=10)
             self.top_menu.list["answer_response"] = self.answer_response
 
-            self.top_menu.list["check_button"].configure(state="disabled", cursor='')
+            self.top_menu.list["check_button"].configure(command=None)
             for f in self.flag_images:
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')
@@ -243,9 +238,16 @@ class SenFlag(Util.AppPage):
             #     error_message.grid(row=0, column=1, rowspan=2)
             #     return
             
+            self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
-            if (not self.senflag_session.next_sentence()):
-                return
-            self.next_button = ctk.CTkButton(self.top_menu, text="Nowe zdanie", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.show_question)
+            next_exists = self.senflag_session.next_sentence()
+            next_command = self.show_question if next_exists else self.finish
+            next_text = "Nowe zdanie" if next_exists else "Wyniki"
+            if (not next_exists):
+                try:
+                    self.countdown.pause()
+                except AttributeError: pass
+            
+            self.next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=next_command)
             self.next_button.pack(side="right", fill='y')
             self.top_menu.list["new_sentence"] = self.next_button

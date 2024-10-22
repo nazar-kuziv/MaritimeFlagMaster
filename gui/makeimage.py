@@ -67,7 +67,7 @@ class MakeImage(Util.AppPage):
         self.top_menu.input_text.bind("<KeyRelease>", textbox_callback)
         self.top_menu.input_text.focus()
 
-        self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.save_image, state="disabled")
+        self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)))
         self.top_menu.check_button.pack(side="right", ipadx=10, ipady=10)
 
         def checkbox_event():
@@ -156,7 +156,7 @@ class MakeImage(Util.AppPage):
             if (event is not None):
                 self.top_menu.input_text.insert('end', self.alphabet[index].code_word[0])
         
-        self.top_menu.check_button.configure(state="enabled", cursor="hand2")
+        self.top_menu.check_button.configure(command=self.save_image)
 
     
     def delete_input_flag(self, event = None):
@@ -166,7 +166,7 @@ class MakeImage(Util.AppPage):
             flag.destroy()
             self.answer_flags.pop()
             if (len(self.input_images) <= 0):
-                self.top_menu.check_button.configure(state="disabled", cursor='')
+                self.top_menu.check_button.configure(command=None)
 
     def save_image(self):
         if Alphabet.saveFlagSentencePNG(self.answer_flags, background=self.is_transparent):

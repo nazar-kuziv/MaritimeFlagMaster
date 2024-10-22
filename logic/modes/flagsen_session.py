@@ -44,7 +44,7 @@ class FlagsenSession(Session):
         :raise NoInternetConnectionException: If the mode is 'internet' and there is no internet connection
         :raise RequestLimitExceededException: If the mode is 'internet' and the request limit has been exceeded
         """
-        if self.current_question > self.number_of_questions:
+        if self.current_question >= self.number_of_questions:
             return False
         match self.mode:
             case 'default':

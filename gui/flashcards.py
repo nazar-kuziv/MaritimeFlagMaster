@@ -36,6 +36,10 @@ class Flashcards(Util.AppQuizPage):
         self.flashcard_frame.pack(fill="both", expand=True)
         
         self.show_flashcard_front()
+        
+        try:
+            self.countdown.startCountdown()
+        except AttributeError: pass
     
     def create_flashcard(self, flag: Flag | FlagMultiple):
         """Creates a flashcard with the FLAG

@@ -6,7 +6,7 @@ from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 import gui.util_functions as Util
-from gui.countdown import Countdown
+from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.meanings_session import MeaningsSession
 
 class Meanings(Util.AppQuizPage):
@@ -39,12 +39,7 @@ class Meanings(Util.AppQuizPage):
         super().draw()
 
         if (self.time_minutes > 0):
-            print("Countdown set")
-            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", lambda: self.finish("Czas minął, oto twój wynik:"),
-                                       fg_color="transparent")
-            # self.countdown = Countdown(self._top_menu, '00:05', self.finish,
-            #                            fg_color="transparent")
-            self.countdown.pack(side="right", padx=10, pady=5)
+            self.countdown = add_countdown_timer_to_top_menu(self)
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)

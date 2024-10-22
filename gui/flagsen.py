@@ -6,7 +6,7 @@ from logic.flags import *
 from logic.alphabet import Alphabet
 from logic.exceptions import *
 import gui.util_functions as Util
-from gui.countdown import Countdown
+from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.flagsen_session import FlagsenSession
 
 class FlagSen(Util.AppQuizPage):
@@ -29,12 +29,7 @@ class FlagSen(Util.AppQuizPage):
         super().draw()
 
         if (self.time_minutes > 0):
-            print("Countdown set")
-            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", lambda: self.finish("Czas minął, oto twój wynik:"),
-                                       fg_color="transparent")
-            # self.countdown = Countdown(self._top_menu, '00:05', self.finish,
-            #                            fg_color="transparent")
-            self.countdown.pack(side="right", padx=10, pady=5)
+            self.countdown = add_countdown_timer_to_top_menu(self)
 
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.container_frame.pack(fill="both", expand=True)

@@ -37,8 +37,8 @@ class MainMenu(Util.AppPage):
             "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
             "commands": [lambda: Util.new_page(OptionsMenu, "Słowo kodowe", master=self.window, next_page=Codewords), 
             lambda: Util.new_page(OptionsMenu, "Znaczenie", master=self.window, next_page=Meanings), 
-            lambda: Util.new_page(OptionsMenu, "Flagi→Zdanie", master=self.window, next_page=FlagSen, select_source=True), 
-            lambda: Util.new_page(OptionsMenu, "Zdanie → Flagi", master=self.window, next_page=SenFlag, select_source=True),]
+            lambda: Util.new_page(OptionsMenu, "Flagi→Zdanie", master=self.window, next_page=FlagSen, select_source=True, questions_number_choices=[5, 10, 15], questions_number_def_ind=0, time_minutes_choices=[5, 10, 15, 20],  time_minutes_def_ind=1), 
+            lambda: Util.new_page(OptionsMenu, "Zdanie → Flagi", master=self.window, next_page=SenFlag, select_source=True, questions_number_choices=[5, 10, 15], questions_number_def_ind=0, time_minutes_choices=[5, 10, 15, 20],  time_minutes_def_ind=1)]
         }
 
         self.about_window = None
@@ -76,7 +76,7 @@ class MainMenu(Util.AppPage):
         buttonNames = ["Nauka\n\nPoznaj flagi i co oznaczają",
                  "Testy\n\nSprawdź się!",
                  "Stwórz zdjęcie\n\nZłóż własny komunikat za pomocą flag"]
-        commands = [lambda: Util.new_page(OptionsMenu, "Flashcards", master=self.window, next_page=Flashcards, time_minutes_choices=[0, 5, 10],  time_minutes_def_ind=0),
+        commands = [lambda: Util.new_page(OptionsMenu, "Flashcards", master=self.window, next_page=Flashcards, questions_number_choices=[0, 5, 10, 20], questions_number_def_ind=0, time_minutes_choices=[0, 5, 10],  time_minutes_def_ind=0),
                     lambda: Util.new_page(Submenu, "Testy", master=self.window, menu=self.tests_submenu, fg_color="transparent"),
                     lambda: Util.new_page(MakeImage, "Zdjęcie", master=self.window, fg_color="transparent")]
         self.button = [None] * len(buttonNames)

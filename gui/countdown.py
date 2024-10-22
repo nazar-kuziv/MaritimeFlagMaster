@@ -41,3 +41,9 @@ class Countdown(ctk.CTkFrame):
     def resume(self):
         self.isRunning = True
         self.countDown(self.seconds)
+
+def add_countdown_timer_to_top_menu(self: ctk.CTkBaseClass):
+    print("Countdown set")
+    countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", lambda: self.finish("Czas minął, oto twój wynik:"),
+                                fg_color="transparent")
+    return countdown

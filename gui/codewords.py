@@ -3,7 +3,7 @@ import tksvg
 
 from logic.environment import Environment
 import gui.util_functions as Util
-from gui.countdown import Countdown
+from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.codewords_session import CodewordsSession
 
 class Codewords(Util.AppQuizPage):
@@ -30,12 +30,7 @@ class Codewords(Util.AppQuizPage):
         super().draw()
 
         if (self.time_minutes > 0):
-            print("Countdown set")
-            self.countdown = Countdown(self._top_menu, str(self.time_minutes).rjust(2, '0')+":00", lambda: self.finish("Czas minął, oto twój wynik:"),
-                                       fg_color="transparent")
-            # self.countdown = Countdown(self._top_menu, '00:05', lambda: self.finish("Czas minął, oto twój wynik:"),
-            #                            fg_color="transparent")
-            self.countdown.pack(side="right", padx=10, pady=5)
+            self.countdown = add_countdown_timer_to_top_menu(self)
 
         self.question_widgets = []
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")

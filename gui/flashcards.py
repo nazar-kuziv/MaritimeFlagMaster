@@ -6,6 +6,7 @@ from logic.environment import Environment
 from logic.flags import *
 from logic.alphabet import Alphabet
 import gui.util_functions as Util
+from gui.countdown import add_countdown_timer_to_top_menu
 
 class Flashcards(Util.AppQuizPage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
@@ -25,8 +26,9 @@ class Flashcards(Util.AppQuizPage):
 
     def draw(self):
         super().draw()
-        # self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
-        # self.container_frame.pack(fill="both", expand=True)
+        
+        if (self.time_minutes > 0):
+            self.countdown = add_countdown_timer_to_top_menu(self)
 
         self.create_flashcard(self.flag_list[self.flag_index])
 

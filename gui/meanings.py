@@ -80,11 +80,11 @@ class Meanings(Util.AppQuizPage):
         meaning_label.pack(padx=5, pady=5)
         self.top_menu.dict["meaning_label"] = meaning_label
 
-        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer, state="disabled")
+        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=None)
         check_button.grid(row=0, column=3, ipadx=10, ipady=10)
         self.top_menu.dict["check_button"] = check_button
 
-        clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.clear_checked_flags, state="disabled")
+        clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=None)
         clear_button.grid(row=0, column=0, sticky="w", ipadx=10, ipady=10)
         self.top_menu.dict["clear_button"] = clear_button
 
@@ -157,9 +157,12 @@ class Meanings(Util.AppQuizPage):
             for i, indx in enumerate(self.selected_flags):
                 self.flag_images[indx].flag.configure(fg_color=f"green{4 - i}", text=(i+1), text_color=f"green{4 - i}")
         if (len(self.selected_flags) > 0):
-            [ x.configure(state="normal") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+            self.top_menu.dict["clear_button"].configure(command=self.clear_checked_flags)
+            self.update()
+            self.top_menu.dict["check_button"].configure(command=self.check_answer)
+            # [ x.configure(state="normal") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         else: 
-            [ x.configure(state="disabled") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+            [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         try:
             self.top_menu.dict["answer"].destroy()
         except (AttributeError, KeyError) as e: pass
@@ -169,7 +172,7 @@ class Meanings(Util.AppQuizPage):
             print("removing selection")
             self.flag_images[index].flag.configure(fg_color="transparent", text="")
         self.selected_flags.clear()
-        [ x.configure(state="disabled") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+        [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         try:
             self.top_menu.dict["answer"].destroy()
         except (AttributeError, KeyError) as e: pass
@@ -197,7 +200,7 @@ class Meanings(Util.AppQuizPage):
         self.top_menu.dict["answer"] = answer
         
         if (isCorrect):
-            [ x.configure(state="disabled") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+            [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
             for f in self.flag_images:
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')

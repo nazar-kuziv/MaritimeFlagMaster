@@ -216,7 +216,7 @@ class SenFlag(Util.AppQuizPage):
             self.answer_response.pack(side="left", padx=10)
             self.top_menu.list["answer_response"] = self.answer_response
 
-            self.top_menu.list["check_button"].configure(state="disabled", cursor='')
+            self.top_menu.list["check_button"].configure(command=None)
             for f in self.flag_images:
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')

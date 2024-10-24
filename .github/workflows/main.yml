@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - feature/action-fix
 
 defaults:
   run:
@@ -40,7 +41,7 @@ jobs:
         run: .venv/Scripts/pyinstaller --noconfirm --onefile --windowed --add-data ".venv/Lib/site-packages/tksvg;tksvg\." --add-data "static;static\." main.py
 
       - name: Deploy artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: app
           path: dist/main*

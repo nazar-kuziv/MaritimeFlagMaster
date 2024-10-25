@@ -93,7 +93,7 @@ class Codewords(Util.AppQuizPage):
             self.answer_response.configure(text='Poprawnie!')
 
             self.answer_cell.entry.configure(state="disabled")
-            self.answer_cell.submit_button.configure(state="disabled")
+            self.answer_cell.submit_button.configure(command=None)
 
             # next button
             next_exists = self.codewords_session.next_flag()

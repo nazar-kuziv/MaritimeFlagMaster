@@ -165,7 +165,6 @@ class Meanings(Util.AppQuizPage):
             self.top_menu.dict["clear_button"].configure(command=self.clear_checked_flags)
             self.update()
             self.top_menu.dict["check_button"].configure(command=self.check_answer)
-            # [ x.configure(state="normal") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         else: 
             [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         try:

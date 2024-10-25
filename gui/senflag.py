@@ -185,8 +185,6 @@ class SenFlag(Util.AppQuizPage):
             self.input_flag_objects.append(self.alphabet[index])
         
         self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
-        # if (len(self.input_flag_labels) == 1):
-        #     self.top_menu.dict["check_button"].configure(state="normal")
         try:
             self.answer_response.destroy()
         except AttributeError: pass
@@ -199,8 +197,6 @@ class SenFlag(Util.AppQuizPage):
             flag.destroy()
             self.input_flag_objects.pop()
             self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
-            # if (len(self.input_flag_labels) <= 0):
-            #     self.top_menu.dict["check_button"].configure(state="disabled")
             if (self.answer_response is not None):
                 self.answer_response.destroy()
 

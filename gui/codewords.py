@@ -24,7 +24,6 @@ class Codewords(Util.AppQuizPage):
         self.codewords_session = CodewordsSession(questions_number) if questions_number > 0 else CodewordsSession()
 
         self.flag_index = 0
-        self.flag = self.codewords_session.get_flag()
     
     def draw(self):
         super().draw()
@@ -42,7 +41,7 @@ class Codewords(Util.AppQuizPage):
         self.container_frame.grid_columnconfigure(1, weight=3)
         self.container_frame.grid_columnconfigure(2, weight=1, uniform="side")
 
-        self.show_question()
+        self.next_question()
 
     def show_question(self):
         """Make sure to first make the main Codewords frame visible with the place/pack/grid functions
@@ -76,7 +75,7 @@ class Codewords(Util.AppQuizPage):
 
         def skip_command():
             next_exists = self.codewords_session.next_flag()
-            self.change_question() if next_exists else self.finish()
+            self.next_question() if next_exists else self.finish()
 
         self.question_widgets.append(self.add_skip_button(skip_command))
 
@@ -98,7 +97,7 @@ class Codewords(Util.AppQuizPage):
 
             # next button
             next_exists = self.codewords_session.next_flag()
-            next_command = self.change_question if next_exists else self.finish
+            next_command = self.next_question if next_exists else self.finish
             next_text = "Następny" if next_exists else "Wyniki"
             if (not next_exists):
                 try:
@@ -112,7 +111,7 @@ class Codewords(Util.AppQuizPage):
             self.next_button.grid(row=1, column=2)
             self.question_widgets.append(self.next_button)
     
-    def change_question(self):
+    def next_question(self):
         self.master.unbind("<Return>")
         self.flag = self.codewords_session.get_flag()
         self.show_question()

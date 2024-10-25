@@ -33,6 +33,16 @@ class AppPage(ABC, ctk.CTkFrame):
 
 import gui.results as Results # here to avoid circular import
 class AppQuizPage(AppPage):
+    """Base class for quiz pages
+    """
+    @abstractmethod
+    def show_question(self):
+        pass
+
+    @abstractmethod
+    def next_question(self):
+        pass
+        
     def finish(self, message: str = None, **kwargs):
         if (message is not None):
             kwargs["message"] = message

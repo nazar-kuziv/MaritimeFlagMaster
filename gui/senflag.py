@@ -58,6 +58,9 @@ class SenFlag(Util.AppQuizPage):
             error_message = ctk.CTkLabel(self.container_menu, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
             error_message.grid(row=0, column=1, rowspan=2)
             return
+        
+        self.sentence = self.senflag_session.get_sentence()
+        print(self.sentence.cleaned_sentence)
         Util.double_buffer_frame(self, Util.loading_widget(self.winfo_toplevel(), True), self.show_question)
     
     def show_question(self):
@@ -80,8 +83,6 @@ class SenFlag(Util.AppQuizPage):
         except AttributeError: print("Couldn't destroy flag_input_box")
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-        self.sentence = self.senflag_session.get_sentence()
-        print(self.sentence.cleaned_sentence)
 
         meaning_label = ctk.CTkLabel(self.top_menu, text=self.sentence.cleaned_sentence, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.011)), 
                                      fg_color='transparent', wraplength=int(self.master.winfo_width()*0.28))
@@ -255,3 +256,7 @@ class SenFlag(Util.AppQuizPage):
             self.next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=next_command)
             self.next_button.pack(side="right", fill='y')
             self.top_menu.dict["new_sentence"] = self.next_button
+    
+    def next_question(self):
+        self.flag = self.senflag_session.get_sentence()
+        self.show_question()

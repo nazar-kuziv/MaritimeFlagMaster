@@ -114,6 +114,12 @@ class Meanings(Util.AppQuizPage):
             kwargs = { "scaletoheight":int(self.master.scale_size*0.8/self.input_columns) } if (self.master.winfo_height() < self.master.winfo_width()) else { "scaletowidth":int(self.master.scale_size*0.8/self.input_columns) }
             f.configure(**kwargs)
         self.place_input_flags()
+        
+        def skip_command():
+            next_exists = self.meaning_session.next_flag()
+            self.change_question() if next_exists else self.finish()
+
+        self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
 
         self.update_idletasks()
         try:

@@ -36,7 +36,7 @@ class SenFlag(Util.AppQuizPage):
         
         self.top_menu = ctk.CTkFrame(self, height=0)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
-        self.top_menu.list = {}
+        self.top_menu.dict = {}
 
         # self.show_options()
         self.establish_session(self.source)
@@ -63,16 +63,15 @@ class SenFlag(Util.AppQuizPage):
     def show_question(self):
         """Make sure to first make the main SenFlags frame visible with the place/pack/grid functions
         """
-        # loading_label = Util.loading_widget(self.master)
         self.flag_images = []
         self.input_flag_objects = []
         self.input_flag_labels = []
         for widget in self.flag_images:
             widget.destroy()
-        print(self.top_menu.list.keys())
-        for widget in self.top_menu.list.values():
+        print(self.top_menu.dict.keys())
+        for widget in self.top_menu.dict.values():
             widget.destroy()
-        self.top_menu.list = {}
+        self.top_menu.dict = {}
         try:
             self.input_frame.destroy()
         except AttributeError: print("Couldn't destroy input_frame")
@@ -87,11 +86,11 @@ class SenFlag(Util.AppQuizPage):
         meaning_label = ctk.CTkLabel(self.top_menu, text=self.sentence.cleaned_sentence, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.011)), 
                                      fg_color='transparent', wraplength=int(self.master.winfo_width()*0.28))
         meaning_label.pack(side="left", padx=10)
-        self.top_menu.list["meaning_label"] = meaning_label
+        self.top_menu.dict["meaning_label"] = meaning_label
 
         check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer)
         check_button.pack(side="left", ipadx=10, ipady=10)
-        self.top_menu.list["check_button"] = check_button
+        self.top_menu.dict["check_button"] = check_button
 
         self.input_parent = ctk.CTkFrame(self, height=int(self.master.scale_size*0.05), fg_color="transparent")
         self.input_parent.pack(side="top", fill="x", padx=10)
@@ -125,11 +124,16 @@ class SenFlag(Util.AppQuizPage):
             self.images, self.alphabet = zip(*temp)
         
         self.place_input_flags()
+
+        def skip_command():
+            next_exists = self.senflag_session.next_sentence()
+            self.show_question() if next_exists else self.finish()
+
+        self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
+
         try:
             self.countdown.startCountdown()
         except AttributeError: pass
-        # self.update_idletasks()
-        # loading_label.destroy()
 
     def place_input_flags(self):
         alphabet_index = 0
@@ -181,7 +185,7 @@ class SenFlag(Util.AppQuizPage):
         
         self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
         # if (len(self.input_flag_labels) == 1):
-        #     self.top_menu.list["check_button"].configure(state="normal")
+        #     self.top_menu.dict["check_button"].configure(state="normal")
         try:
             self.answer_response.destroy()
         except AttributeError: pass
@@ -195,7 +199,7 @@ class SenFlag(Util.AppQuizPage):
             self.input_flag_objects.pop()
             self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
             # if (len(self.input_flag_labels) <= 0):
-            #     self.top_menu.list["check_button"].configure(state="disabled")
+            #     self.top_menu.dict["check_button"].configure(state="disabled")
             if (self.answer_response is not None):
                 self.answer_response.destroy()
 
@@ -209,14 +213,14 @@ class SenFlag(Util.AppQuizPage):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self.top_menu, text="Źle", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)
-            self.top_menu.list["answer_response"] = self.answer_response
+            self.top_menu.dict["answer_response"] = self.answer_response
         else:
             print("Correct answer!")
             self.answer_response = ctk.CTkLabel(self.top_menu, text="Poprawnie!", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)
-            self.top_menu.list["answer_response"] = self.answer_response
+            self.top_menu.dict["answer_response"] = self.answer_response
 
-            self.top_menu.list["check_button"].configure(command=None)
+            self.top_menu.dict["check_button"].configure(command=None)
             for f in self.flag_images:
                 f.flag.unbind("<Button-1>")
                 f.flag.configure(cursor='')
@@ -250,4 +254,4 @@ class SenFlag(Util.AppQuizPage):
             
             self.next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=next_command)
             self.next_button.pack(side="right", fill='y')
-            self.top_menu.list["new_sentence"] = self.next_button
+            self.top_menu.dict["new_sentence"] = self.next_button

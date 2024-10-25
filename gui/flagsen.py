@@ -128,6 +128,12 @@ class FlagSen(Util.AppQuizPage):
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
 
+        def skip_command():
+            next_exists = self.flagsen_session.next_sentence()
+            self.show_question() if next_exists else self.finish()
+
+        self.question_widgets.append(self.add_skip_button(skip_command))
+
         self.update_idletasks()
         try:
             self.countdown.startCountdown()

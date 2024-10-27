@@ -70,7 +70,7 @@ class FlagSen(Util.AppQuizPage):
             error_message.place(relx=0.5, rely=0.5)
             return
         
-        self.sentence = self.flagsen_session.get_sentence()
+        self.sentence = self.flagsen_session.get_question()
         print(self.sentence.cleaned_sentence)
         self.show_question()
 
@@ -128,7 +128,7 @@ class FlagSen(Util.AppQuizPage):
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
 
         def skip_command():
-            next_exists = self.flagsen_session.next_sentence()
+            next_exists = self.flagsen_session.next_question()
             self.next_question() if next_exists else self.finish()
 
         self.question_widgets.append(self.add_skip_button(skip_command))
@@ -176,7 +176,7 @@ class FlagSen(Util.AppQuizPage):
             
             self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
-            next_exists = self.flagsen_session.next_sentence()
+            next_exists = self.flagsen_session.next_question()
             next_command = self.next_question if next_exists else self.finish
             next_text = "Nowe zdanie" if next_exists else "Wyniki"
             if (not next_exists):
@@ -189,5 +189,5 @@ class FlagSen(Util.AppQuizPage):
             self.question_widgets.append(self.next_button)
 
     def next_question(self):
-        self.flag = self.flagsen_session.get_sentence()
+        self.flag = self.flagsen_session.get_question()
         self.show_question()

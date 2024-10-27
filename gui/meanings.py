@@ -115,7 +115,7 @@ class Meanings(Util.AppQuizPage):
         self.place_input_flags()
         
         def skip_command():
-            next_exists = self.meaning_session.next_flag()
+            next_exists = self.meaning_session.next_question()
             self.next_question() if next_exists else self.finish()
 
         self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
@@ -212,7 +212,7 @@ class Meanings(Util.AppQuizPage):
             self.selected_flags = []
 
             #next button
-            next_exists = self.meaning_session.next_flag()
+            next_exists = self.meaning_session.next_question()
             next_command = self.next_question if next_exists else self.finish
             next_text = "Następny" if next_exists else "Wyniki"
             if (not next_exists):
@@ -225,5 +225,5 @@ class Meanings(Util.AppQuizPage):
             self.top_menu.dict["next_button"] = next_button
 
     def next_question(self):
-        self.flag = self.meaning_session.get_flag()
+        self.flag = self.meaning_session.get_question()
         self.show_question()

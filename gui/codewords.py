@@ -74,7 +74,7 @@ class Codewords(Util.AppQuizPage):
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
 
         def skip_command():
-            next_exists = self.codewords_session.next_flag()
+            next_exists = self.codewords_session.next_question()
             self.next_question() if next_exists else self.finish()
 
         self.question_widgets.append(self.add_skip_button(skip_command))
@@ -96,7 +96,7 @@ class Codewords(Util.AppQuizPage):
             self.answer_cell.submit_button.configure(command=None)
 
             # next button
-            next_exists = self.codewords_session.next_flag()
+            next_exists = self.codewords_session.next_question()
             next_command = self.next_question if next_exists else self.finish
             next_text = "Następny" if next_exists else "Wyniki"
             if (not next_exists):
@@ -113,5 +113,5 @@ class Codewords(Util.AppQuizPage):
     
     def next_question(self):
         self.master.unbind("<Return>")
-        self.flag = self.codewords_session.get_flag()
+        self.flag = self.codewords_session.get_question()
         self.show_question()

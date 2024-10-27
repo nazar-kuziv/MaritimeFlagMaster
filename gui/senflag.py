@@ -59,7 +59,7 @@ class SenFlag(Util.AppQuizPage):
             error_message.grid(row=0, column=1, rowspan=2)
             return
         
-        self.sentence = self.senflag_session.get_sentence()
+        self.sentence = self.senflag_session.get_question()
         print(self.sentence.cleaned_sentence)
         Util.double_buffer_frame(self, Util.loading_widget(self.winfo_toplevel(), True), self.show_question)
     
@@ -127,7 +127,7 @@ class SenFlag(Util.AppQuizPage):
         self.place_input_flags()
 
         def skip_command():
-            next_exists = self.senflag_session.next_sentence()
+            next_exists = self.senflag_session.next_question()
             self.show_question() if next_exists else self.finish()
 
         self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
@@ -241,7 +241,7 @@ class SenFlag(Util.AppQuizPage):
             
             self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
-            next_exists = self.senflag_session.next_sentence()
+            next_exists = self.senflag_session.next_question()
             next_command = self.show_question if next_exists else self.finish
             next_text = "Nowe zdanie" if next_exists else "Wyniki"
             if (not next_exists):
@@ -254,5 +254,5 @@ class SenFlag(Util.AppQuizPage):
             self.top_menu.dict["new_sentence"] = self.next_button
     
     def next_question(self):
-        self.flag = self.senflag_session.get_sentence()
+        self.flag = self.senflag_session.get_question()
         self.show_question()

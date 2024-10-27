@@ -50,7 +50,7 @@ class Flashcards(Util.AppQuizPage):
         else:
             self.flags = flag.flags
 
-    def show_flashcard_base(self):
+    def show_question(self):
         try:
             self.flashcard.destroy()
         except AttributeError: pass
@@ -69,7 +69,7 @@ class Flashcards(Util.AppQuizPage):
             self.next_button.destroy()
         except AttributeError: pass
         if (self.flag_index < len(self.flag_list)-1):
-            self.next_button = ctk.CTkButton(self.flashcard_frame, text="〉", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=self.increment_flag_index)
+            self.next_button = ctk.CTkButton(self.flashcard_frame, text="〉", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=self.next_question)
             self.next_button.grid(row=0, column=2)
         
         # back button
@@ -77,7 +77,7 @@ class Flashcards(Util.AppQuizPage):
             self.back_button.destroy()
         except AttributeError: pass
         if (self.flag_index > 0):
-            self.back_button = ctk.CTkButton(self.flashcard_frame, text="〈", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=lambda: self.increment_flag_index(number=-1))
+            self.back_button = ctk.CTkButton(self.flashcard_frame, text="〈", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=lambda: self.next_question(number=-1))
             self.back_button.grid(row=0, column=0)
         
         self.flashcard.grid_propagate(False)
@@ -87,7 +87,7 @@ class Flashcards(Util.AppQuizPage):
     def show_flashcard_front(self, event=None):
         """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions
         """
-        self.show_flashcard_base()
+        self.show_question()
         
         self.flashcard.bind("<Button-1>", self.show_flashcard_back)
         self.flashcard.grid_rowconfigure(0, weight=1)
@@ -112,7 +112,7 @@ class Flashcards(Util.AppQuizPage):
     def show_flashcard_back(self, event=None):
         """Make sure to first make the main Flashcards frame visible with the place/pack/grid functions
         """
-        self.show_flashcard_base()
+        self.show_question()
         self.flashcard.bind("<Button-1>", self.show_flashcard_front)
 
         self.flashcard.rowconfigure(0, weight=1, uniform="yes")
@@ -157,15 +157,15 @@ class Flashcards(Util.AppQuizPage):
         CustomTooltipLabel(self.flashcard.morse.morse_mnemonic, text=f"Skojarzenie mnemotechniczne:\n{self.flag.morse_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
         self.flashcard.morse.morse_mnemonic.bind("<Button-1>", self.show_flashcard_front)
 
-    def change_flag_index(self, index: int = 0):
+    def change_question(self, index: int = 0):
         if (index not in range(0, len(self.flag_list))):
             raise IndexError("Index out of range")
         self.flag_index = index
         self.create_flashcard(self.flag_list[self.flag_index])
         self.show_flashcard_front()
 
-    def increment_flag_index(self, number: int = 1):
+    def next_question(self, number: int = 1):
         """Adjust the flag index by the given number
         """
-        self.change_flag_index(index=self.flag_index + number)
+        self.change_question(index=self.flag_index + number)
 

@@ -33,11 +33,26 @@ class AppPage(ABC, ctk.CTkFrame):
 
 import gui.results as Results # here to avoid circular import
 class AppQuizPage(AppPage):
+    """Base class for quiz pages
+    """
+    @abstractmethod
+    def show_question(self):
+        pass
+
+    @abstractmethod
+    def next_question(self):
+        pass
+        
     def finish(self, message: str = None, **kwargs):
         if (message is not None):
             kwargs["message"] = message
         page = Results.Results(self.master, fg_color="transparent", **kwargs)
         change_page(page)
+    
+    def add_skip_button(self, command: Callable, **kwargs):
+        skip_button = ctk.CTkButton(self._top_menu, text='Pomiń', width=0, command=command, **kwargs)
+        skip_button.pack(side="right", padx=5)
+        return skip_button
 
 def loading_widget(master, isFill: bool = False):
     """Shows some loading text in the middle of the screen

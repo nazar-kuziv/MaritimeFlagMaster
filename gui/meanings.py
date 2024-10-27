@@ -32,7 +32,6 @@ class Meanings(Util.AppQuizPage):
         self.flag_images = []
         self.selected_flags = []
         self.flag_index = 0
-        self.flag = self.meaning_session.get_flag()
         self.images = []
     
     def draw(self):
@@ -52,7 +51,7 @@ class Meanings(Util.AppQuizPage):
         self.top_menu.grid_columnconfigure(6, weight=1, uniform="yes")
         self.top_menu.dict = {}
         
-        self.show_question()
+        self.next_question()
     
     def show_question(self):
         """Make sure to first make the main Meanings frame visible with the place/pack/grid functions
@@ -114,6 +113,12 @@ class Meanings(Util.AppQuizPage):
             kwargs = { "scaletoheight":int(self.master.scale_size*0.8/self.input_columns) } if (self.master.winfo_height() < self.master.winfo_width()) else { "scaletowidth":int(self.master.scale_size*0.8/self.input_columns) }
             f.configure(**kwargs)
         self.place_input_flags()
+        
+        def skip_command():
+            next_exists = self.meaning_session.next_flag()
+            self.next_question() if next_exists else self.finish()
+
+        self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
 
         self.update_idletasks()
         try:
@@ -160,7 +165,6 @@ class Meanings(Util.AppQuizPage):
             self.top_menu.dict["clear_button"].configure(command=self.clear_checked_flags)
             self.update()
             self.top_menu.dict["check_button"].configure(command=self.check_answer)
-            # [ x.configure(state="normal") for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         else: 
             [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         try:
@@ -209,7 +213,7 @@ class Meanings(Util.AppQuizPage):
 
             #next button
             next_exists = self.meaning_session.next_flag()
-            next_command = self.change_question if next_exists else self.finish
+            next_command = self.next_question if next_exists else self.finish
             next_text = "Następny" if next_exists else "Wyniki"
             if (not next_exists):
                 try:
@@ -220,6 +224,6 @@ class Meanings(Util.AppQuizPage):
             next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
             self.top_menu.dict["next_button"] = next_button
 
-    def change_question(self):
+    def next_question(self):
         self.flag = self.meaning_session.get_flag()
         self.show_question()

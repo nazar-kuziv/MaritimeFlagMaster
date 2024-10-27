@@ -24,7 +24,6 @@ class Codewords(Util.AppQuizPage):
         self.codewords_session = CodewordsSession(questions_number) if questions_number > 0 else CodewordsSession()
 
         self.flag_index = 0
-        self.flag = self.codewords_session.get_flag()
     
     def draw(self):
         super().draw()
@@ -41,16 +40,12 @@ class Codewords(Util.AppQuizPage):
         self.container_frame.grid_columnconfigure(0, weight=1, uniform="side")
         self.container_frame.grid_columnconfigure(1, weight=3)
         self.container_frame.grid_columnconfigure(2, weight=1, uniform="side")
-        
-        # self.options = Util.options_menu(self.container_frame, self.show_question, time_minutes_choices=[5, 10, -1], time_minutes_def_ind=0)
-        self.show_question()
+
+        self.next_question()
 
     def show_question(self):
         """Make sure to first make the main Codewords frame visible with the place/pack/grid functions
         """
-        try:
-            self.options.destroy()
-        except AttributeError: pass
         for widget in self.question_widgets:
             widget.destroy()
         self.update_idletasks()
@@ -78,9 +73,16 @@ class Codewords(Util.AppQuizPage):
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
 
+        def skip_command():
+            next_exists = self.codewords_session.next_flag()
+            self.next_question() if next_exists else self.finish()
+
+        self.question_widgets.append(self.add_skip_button(skip_command))
+
         try:
             self.countdown.startCountdown()
         except AttributeError: pass
+
 
     def enter_answer(self):
         if (not self.codewords_session.check_answer(self.answer_cell.entry.get())):
@@ -91,11 +93,11 @@ class Codewords(Util.AppQuizPage):
             self.answer_response.configure(text='Poprawnie!')
 
             self.answer_cell.entry.configure(state="disabled")
-            self.answer_cell.submit_button.configure(state="disabled")
+            self.answer_cell.submit_button.configure(command=None)
 
             # next button
             next_exists = self.codewords_session.next_flag()
-            next_command = self.change_question if next_exists else self.finish
+            next_command = self.next_question if next_exists else self.finish
             next_text = "Następny" if next_exists else "Wyniki"
             if (not next_exists):
                 try:
@@ -109,7 +111,7 @@ class Codewords(Util.AppQuizPage):
             self.next_button.grid(row=1, column=2)
             self.question_widgets.append(self.next_button)
     
-    def change_question(self):
+    def next_question(self):
         self.master.unbind("<Return>")
         self.flag = self.codewords_session.get_flag()
         self.show_question()

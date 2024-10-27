@@ -70,7 +70,8 @@ class FlagSen(Util.AppQuizPage):
             error_message.place(relx=0.5, rely=0.5)
             return
         
-        # Util.double_buffer_frame(self.container_frame, self.options, self.show_question)
+        self.sentence = self.flagsen_session.get_sentence()
+        print(self.sentence.cleaned_sentence)
         self.show_question()
 
     def show_question(self):
@@ -82,8 +83,6 @@ class FlagSen(Util.AppQuizPage):
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.is_answered = False
-        self.sentence = self.flagsen_session.get_sentence()
-        print(self.sentence.cleaned_sentence)
 
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
@@ -127,6 +126,12 @@ class FlagSen(Util.AppQuizPage):
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
+
+        def skip_command():
+            next_exists = self.flagsen_session.next_sentence()
+            self.next_question() if next_exists else self.finish()
+
+        self.question_widgets.append(self.add_skip_button(skip_command))
 
         self.update_idletasks()
         try:
@@ -172,7 +177,7 @@ class FlagSen(Util.AppQuizPage):
             self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
             next_exists = self.flagsen_session.next_sentence()
-            next_command = self.show_question if next_exists else self.finish
+            next_command = self.next_question if next_exists else self.finish
             next_text = "Nowe zdanie" if next_exists else "Wyniki"
             if (not next_exists):
                 try:
@@ -182,3 +187,7 @@ class FlagSen(Util.AppQuizPage):
             self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=next_command)
             self.next_button.grid(row=2, column=2, sticky="e", padx=10)
             self.question_widgets.append(self.next_button)
+
+    def next_question(self):
+        self.flag = self.flagsen_session.get_sentence()
+        self.show_question()

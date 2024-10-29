@@ -28,7 +28,7 @@ class Flashcards(Util.AppQuizPage):
         super().draw()
         
         if (self.time_minutes > 0):
-            self.countdown = add_countdown_timer_to_top_menu(self)
+            self.countdown = add_countdown_timer_to_top_menu(self, self.time_minutes)
 
         self.create_flashcard(self.flag_list[self.flag_index])
 

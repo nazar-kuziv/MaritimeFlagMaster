@@ -43,10 +43,12 @@ class AppQuizPage(AppPage):
     def next_question(self):
         pass
         
+    session = None
+
     def finish(self, message: str = None, **kwargs):
         if (message is not None):
             kwargs["message"] = message
-        page = Results.Results(self.master, fg_color="transparent", **kwargs)
+        page = Results.Results(self.master, self.session, fg_color="transparent", **kwargs)
         change_page(page)
     
     def add_skip_button(self, command: Callable, **kwargs):

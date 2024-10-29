@@ -29,7 +29,7 @@ class FlagSen(Util.AppQuizPage):
         super().draw()
 
         if (self.time_minutes > 0):
-            self.countdown = add_countdown_timer_to_top_menu(self)
+            self.countdown = add_countdown_timer_to_top_menu(self, self.time_minutes)
 
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.container_frame.pack(fill="both", expand=True)
@@ -55,7 +55,7 @@ class FlagSen(Util.AppQuizPage):
     def establish_session(self, source: str):
         error_text = ""
         try:
-            self.flagsen_session = FlagsenSession(source, self.questions_number)
+            self.session = FlagsenSession(source, self.questions_number)
         except NoInternetConnectionException:
             error_text = "Brak połączenia z internetem."
         except RequestLimitExceededException:
@@ -69,9 +69,7 @@ class FlagSen(Util.AppQuizPage):
             error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
             error_message.place(relx=0.5, rely=0.5)
             return
-        
-        self.sentence = self.flagsen_session.get_question()
-        print(self.sentence.cleaned_sentence)
+
         self.show_question()
 
     def show_question(self):
@@ -83,6 +81,8 @@ class FlagSen(Util.AppQuizPage):
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.is_answered = False
+        self.sentence = self.session.get_question()
+        print(self.sentence.cleaned_sentence)
 
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
@@ -128,7 +128,7 @@ class FlagSen(Util.AppQuizPage):
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
 
         def skip_command():
-            next_exists = self.flagsen_session.next_question()
+            next_exists = self.session.next_question()
             self.next_question() if next_exists else self.finish()
 
         self.question_widgets.append(self.add_skip_button(skip_command))
@@ -150,7 +150,7 @@ class FlagSen(Util.AppQuizPage):
         except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
-        if (not self.flagsen_session.check_answer(self.answer_cell.entry.get())):
+        if (not self.session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self.container_frame, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
             self.answer_response.grid(row=0, column=0, columnspan=3)
@@ -176,7 +176,7 @@ class FlagSen(Util.AppQuizPage):
             
             self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
-            next_exists = self.flagsen_session.next_question()
+            next_exists = self.session.next_question()
             next_command = self.next_question if next_exists else self.finish
             next_text = "Nowe zdanie" if next_exists else "Wyniki"
             if (not next_exists):
@@ -189,5 +189,5 @@ class FlagSen(Util.AppQuizPage):
             self.question_widgets.append(self.next_button)
 
     def next_question(self):
-        self.flag = self.flagsen_session.get_question()
+        self.flag = self.session.get_question()
         self.show_question()

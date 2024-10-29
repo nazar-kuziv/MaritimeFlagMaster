@@ -10,9 +10,11 @@ class MeaningsSession(Session):
         super().__init__(number_of_flags)
         self.flags = Alphabet.get_all_flags_with_meaning(number_of_flags)
 
-    def get_question(self) -> Flag | FlagMultiple:
-        """Returns the current flag"""
-        return self.flags[self.current_question]
+    def get_question(self) -> Flag | None:
+        """Returns the current flag, or None if there are no more flags"""
+        if not self.current_question >= self.number_of_questions:
+            return self.flags[self.current_question]
+        return None
 
     def check_answer(self, answer: Flag | list[Flag]) -> bool:
         """Checks if the answer is correct and updates the number of correct answers if it is"""

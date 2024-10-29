@@ -23,3 +23,8 @@ class Results(Util.AppPage):
         canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
         canvas.draw()
         canvas.get_tk_widget().pack()
+
+        def _quit(): # function to destroy this page when closing the window on this page
+            self.quit() # because FigureCanvasTkAgg throws an error and keeps the program running in backgound
+            self.destroy()
+        self.winfo_toplevel().protocol("WM_DELETE_WINDOW", _quit)

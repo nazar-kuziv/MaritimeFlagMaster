@@ -109,6 +109,7 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
         next_command = self.next_question if next_exists else self.finish
         next_text = "Następny" if next_exists else "Wyniki"
         if (not next_exists):
+            self.answer_cell.entry.unbind("<Return>")
             try:
                 self.countdown.pause()
             except AttributeError: pass

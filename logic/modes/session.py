@@ -15,7 +15,8 @@ class Session:
         number_of_wrong_answers = self.number_of_questions - self.number_of_correct_answers
 
         fig, ax = plt.subplots()
-        fig.set_facecolor("#ffffff")
+        fig.set_facecolor("none")
+        ax.set_facecolor("none")
 
         wedges, text, autotext = ax.pie([self.number_of_correct_answers, number_of_wrong_answers],
                                         colors=['#59e8b5', '#ff983a'], startangle=90, autopct='%1.1f%%')

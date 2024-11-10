@@ -42,9 +42,9 @@ class Countdown(ctk.CTkFrame):
         self.isRunning = True
         self.countDown(self.seconds)
 
-def add_countdown_timer_to_top_menu(self: ctk.CTkBaseClass, time_minutes: int):
+def add_countdown_timer_to_top_menu(self: ctk.CTkBaseClass, time_minutes: int, message: str = "Czas minął, oto twój wynik:"):
     print("Countdown set")
-    countdown = Countdown(self._top_menu, str(time_minutes).rjust(2, '0')+":00", lambda: self.finish("Czas minął, oto twój wynik:"),
+    countdown = Countdown(self._top_menu, str(time_minutes).rjust(2, '0')+":00", lambda: self.finish(message),
                                 fg_color="transparent")
     countdown.pack(side="right", padx=10, pady=5)
     return countdown

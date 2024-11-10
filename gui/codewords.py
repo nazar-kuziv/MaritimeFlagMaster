@@ -102,6 +102,7 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
 
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(command=None)
+            self.answer_cell.entry.unbind("<Return>")
             self.show_next_button()
 
     def show_next_button(self):

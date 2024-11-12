@@ -42,6 +42,8 @@ class AppQuizPage(AppPage):
     @abstractmethod
     def next_question(self):
         pass
+
+    session = None
         
     def finish(self, message: str = None, **kwargs):
         if (message is not None):

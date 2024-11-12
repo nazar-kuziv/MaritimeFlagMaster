@@ -21,7 +21,7 @@ class Codewords(Util.AppQuizPage):
 
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
-        self.codewords_session = CodewordsSession(questions_number) if questions_number > 0 else CodewordsSession()
+        self.session = CodewordsSession(questions_number) if questions_number > 0 else CodewordsSession()
 
         self.flag_index = 0
     
@@ -74,8 +74,14 @@ class Codewords(Util.AppQuizPage):
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
 
         def skip_command():
-            next_exists = self.codewords_session.next_flag()
-            self.next_question() if next_exists else self.finish()
+            print("Skipped.")
+            self.answer_response.configure(text='Pominięto.')
+            self.answer_cell.entry.insert(0, self.session.get_correct_answer())
+            self.answer_cell.entry.configure(state="disabled")
+            self.answer_cell.submit_button.configure(command=None)
+            self.show_next_button()
+            # next_exists = self.session.next_flag()
+            # self.next_question() if next_exists else self.finish()
 
         self.question_widgets.append(self.add_skip_button(skip_command))
 
@@ -85,7 +91,7 @@ class Codewords(Util.AppQuizPage):
 
 
     def enter_answer(self):
-        if (not self.codewords_session.check_answer(self.answer_cell.entry.get())):
+        if (not self.session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response.configure(text='Źle')
         else:
@@ -94,24 +100,25 @@ class Codewords(Util.AppQuizPage):
 
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(command=None)
+            self.show_next_button()
 
-            # next button
-            next_exists = self.codewords_session.next_flag()
-            next_command = self.next_question if next_exists else self.finish
-            next_text = "Następny" if next_exists else "Wyniki"
-            if (not next_exists):
-                try:
-                    self.countdown.pause()
-                except AttributeError: pass
+    def show_next_button(self):
+        next_exists = self.session.next_flag()
+        next_command = self.next_question if next_exists else self.finish
+        next_text = "Następny" if next_exists else "Wyniki"
+        if (not next_exists):
+            try:
+                self.countdown.pause()
+            except AttributeError: pass
 
-            self.master.bind("<Return>", lambda x: next_command())
-            self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
-                                                height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=next_command)
-            self.update()
-            self.next_button.grid(row=1, column=2)
-            self.question_widgets.append(self.next_button)
+        self.master.bind("<Return>", lambda x: next_command())
+        self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
+                                            height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=next_command)
+        self.update()
+        self.next_button.grid(row=1, column=2)
+        self.question_widgets.append(self.next_button)
     
     def next_question(self):
         self.master.unbind("<Return>")
-        self.flag = self.codewords_session.get_flag()
+        self.flag = self.session.get_flag()
         self.show_question()

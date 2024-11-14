@@ -56,6 +56,17 @@ class AppQuizPage(AppPage):
         skip_button.pack(side="right", padx=5)
         return skip_button
 
+class ISkippablePage(ABC):
+    """Interface for skippable pages
+    """
+    @abstractmethod
+    def skip_command(self):
+        pass
+
+    @abstractmethod
+    def show_next_button(self):
+        pass
+
 def loading_widget(master, isFill: bool = False):
     """Shows some loading text in the middle of the screen
 

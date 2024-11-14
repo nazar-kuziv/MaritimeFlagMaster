@@ -6,7 +6,7 @@ import gui.util_functions as Util
 from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.codewords_session import CodewordsSession
 
-class Codewords(Util.AppQuizPage):
+class Codewords(Util.AppQuizPage, Util.ISkippablePage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the codewords screen
 
@@ -65,7 +65,7 @@ class Codewords(Util.AppQuizPage):
         self.question_widgets.append(self.answer_cell)
 
         print(self.flag.code_word)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), width=int(self.master.scale_size*0.3), validate="key")
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), width=int(self.master.scale_size*0.3))
         self.answer_cell.entry.bind("<Return>", lambda x: self.enter_answer())
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
@@ -73,21 +73,20 @@ class Codewords(Util.AppQuizPage):
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
 
-        def skip_command():
-            print("Skipped.")
-            self.answer_response.configure(text='Pominięto.')
-            self.answer_cell.entry.insert(0, self.session.get_correct_answer())
-            self.answer_cell.entry.configure(state="disabled")
-            self.answer_cell.submit_button.configure(command=None)
-            self.show_next_button()
-            # next_exists = self.session.next_flag()
-            # self.next_question() if next_exists else self.finish()
-
-        self.question_widgets.append(self.add_skip_button(skip_command))
+        self.question_widgets.append(self.add_skip_button(self.skip_command))
 
         try:
             self.countdown.startCountdown()
         except AttributeError: pass
+
+    def skip_command(self):
+        print("Skipped.")
+        self.answer_response.configure(text='Pominięto.')
+        self.answer_cell.entry.delete(0, 'end')
+        self.answer_cell.entry.insert(0, self.session.get_correct_answer())
+        self.answer_cell.entry.configure(state="disabled")
+        self.answer_cell.submit_button.configure(command=None)
+        self.show_next_button()
 
 
     def enter_answer(self):

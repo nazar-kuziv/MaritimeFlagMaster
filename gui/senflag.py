@@ -10,7 +10,7 @@ import gui.util_functions as Util
 from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.senflag_session import SenflagSession
 
-class SenFlag(Util.AppQuizPage):
+class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
     def __init__(self, master, source: str = "default", questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Sentence-Flags screen
 
@@ -92,6 +92,10 @@ class SenFlag(Util.AppQuizPage):
         check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer)
         check_button.pack(side="left", ipadx=10, ipady=10)
         self.top_menu.dict["check_button"] = check_button
+        
+        self.answer_response = ctk.CTkLabel(self.top_menu, text="", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
+        self.answer_response.pack(side="left", padx=10)
+        self.top_menu.dict["answer_response"] = self.answer_response
 
         self.input_parent = ctk.CTkFrame(self, height=int(self.master.scale_size*0.05), fg_color="transparent")
         self.input_parent.pack(side="top", fill="x", padx=10)
@@ -126,15 +130,32 @@ class SenFlag(Util.AppQuizPage):
         
         self.place_input_flags()
 
-        def skip_command():
-            next_exists = self.session.next_sentence()
-            self.show_question() if next_exists else self.finish()
-
-        self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
+        self.top_menu.dict["skip"] = self.add_skip_button(self.skip_command)
 
         try:
             self.countdown.startCountdown()
         except AttributeError: pass
+
+    def skip_command(self):
+        correct_flags = self.session.get_correct_answer().flags
+        for f in correct_flags:
+            if (f is None):
+                new_input_flag = ctk.CTkLabel(self.flag_input_box, text='␣', font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
+                new_input_flag.pack(side="left", padx=1)
+                self.update()
+                self.input_flag_labels.append(new_input_flag)
+                self.input_flag_objects.append(None)
+            else:
+                input_image = tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletoheight=int(self.master.scale_size*0.04))
+                new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
+                new_input_flag.pack(side="left", padx=1)
+                self.input_flag_labels.append(new_input_flag)
+                self.input_flag_objects.append(f)
+        
+        self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
+        print("Skipped.")
+        self.answer_response.configure(text='Pominięto.')
+        self.show_next_button()
 
     def place_input_flags(self):
         alphabet_index = 0
@@ -185,9 +206,7 @@ class SenFlag(Util.AppQuizPage):
             self.input_flag_objects.append(self.alphabet[index])
         
         self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
-        try:
-            self.answer_response.destroy()
-        except AttributeError: pass
+        self.answer_response.configure(text='')
 
     
     def delete_input_flag(self, event = None):
@@ -197,61 +216,56 @@ class SenFlag(Util.AppQuizPage):
             flag.destroy()
             self.input_flag_objects.pop()
             self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
-            if (self.answer_response is not None):
-                self.answer_response.destroy()
+            self.answer_response.configure(text='')
 
     def check_answer(self):
-        try:
-            self.answer_response.destroy()
-        except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
         if (not self.session.check_answer(self.input_flag_objects)):
             print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self.top_menu, text="Źle", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
-            self.answer_response.pack(side="left", padx=10)
-            self.top_menu.dict["answer_response"] = self.answer_response
-        else:
-            print("Correct answer!")
-            self.answer_response = ctk.CTkLabel(self.top_menu, text="Poprawnie!", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
-            self.answer_response.pack(side="left", padx=10)
-            self.top_menu.dict["answer_response"] = self.answer_response
-
-            self.top_menu.dict["check_button"].configure(command=None)
-            for f in self.flag_images:
-                f.flag.unbind("<Button-1>")
-                f.flag.configure(cursor='')
-
-            def save_image():
-                if (Alphabet.saveFlagSentencePNG(self.sentence.flags)):
-                    label = ctk.CTkLabel(self.input_parent, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
-                    label.pack(side="right", padx=10)
-                    label.after(4000, lambda: label.destroy())
+            self.answer_response.configure(text='Źle')
+            return
         
-            self.save_image = ctk.CTkButton(self.input_parent, text='Zapisz jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
-            self.save_image.pack(side="right", ipadx=10, ipady=10, padx=10, pady=5)
+        print("Correct answer!")
+        self.answer_response.configure(text='Poprawnie')
 
-            # message = self.get_new_sentence()
-            # if (message == "Błąd czytania z pliku."):
-            #     return
-            # elif (message is not None):
-            #     error_message = ctk.CTkLabel(self, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
-            #     error_message.grid(row=0, column=1, rowspan=2)
-            #     return
-            
-            self.update() # for internet delays, so that the user knows if it was right immediately
-            # next button
-            next_exists = self.session.next_sentence()
-            next_command = self.show_question if next_exists else self.finish
-            next_text = "Nowe zdanie" if next_exists else "Wyniki"
-            if (not next_exists):
-                try:
-                    self.countdown.pause()
-                except AttributeError: pass
-            
-            self.next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=next_command)
-            self.next_button.pack(side="right", fill='y')
-            self.top_menu.dict["new_sentence"] = self.next_button
+        def save_image():
+            if (Alphabet.saveFlagSentencePNG(self.sentence.flags)):
+                label = ctk.CTkLabel(self.input_parent, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
+                label.pack(side="right", padx=10)
+                label.after(4000, lambda: label.destroy())
+    
+        self.save_image = ctk.CTkButton(self.input_parent, text='Zapisz jako zdjęcie...', width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=save_image)
+        self.save_image.pack(side="right", ipadx=10, ipady=10, padx=10, pady=5)
+
+        # message = self.get_new_sentence()
+        # if (message == "Błąd czytania z pliku."):
+        #     return
+        # elif (message is not None):
+        #     error_message = ctk.CTkLabel(self, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
+        #     error_message.grid(row=0, column=1, rowspan=2)
+        #     return
+        
+        self.update() # for internet delays, so that the user knows if it was right immediately
+        self.show_next_button()
+
+    def show_next_button(self):
+        self.top_menu.dict["check_button"].configure(command=None)
+        for f in self.flag_images:
+            f.flag.unbind("<Button-1>")
+            f.flag.configure(cursor='')
+
+        next_exists = self.session.next_sentence()
+        next_command = self.show_question if next_exists else self.finish
+        next_text = "Nowe zdanie" if next_exists else "Wyniki"
+        if (not next_exists):
+            try:
+                self.countdown.pause()
+            except AttributeError: pass
+        
+        self.next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=next_command)
+        self.next_button.pack(side="right", fill='y')
+        self.top_menu.dict["new_sentence"] = self.next_button
     
     def next_question(self):
         self.flag = self.session.get_sentence()

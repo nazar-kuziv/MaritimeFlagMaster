@@ -255,7 +255,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
             f.flag.configure(cursor='')
 
         next_exists = self.session.next_sentence()
-        next_command = self.show_question if next_exists else self.finish
+        next_command = self.next_question if next_exists else self.finish
         next_text = "Nowe zdanie" if next_exists else "Wyniki"
         if (not next_exists):
             try:

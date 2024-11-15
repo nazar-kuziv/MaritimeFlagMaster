@@ -59,9 +59,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
             error_message.grid(row=0, column=1, rowspan=2)
             return
         
-        self.sentence = self.session.get_sentence()
-        print(self.sentence.cleaned_sentence)
-        Util.double_buffer_frame(self, Util.loading_widget(self.winfo_toplevel(), True), self.show_question)
+        Util.double_buffer_frame(self, Util.loading_widget(self.winfo_toplevel(), True), self.next_question)
     
     def show_question(self):
         """Make sure to first make the main SenFlags frame visible with the place/pack/grid functions
@@ -84,7 +82,8 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
-        meaning_label = ctk.CTkLabel(self.top_menu, text=self.sentence.cleaned_sentence, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.011)), 
+        print(self.question.cleaned_sentence)
+        meaning_label = ctk.CTkLabel(self.top_menu, text=self.question.cleaned_sentence, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.011)), 
                                      fg_color='transparent', wraplength=int(self.master.winfo_width()*0.28))
         meaning_label.pack(side="left", padx=10)
         self.top_menu.dict["meaning_label"] = meaning_label
@@ -99,7 +98,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
 
         self.input_parent = ctk.CTkFrame(self, height=int(self.master.scale_size*0.05), fg_color="transparent")
         self.input_parent.pack(side="top", fill="x", padx=10)
-        self.text_length = ctk.CTkLabel(self.input_parent, text=f"0/{len(self.sentence.cleaned_sentence)}", font=ctk.CTkFont(size=int(self.winfo_width()*0.013)), justify="right", 
+        self.text_length = ctk.CTkLabel(self.input_parent, text=f"0/{len(self.question.cleaned_sentence)}", font=ctk.CTkFont(size=int(self.winfo_width()*0.013)), justify="right", 
                                                        height=int(self.master.scale_size*0.055), fg_color='transparent')
         self.text_length.pack(side="left", padx=(0, 5))
         self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, height=int(self.master.scale_size*0.05), orientation="horizontal")
@@ -152,7 +151,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
                 self.input_flag_labels.append(new_input_flag)
                 self.input_flag_objects.append(f)
         
-        self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
+        self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.question.cleaned_sentence)}")
         print("Skipped.")
         self.answer_response.configure(text='Pominięto.')
         self.show_next_button()
@@ -186,7 +185,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
     def flag_input_handler(self, event=None, index: int | str = -1):
         """Handler function for clicking on flags.
         """
-        if (len(self.input_flag_labels) >= len(self.sentence.cleaned_sentence)):
+        if (len(self.input_flag_labels) >= len(self.question.cleaned_sentence)):
             return
         print(f"New flag {index}")
         if ((isinstance(index, str) and index != "SPACJA") or (isinstance(index, int) and index < 0)):
@@ -205,7 +204,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
             self.input_flag_labels.append(new_input_flag)
             self.input_flag_objects.append(self.alphabet[index])
         
-        self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
+        self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.question.cleaned_sentence)}")
         self.answer_response.configure(text='')
 
     
@@ -215,7 +214,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
             flag = self.input_flag_labels.pop()
             flag.destroy()
             self.input_flag_objects.pop()
-            self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.sentence.cleaned_sentence)}")
+            self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.question.cleaned_sentence)}")
             self.answer_response.configure(text='')
 
     def check_answer(self):
@@ -230,7 +229,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_response.configure(text='Poprawnie')
 
         def save_image():
-            if (Alphabet.saveFlagSentencePNG(self.sentence.flags)):
+            if (Alphabet.saveFlagSentencePNG(self.question.flags)):
                 label = ctk.CTkLabel(self.input_parent, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
                 label.pack(side="right", padx=10)
                 label.after(4000, lambda: label.destroy())
@@ -268,5 +267,5 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         self.top_menu.dict["new_sentence"] = self.next_button
     
     def next_question(self):
-        self.flag = self.session.get_sentence()
+        self.question = self.session.get_sentence()
         self.show_question()

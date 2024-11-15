@@ -138,7 +138,6 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
                     break
             
             label = self.flag_images[flag_index].flag
-            print(f"Coords: {label.winfo_rootx()}, {label.winfo_rooty()}")
             label.children['!ctkcanvas'].event_generate("<Button-1>")
         
         print("Skipped.")

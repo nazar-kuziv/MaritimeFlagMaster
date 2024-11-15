@@ -41,7 +41,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.container_frame.grid_columnconfigure(2, weight=0)
 
         def save_image():
-            if (Alphabet.saveFlagSentencePNG(self.sentence.flags, suggest_file_name=self.is_answered)):
+            if (Alphabet.saveFlagSentencePNG(self.question.flags, suggest_file_name=self.is_answered)):
                 label = ctk.CTkLabel(self.container_frame, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
                 label.grid(column=1, row=0, sticky="e", pady=10)
                 label.after(4000, lambda: label.destroy())
@@ -70,9 +70,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
             error_message.place(relx=0.5, rely=0.5)
             return
         
-        self.sentence = self.session.get_sentence()
-        print(self.sentence.cleaned_sentence)
-        self.show_question()
+        self.next_question()
 
     def show_question(self):
         """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
@@ -84,6 +82,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.is_answered = False
 
+        print(self.question.cleaned_sentence)
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
         self.flag_sentence.flags = []
@@ -93,13 +92,13 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.question_widgets.append(self.answer_response)
 
         flag_columns = 12
-        flag_rows = math.floor(len(self.sentence.flags)/flag_columns)
+        flag_rows = math.floor(len(self.question.flags)/flag_columns)
         for i in range(flag_rows):
             self.flag_sentence.grid_rowconfigure(i, weight=1)
         for i in range(flag_columns):
             self.flag_sentence.grid_columnconfigure(i, weight=1, uniform="yes")
 
-        for i, flag in enumerate(self.sentence.flags):
+        for i, flag in enumerate(self.question.flags):
             img = None
             if (self.master.winfo_height() < self.master.winfo_width()):
                 img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletoheight=int(self.master.scale_size*0.1)) if (flag is not None) else None
@@ -123,7 +122,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
                                               validate="key", validatecommand=(validate_command,'%P'))
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
 
-        self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.sentence.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
+        self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.question.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
         self.text_length.grid(row=0, column=0, sticky="e", padx=10)
         self.answer_cell.entry.grid(row=0, column=1)
         self.answer_cell.entry.focus()
@@ -149,8 +148,8 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.show_next_button()
 
     def validate_answer(self, new_text):
-        if (len(new_text) > len(self.sentence.cleaned_sentence)): return False
-        self.text_length.configure(text=f"{len(new_text)}/{len(self.sentence.cleaned_sentence)}")
+        if (len(new_text) > len(self.question.cleaned_sentence)): return False
+        self.text_length.configure(text=f"{len(new_text)}/{len(self.question.cleaned_sentence)}")
         return True
 
     def enter_answer(self, event=None):
@@ -171,14 +170,6 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell.entry.configure(state="disabled")
         self.answer_cell.submit_button.configure(state="disabled")
         self.answer_cell.entry.unbind("<Return>")
-
-        # message = self.get_new_sentence()
-        # if (message == "Błąd czytania z pliku."):
-        #     return
-        # elif (message is not None):
-        #     error_message = ctk.CTkLabel(self.container_menu, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
-        #     error_message.grid(row=0, column=1, rowspan=2)
-        #     return
         
         self.update() # for internet delays, so that the user knows if it was right immediately
         self.show_next_button()
@@ -197,5 +188,5 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.question_widgets.append(self.next_button)
 
     def next_question(self):
-        self.flag = self.session.get_sentence()
+        self.question = self.session.get_sentence()
         self.show_question()

@@ -35,6 +35,12 @@ import gui.results as Results # here to avoid circular import
 class AppQuizPage(AppPage):
     """Base class for quiz pages
     """
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.session = None
+        self.question = None
+
     @abstractmethod
     def show_question(self):
         pass
@@ -42,8 +48,6 @@ class AppQuizPage(AppPage):
     @abstractmethod
     def next_question(self):
         pass
-
-    session = None
         
     def finish(self, message: str = None, **kwargs):
         if (message is not None):

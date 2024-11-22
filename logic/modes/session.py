@@ -23,6 +23,7 @@ class Session:
             text.set_visible(False)
         plt.setp(wedges, width=0.25)
         ax.set_aspect("equal")
+        plt.tight_layout()
         # plot_img_path = Environment.resource_path('static/tmp/' + Session._generate_filename_for_statistics())
         # plt.savefig(plot_img_path, format='png', dpi=600, transparent=True)
         return fig

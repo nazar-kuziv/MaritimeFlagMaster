@@ -32,7 +32,7 @@ class SenFlag(Util.AppQuizPage):
         super().draw()
 
         if (self.time_minutes > 0):
-            self.countdown = add_countdown_timer_to_top_menu(self)
+            self.countdown = add_countdown_timer_to_top_menu(self, self.time_minutes)
         
         self.top_menu = ctk.CTkFrame(self, height=0)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
@@ -44,7 +44,7 @@ class SenFlag(Util.AppQuizPage):
     def establish_session(self, mode: str):
         error_text = ""
         try:
-            self.senflag_session = SenflagSession(mode, self.questions_number)
+            self.session = SenflagSession(mode, self.questions_number)
         except NoInternetConnectionException:
             error_text = "Brak połączenia z internetem."
         except RequestLimitExceededException:
@@ -58,9 +58,7 @@ class SenFlag(Util.AppQuizPage):
             error_message = ctk.CTkLabel(self.container_menu, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
             error_message.grid(row=0, column=1, rowspan=2)
             return
-        
-        self.sentence = self.senflag_session.get_sentence()
-        print(self.sentence.cleaned_sentence)
+
         Util.double_buffer_frame(self, Util.loading_widget(self.winfo_toplevel(), True), self.show_question)
     
     def show_question(self):
@@ -83,6 +81,8 @@ class SenFlag(Util.AppQuizPage):
         except AttributeError: print("Couldn't destroy flag_input_box")
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
+        self.sentence = self.session.get_question()
+        print(self.sentence.cleaned_sentence)
 
         meaning_label = ctk.CTkLabel(self.top_menu, text=self.sentence.cleaned_sentence, width=int(self.master.winfo_width()*0.3), font=ctk.CTkFont(size=int(self.master.winfo_width()*0.011)), 
                                      fg_color='transparent', wraplength=int(self.master.winfo_width()*0.28))
@@ -127,7 +127,7 @@ class SenFlag(Util.AppQuizPage):
         self.place_input_flags()
 
         def skip_command():
-            next_exists = self.senflag_session.next_sentence()
+            next_exists = self.session.next_question()
             self.show_question() if next_exists else self.finish()
 
         self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
@@ -206,7 +206,7 @@ class SenFlag(Util.AppQuizPage):
         except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
-        if (not self.senflag_session.check_answer(self.input_flag_objects)):
+        if (not self.session.check_answer(self.input_flag_objects)):
             print("Wrong answer.")
             self.answer_response = ctk.CTkLabel(self.top_menu, text="Źle", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
             self.answer_response.pack(side="left", padx=10)
@@ -241,7 +241,7 @@ class SenFlag(Util.AppQuizPage):
             
             self.update() # for internet delays, so that the user knows if it was right immediately
             # next button
-            next_exists = self.senflag_session.next_sentence()
+            next_exists = self.session.next_question()
             next_command = self.show_question if next_exists else self.finish
             next_text = "Nowe zdanie" if next_exists else "Wyniki"
             if (not next_exists):
@@ -254,5 +254,5 @@ class SenFlag(Util.AppQuizPage):
             self.top_menu.dict["new_sentence"] = self.next_button
     
     def next_question(self):
-        self.flag = self.senflag_session.get_sentence()
+        self.flag = self.senflag_session.get_question()
         self.show_question()

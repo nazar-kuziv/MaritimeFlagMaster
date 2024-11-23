@@ -21,7 +21,7 @@ class Meanings(Util.AppQuizPage):
         self.questions_number = questions_number
         self.time_minutes = time_minutes
         print(f"Questions number: {questions_number}, time: {time_minutes}")
-        self.meaning_session = MeaningsSession(questions_number) if questions_number > 0 else MeaningsSession()
+        self.session = MeaningsSession(questions_number) if questions_number > 0 else MeaningsSession()
 
         # self.flag_list = [Alphabet._characters['C'], Alphabet._characters['B'], Alphabet._characters['A']] # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['6']]
@@ -32,13 +32,14 @@ class Meanings(Util.AppQuizPage):
         self.flag_images = []
         self.selected_flags = []
         self.flag_index = 0
+        self.flag = self.session.get_question()
         self.images = []
     
     def draw(self):
         super().draw()
 
         if (self.time_minutes > 0):
-            self.countdown = add_countdown_timer_to_top_menu(self)
+            self.countdown = add_countdown_timer_to_top_menu(self, self.time_minutes)
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
@@ -115,7 +116,7 @@ class Meanings(Util.AppQuizPage):
         self.place_input_flags()
         
         def skip_command():
-            next_exists = self.meaning_session.next_flag()
+            next_exists = self.session.next_question()
             self.next_question() if next_exists else self.finish()
 
         self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
@@ -189,9 +190,9 @@ class Meanings(Util.AppQuizPage):
             self.show_answer(False)
             return
         elif (len(self.selected_flags) == 1):
-            self.show_answer(self.meaning_session.check_answer(self.alphabet[self.selected_flags[0]]))
+            self.show_answer(self.session.check_answer(self.alphabet[self.selected_flags[0]]))
         else:
-            self.show_answer(self.meaning_session.check_answer([self.alphabet[i] for i in self.selected_flags]))
+            self.show_answer(self.session.check_answer([self.alphabet[i] for i in self.selected_flags]))
     
     def show_answer(self, isCorrect: bool):
         try:
@@ -212,7 +213,7 @@ class Meanings(Util.AppQuizPage):
             self.selected_flags = []
 
             #next button
-            next_exists = self.meaning_session.next_flag()
+            next_exists = self.session.next_question()
             next_command = self.next_question if next_exists else self.finish
             next_text = "Następny" if next_exists else "Wyniki"
             if (not next_exists):
@@ -225,5 +226,5 @@ class Meanings(Util.AppQuizPage):
             self.top_menu.dict["next_button"] = next_button
 
     def next_question(self):
-        self.flag = self.meaning_session.get_flag()
+        self.flag = self.session.get_question()
         self.show_question()

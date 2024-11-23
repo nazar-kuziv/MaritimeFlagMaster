@@ -23,9 +23,10 @@ class Session:
             text.set_visible(False)
         plt.setp(wedges, width=0.25)
         ax.set_aspect("equal")
-        plot_img_path = Environment.resource_path('static/tmp/' + Session._generate_filename_for_statistics())
-        plt.savefig(plot_img_path, format='png', dpi=600, transparent=True)
-        return plot_img_path
+        plt.tight_layout()
+        # plot_img_path = Environment.resource_path('static/tmp/' + Session._generate_filename_for_statistics())
+        # plt.savefig(plot_img_path, format='png', dpi=600, transparent=True)
+        return fig
 
     def get_procent_of_correct_answers(self):
         return round((self.number_of_correct_answers / self.number_of_questions)*100)

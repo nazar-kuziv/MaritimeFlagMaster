@@ -33,13 +33,13 @@ class SenflagSession(Session):
 
         super().__init__(number_of_sentences)
         self.mode = mode
-        self.next_sentence()
+        self.next_question()
 
-    def get_sentence(self) -> FlagSentence:
+    def get_question(self) -> FlagSentence:
         """Returns the current sentence"""
         return self.sentence
 
-    def next_sentence(self):
+    def next_question(self):
         """Moves to the next sentence. If there are no more sentences, returns False, otherwise returns True.
 
         :raise NoInternetConnectionException: If the mode is 'internet' and there is no internet connection

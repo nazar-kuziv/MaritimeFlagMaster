@@ -21,15 +21,16 @@ class Codewords(Util.AppQuizPage):
 
         # self.flag_list = random.sample(list(Alphabet._characters.values()), 3) # randomly choose a flag, change later
         # self.flag_list = [Alphabet._characters['A'], Alphabet._characters['B'], Alphabet._characters['C']] # randomly choose a flag, change later
-        self.codewords_session = CodewordsSession(questions_number) if questions_number > 0 else CodewordsSession()
+        self.session = CodewordsSession(questions_number) if questions_number > 0 else CodewordsSession()
 
         self.flag_index = 0
-    
+        self.flag = self.session.get_question()
+
     def draw(self):
         super().draw()
 
         if (self.time_minutes > 0):
-            self.countdown = add_countdown_timer_to_top_menu(self)
+            self.countdown = add_countdown_timer_to_top_menu(self, self.time_minutes)
 
         self.question_widgets = []
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -74,7 +75,7 @@ class Codewords(Util.AppQuizPage):
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
 
         def skip_command():
-            next_exists = self.codewords_session.next_flag()
+            next_exists = self.session.next_question()
             self.next_question() if next_exists else self.finish()
 
         self.question_widgets.append(self.add_skip_button(skip_command))
@@ -85,7 +86,7 @@ class Codewords(Util.AppQuizPage):
 
 
     def enter_answer(self):
-        if (not self.codewords_session.check_answer(self.answer_cell.entry.get())):
+        if (not self.session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
             self.answer_response.configure(text='Źle')
         else:
@@ -96,8 +97,8 @@ class Codewords(Util.AppQuizPage):
             self.answer_cell.submit_button.configure(command=None)
 
             # next button
-            next_exists = self.codewords_session.next_flag()
-            next_command = self.next_question if next_exists else self.finish
+            next_exists = self.session.next_question()
+            next_command = self.next_question if next_exists else lambda: self.finish()
             next_text = "Następny" if next_exists else "Wyniki"
             if (not next_exists):
                 try:
@@ -113,5 +114,5 @@ class Codewords(Util.AppQuizPage):
     
     def next_question(self):
         self.master.unbind("<Return>")
-        self.flag = self.codewords_session.get_flag()
+        self.flag = self.session.get_question()
         self.show_question()

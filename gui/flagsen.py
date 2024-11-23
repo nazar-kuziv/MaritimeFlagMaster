@@ -130,7 +130,8 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
 
-        self.question_widgets.append(self.add_skip_button(self.skip_command))
+        self.skip_button = self.add_skip_button(self.skip_command)
+        self.question_widgets.append(self.skip_button)
 
         self.update_idletasks()
         try:
@@ -140,6 +141,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
 
     def skip_command(self):
         print("Skipped.")
+        self.skip_button.configure(command=None)
         self.answer_response.configure(text='Pominięto.')
         self.answer_cell.entry.delete(0, 'end')
         self.answer_cell.entry.insert(0, self.session.get_correct_answer())

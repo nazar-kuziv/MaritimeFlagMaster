@@ -126,6 +126,7 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         loading_label.destroy()
 
     def skip_command(self):
+        self.top_menu.dict["skip"].configure(command=None)
         self.clear_checked_flags()
         correct_flags = [self.session.get_correct_answer()]
         if (isinstance(correct_flags[0], FlagMultiple)):

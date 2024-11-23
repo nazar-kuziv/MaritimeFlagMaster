@@ -136,6 +136,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         except AttributeError: pass
 
     def skip_command(self):
+        self.top_menu.dict["skip"].configure(command=None)
         correct_flags = self.session.get_correct_answer().flags
         for f in correct_flags:
             if (f is None):

@@ -36,5 +36,8 @@ class Results(Util.AppPage):
         self.winfo_toplevel().protocol("WM_DELETE_WINDOW", _quit)
         
         percent = self.session.get_procent_of_correct_answers()
-        self.percent_label = ctk.CTkLabel(self.plot_frame, text=percent, font=ctk.CTkFont(size=int(self.winfo_width()*0.022)), width=0, fg_color='transparent')
+        no_of_correct = self.session.number_of_correct_answers
+        no_of_questions = self.session.number_of_questions
+        self.percent_label = ctk.CTkLabel(self.plot_frame, text=f"{no_of_correct}/{no_of_questions}\n{percent}%",
+                                          font=ctk.CTkFont(size=int(self.winfo_width()*0.022)), width=0, fg_color='transparent')
         self.percent_label.place(anchor="center", relx=0.5, rely=0.5)

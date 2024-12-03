@@ -164,6 +164,9 @@ def new_page(page: Type[AppPage], breadcrumb_name: str, **kwargs) -> ctk.CTkBase
     add_breadcrumb(breadcrumb_name, page.__class__, **kwargs)
     return change_page(page)
 
+def refresh_page():
+    return change_page(_page_class[-1](**_page_kwargs[-1]))
+
 def previous_page(index: int) -> ctk.CTkBaseClass:
     for i in range(index + 1, len(_page_class)):
             delete_breadcrumb()

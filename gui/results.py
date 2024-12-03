@@ -41,3 +41,9 @@ class Results(Util.AppPage):
         self.percent_label = ctk.CTkLabel(self.plot_frame, text=f"{no_of_correct}/{no_of_questions}\n{percent}%",
                                           font=ctk.CTkFont(size=int(self.winfo_width()*0.022)), width=0, fg_color='transparent')
         self.percent_label.place(anchor="center", relx=0.5, rely=0.5)
+        
+        self.retry_button = ctk.CTkButton(self, text='Spróbuj ponownie', command=self.retry, font=ctk.CTkFont(size=int(self.winfo_width()*0.02)))
+        self.retry_button.pack(side="top", ipadx=2, ipady=2)
+    
+    def retry(self):
+        Util.refresh_page()

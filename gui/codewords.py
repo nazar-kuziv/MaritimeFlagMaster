@@ -6,7 +6,7 @@ import gui.util_functions as Util
 from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.codewords_session import CodewordsSession
 
-class Codewords(Util.AppQuizPage):
+class Codewords(Util.AppQuizPage, Util.ISkippablePage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the codewords screen
 
@@ -66,7 +66,7 @@ class Codewords(Util.AppQuizPage):
         self.question_widgets.append(self.answer_cell)
 
         print(self.flag.code_word)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), width=int(self.master.scale_size*0.3), validate="key")
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), width=int(self.master.scale_size*0.3))
         self.answer_cell.entry.bind("<Return>", lambda x: self.enter_answer())
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
@@ -74,15 +74,22 @@ class Codewords(Util.AppQuizPage):
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
 
-        def skip_command():
-            next_exists = self.session.next_question()
-            self.next_question() if next_exists else self.finish()
-
-        self.question_widgets.append(self.add_skip_button(skip_command))
+        self.skip_button = self.add_skip_button(self.skip_command)
+        self.question_widgets.append(self.skip_button)
 
         try:
             self.countdown.startCountdown()
         except AttributeError: pass
+
+    def skip_command(self):
+        print("Skipped.")
+        self.skip_button.configure(command=None)
+        self.answer_response.configure(text='Pominięto.')
+        self.answer_cell.entry.delete(0, 'end')
+        self.answer_cell.entry.insert(0, self.session.get_correct_answer())
+        self.answer_cell.entry.configure(state="disabled")
+        self.answer_cell.submit_button.configure(command=None)
+        self.show_next_button()
 
 
     def enter_answer(self):
@@ -95,22 +102,23 @@ class Codewords(Util.AppQuizPage):
 
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(command=None)
+            self.show_next_button()
 
-            # next button
-            next_exists = self.session.next_question()
-            next_command = self.next_question if next_exists else lambda: self.finish()
-            next_text = "Następny" if next_exists else "Wyniki"
-            if (not next_exists):
-                try:
-                    self.countdown.pause()
-                except AttributeError: pass
+    def show_next_button(self):
+        next_exists = self.session.next_question()
+        next_command = self.next_question if next_exists else self.finish
+        next_text = "Następny" if next_exists else "Wyniki"
+        if (not next_exists):
+            try:
+                self.countdown.pause()
+            except AttributeError: pass
 
-            self.master.bind("<Return>", lambda x: next_command())
-            self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
-                                                height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=next_command)
-            self.update()
-            self.next_button.grid(row=1, column=2)
-            self.question_widgets.append(self.next_button)
+        self.master.bind("<Return>", lambda x: next_command())
+        self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), 
+                                            height=int(self.master.scale_size*0.18), width=int(self.master.scale_size*0.14), command=next_command)
+        self.update()
+        self.next_button.grid(row=1, column=2)
+        self.question_widgets.append(self.next_button)
     
     def next_question(self):
         self.master.unbind("<Return>")

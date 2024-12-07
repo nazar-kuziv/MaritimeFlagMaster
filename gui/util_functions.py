@@ -35,6 +35,12 @@ import gui.results as Results # here to avoid circular import
 class AppQuizPage(AppPage):
     """Base class for quiz pages
     """
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.session = None
+        self.question = None
+
     @abstractmethod
     def show_question(self):
         pass
@@ -55,6 +61,17 @@ class AppQuizPage(AppPage):
         skip_button = ctk.CTkButton(self._top_menu, text='Pomiń', width=0, command=command, **kwargs)
         skip_button.pack(side="right", padx=5)
         return skip_button
+
+class ISkippablePage(ABC):
+    """Interface for skippable pages
+    """
+    @abstractmethod
+    def skip_command(self):
+        pass
+
+    @abstractmethod
+    def show_next_button(self):
+        pass
 
 def loading_widget(master, isFill: bool = False):
     """Shows some loading text in the middle of the screen

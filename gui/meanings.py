@@ -9,7 +9,7 @@ import gui.util_functions as Util
 from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.meanings_session import MeaningsSession
 
-class Meanings(Util.AppQuizPage):
+class Meanings(Util.AppQuizPage, Util.ISkippablePage):
     def __init__(self, master, questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the meanings screen
 
@@ -31,8 +31,6 @@ class Meanings(Util.AppQuizPage):
         self.alphabet = Alphabet.get_single_flags_shuffled()
         self.flag_images = []
         self.selected_flags = []
-        self.flag_index = 0
-        self.flag = self.session.get_question()
         self.images = []
     
     def draw(self):
@@ -83,6 +81,10 @@ class Meanings(Util.AppQuizPage):
         check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=None)
         check_button.grid(row=0, column=3, ipadx=10, ipady=10)
         self.top_menu.dict["check_button"] = check_button
+        
+        answer = ctk.CTkLabel(self.top_menu, text='', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
+        answer.grid(row=0, column=5, sticky="e", padx=10)
+        self.top_menu.dict["answer"] = answer
 
         clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=None)
         clear_button.grid(row=0, column=0, sticky="w", ipadx=10, ipady=10)
@@ -114,18 +116,34 @@ class Meanings(Util.AppQuizPage):
             kwargs = { "scaletoheight":int(self.master.scale_size*0.8/self.input_columns) } if (self.master.winfo_height() < self.master.winfo_width()) else { "scaletowidth":int(self.master.scale_size*0.8/self.input_columns) }
             f.configure(**kwargs)
         self.place_input_flags()
-        
-        def skip_command():
-            next_exists = self.session.next_question()
-            self.next_question() if next_exists else self.finish()
 
-        self.top_menu.dict["skip"] = self.add_skip_button(skip_command)
+        self.top_menu.dict["skip"] = self.add_skip_button(self.skip_command)
 
         self.update_idletasks()
         try:
             self.countdown.startCountdown()
         except AttributeError: pass
         loading_label.destroy()
+
+    def skip_command(self):
+        self.top_menu.dict["skip"].configure(command=None)
+        self.clear_checked_flags()
+        correct_flags = [self.session.get_correct_answer()]
+        if (isinstance(correct_flags[0], FlagMultiple)):
+            correct_flags = correct_flags[0].flags
+        for flag in correct_flags:
+            flag_index = -1
+            for i, x in enumerate(self.alphabet):
+                if (x.code_word == flag.code_word):
+                    flag_index = i
+                    break
+            
+            label = self.flag_images[flag_index].flag
+            label.children['!ctkcanvas'].event_generate("<Button-1>")
+        
+        print("Skipped.")
+        self.top_menu.dict["answer"].configure(text='Pominięto.')
+        self.show_next_button()
 
     def place_input_flags(self):
         alphabet_index = 0
@@ -148,7 +166,7 @@ class Meanings(Util.AppQuizPage):
         """
         if (index < 0): return
         print(f"{len(self.selected_flags)}, {index}")
-        print(event.widget)
+        print(self.alphabet[index].code_word)
         if (index not in self.selected_flags):
             if (len(self.selected_flags) >= 3):
                 print("longer than 3")
@@ -168,9 +186,7 @@ class Meanings(Util.AppQuizPage):
             self.top_menu.dict["check_button"].configure(command=self.check_answer)
         else: 
             [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
-        try:
-            self.top_menu.dict["answer"].destroy()
-        except (AttributeError, KeyError) as e: pass
+        self.top_menu.dict["answer"].configure(text='')
 
     def clear_checked_flags(self):
         for index in self.selected_flags:
@@ -178,9 +194,7 @@ class Meanings(Util.AppQuizPage):
             self.flag_images[index].flag.configure(fg_color="transparent", text="")
         self.selected_flags.clear()
         [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
-        try:
-            self.top_menu.dict["answer"].destroy()
-        except (AttributeError, KeyError) as e: pass
+        self.top_menu.dict["answer"].configure(text='')
 
     def check_answer(self):
         print(f"Checking, {self.flag}, {len(self.selected_flags)}")
@@ -195,36 +209,36 @@ class Meanings(Util.AppQuizPage):
             self.show_answer(self.session.check_answer([self.alphabet[i] for i in self.selected_flags]))
     
     def show_answer(self, isCorrect: bool):
-        try:
-            self.top_menu.dict["answer"].destroy()
-        except (AttributeError, KeyError) as e: pass
+        # try:
+        #     self.top_menu.dict["answer"].destroy()
+        # except (AttributeError, KeyError) as e: pass
         answer_text = "Poprawnie!" if isCorrect else "Źle"
+        self.top_menu.dict["answer"].configure(text=answer_text)
         print(answer_text)
-        answer = ctk.CTkLabel(self.top_menu, text=answer_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
-        answer.grid(row=0, column=5, sticky="e", padx=10)
-        self.top_menu.dict["answer"] = answer
         
-        if (isCorrect):
-            [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
-            for f in self.flag_images:
-                f.flag.unbind("<Button-1>")
-                f.flag.configure(cursor='')
-            
-            self.selected_flags = []
+        if (not isCorrect): return
+        
+        self.show_next_button()
 
-            #next button
-            next_exists = self.session.next_question()
-            next_command = self.next_question if next_exists else self.finish
-            next_text = "Następny" if next_exists else "Wyniki"
-            if (not next_exists):
-                try:
-                    self.countdown.pause()
-                except AttributeError: pass
+    def show_next_button(self):
+        [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+        for f in self.flag_images:
+            f.flag.unbind("<Button-1>")
+            f.flag.configure(cursor='')
+        
+        next_exists = self.session.next_question()
+        next_command = self.next_question if next_exists else self.finish
+        next_text = "Następny" if next_exists else "Wyniki"
+        if (not next_exists):
+            try:
+                self.countdown.pause()
+            except AttributeError: pass
 
-            next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=next_command)
-            next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
-            self.top_menu.dict["next_button"] = next_button
+        next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=next_command)
+        next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
+        self.top_menu.dict["next_button"] = next_button
 
     def next_question(self):
+        self.selected_flags = []
         self.flag = self.session.get_question()
         self.show_question()

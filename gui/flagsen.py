@@ -9,7 +9,7 @@ import gui.util_functions as Util
 from gui.countdown import add_countdown_timer_to_top_menu
 from logic.modes.flagsen_session import FlagsenSession
 
-class FlagSen(Util.AppQuizPage):
+class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
     def __init__(self, master, source: str = "default", questions_number: int = 0, time_minutes: int = 0, **kwargs):
         """Class for initializing the Flags-sentence screen
 
@@ -41,7 +41,7 @@ class FlagSen(Util.AppQuizPage):
         self.container_frame.grid_columnconfigure(2, weight=0)
 
         def save_image():
-            if (Alphabet.saveFlagSentencePNG(self.sentence.flags, suggest_file_name=self.is_answered)):
+            if (Alphabet.saveFlagSentencePNG(self.question.flags, suggest_file_name=self.is_answered)):
                 label = ctk.CTkLabel(self.container_frame, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
                 label.grid(column=1, row=0, sticky="e", pady=10)
                 label.after(4000, lambda: label.destroy())
@@ -69,8 +69,8 @@ class FlagSen(Util.AppQuizPage):
             error_message = ctk.CTkLabel(self, text=error_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
             error_message.place(relx=0.5, rely=0.5)
             return
-
-        self.show_question()
+        
+        self.next_question()
 
     def show_question(self):
         """Make sure to first make the main FlagSen frame visible with the place/pack/grid functions
@@ -84,18 +84,23 @@ class FlagSen(Util.AppQuizPage):
         self.sentence = self.session.get_question()
         print(self.sentence.cleaned_sentence)
 
+        print(self.question.cleaned_sentence)
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
         self.flag_sentence.flags = []
 
+        self.answer_response = ctk.CTkLabel(self.container_frame, text='', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
+        self.answer_response.grid(row=0, column=0, columnspan=3)
+        self.question_widgets.append(self.answer_response)
+
         flag_columns = 12
-        flag_rows = math.floor(len(self.sentence.flags)/flag_columns)
+        flag_rows = math.floor(len(self.question.flags)/flag_columns)
         for i in range(flag_rows):
             self.flag_sentence.grid_rowconfigure(i, weight=1)
         for i in range(flag_columns):
             self.flag_sentence.grid_columnconfigure(i, weight=1, uniform="yes")
 
-        for i, flag in enumerate(self.sentence.flags):
+        for i, flag in enumerate(self.question.flags):
             img = None
             if (self.master.winfo_height() < self.master.winfo_width()):
                 img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletoheight=int(self.master.scale_size*0.1)) if (flag is not None) else None
@@ -119,7 +124,7 @@ class FlagSen(Util.AppQuizPage):
                                               validate="key", validatecommand=(validate_command,'%P'))
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
 
-        self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.sentence.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
+        self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.question.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
         self.text_length.grid(row=0, column=0, sticky="e", padx=10)
         self.answer_cell.entry.grid(row=0, column=1)
         self.answer_cell.entry.focus()
@@ -127,11 +132,8 @@ class FlagSen(Util.AppQuizPage):
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
 
-        def skip_command():
-            next_exists = self.session.next_question()
-            self.next_question() if next_exists else self.finish()
-
-        self.question_widgets.append(self.add_skip_button(skip_command))
+        self.skip_button = self.add_skip_button(self.skip_command)
+        self.question_widgets.append(self.skip_button)
 
         self.update_idletasks()
         try:
@@ -139,55 +141,56 @@ class FlagSen(Util.AppQuizPage):
         except AttributeError: pass
         loading_label.destroy()
 
+    def skip_command(self):
+        print("Skipped.")
+        self.skip_button.configure(command=None)
+        self.answer_response.configure(text='Pominięto.')
+        self.answer_cell.entry.delete(0, 'end')
+        self.answer_cell.entry.insert(0, self.session.get_correct_answer())
+        self.answer_cell.entry.configure(state="disabled")
+        self.answer_cell.submit_button.configure(command=None)
+        self.show_next_button()
+
     def validate_answer(self, new_text):
-        if (len(new_text) > len(self.sentence.cleaned_sentence)): return False
-        self.text_length.configure(text=f"{len(new_text)}/{len(self.sentence.cleaned_sentence)}")
+        if (len(new_text) > len(self.question.cleaned_sentence)): return False
+        self.text_length.configure(text=f"{len(new_text)}/{len(self.question.cleaned_sentence)}")
         return True
 
     def enter_answer(self, event=None):
-        try:
-            self.answer_response.destroy()
-        except AttributeError: pass
+        # try:
+        #     self.answer_response.destroy()
+        # except AttributeError: pass
         # correct_answer = self.flag.letter[0].upper()
         
         if (not self.session.check_answer(self.answer_cell.entry.get())):
             print("Wrong answer.")
-            self.answer_response = ctk.CTkLabel(self.container_frame, text='Źle', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
-            self.answer_response.grid(row=0, column=0, columnspan=3)
-            self.question_widgets.append(self.answer_response)
-        else:
-            print("Correct answer!")
-            self.is_answered = True
-            self.answer_response = ctk.CTkLabel(self.container_frame, text='Poprawnie!', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
-            self.answer_response.grid(row=0, column=0, columnspan=3)
-            self.question_widgets.append(self.answer_response)
+            self.answer_response.configure(text='Źle')
+            return
+        
+        print("Correct answer!")
+        self.is_answered = True
+        self.answer_response.configure(text='Poprawnie')
 
-            self.answer_cell.entry.configure(state="disabled")
-            self.answer_cell.submit_button.configure(state="disabled")
-            self.answer_cell.entry.unbind("<Return>")
+        self.answer_cell.entry.configure(state="disabled")
+        self.answer_cell.submit_button.configure(state="disabled")
+        self.answer_cell.entry.unbind("<Return>")
+        
+        self.update() # for internet delays, so that the user knows if it was right immediately
+        self.show_next_button()
 
-            # message = self.get_new_sentence()
-            # if (message == "Błąd czytania z pliku."):
-            #     return
-            # elif (message is not None):
-            #     error_message = ctk.CTkLabel(self.container_menu, text=message, font=ctk.CTkFont(size=int(self.master.scale_size*0.05)), fg_color='white')
-            #     error_message.grid(row=0, column=1, rowspan=2)
-            #     return
-            
-            self.update() # for internet delays, so that the user knows if it was right immediately
-            # next button
-            next_exists = self.session.next_question()
-            next_command = self.next_question if next_exists else self.finish
-            next_text = "Nowe zdanie" if next_exists else "Wyniki"
-            if (not next_exists):
-                try:
-                    self.countdown.pause()
-                except AttributeError: pass
-            
-            self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=next_command)
-            self.next_button.grid(row=2, column=2, sticky="e", padx=10)
-            self.question_widgets.append(self.next_button)
+    def show_next_button(self):
+        next_exists = self.session.next_question()
+        next_command = self.next_question if next_exists else self.finish
+        next_text = "Nowe zdanie" if next_exists else "Wyniki"
+        if (not next_exists):
+            try:
+                self.countdown.pause()
+            except AttributeError: pass
+        
+        self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=next_command)
+        self.next_button.grid(row=2, column=2, sticky="e", padx=10)
+        self.question_widgets.append(self.next_button)
 
     def next_question(self):
-        self.flag = self.session.get_question()
+        self.flag = self.flagsen_session.get_question()
         self.show_question()

@@ -230,6 +230,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         
         print("Correct answer!")
         self.answer_response.configure(text='Poprawnie')
+        self.skip_button.configure(command=None)
 
         def save_image():
             if (Alphabet.saveFlagSentencePNG(self.question.flags)):

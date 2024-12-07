@@ -218,6 +218,7 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         
         if (not isCorrect): return
         
+        self.skip_button.configure(command=None)
         self.show_next_button()
 
     def show_next_button(self):

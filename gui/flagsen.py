@@ -82,9 +82,9 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.is_answered = False
         self.sentence = self.session.get_question()
-        print(self.sentence.cleaned_sentence)
+        print(self.sentence)
 
-        print(self.question.cleaned_sentence)
+        print(self.question)
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
         self.flag_sentence.flags = []
@@ -192,5 +192,5 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.question_widgets.append(self.next_button)
 
     def next_question(self):
-        self.flag = self.flagsen_session.get_question()
+        self.question = self.session.get_question()
         self.show_question()

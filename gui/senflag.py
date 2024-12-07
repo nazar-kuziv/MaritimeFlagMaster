@@ -270,5 +270,5 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         self.top_menu.dict["new_sentence"] = self.next_button
     
     def next_question(self):
-        self.flag = self.senflag_session.get_question()
+        self.question = self.session.get_question()
         self.show_question()

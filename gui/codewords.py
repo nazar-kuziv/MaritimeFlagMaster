@@ -24,12 +24,13 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
         self.session = CodewordsSession(questions_number) if questions_number > 0 else CodewordsSession()
 
         self.flag_index = 0
-    
+        self.flag = self.session.get_question()
+
     def draw(self):
         super().draw()
 
         if (self.time_minutes > 0):
-            self.countdown = add_countdown_timer_to_top_menu(self)
+            self.countdown = add_countdown_timer_to_top_menu(self, self.time_minutes)
 
         self.question_widgets = []
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -104,7 +105,7 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
             self.show_next_button()
 
     def show_next_button(self):
-        next_exists = self.session.next_flag()
+        next_exists = self.session.next_question()
         next_command = self.next_question if next_exists else self.finish
         next_text = "Następny" if next_exists else "Wyniki"
         if (not next_exists):
@@ -121,5 +122,5 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
     
     def next_question(self):
         self.master.unbind("<Return>")
-        self.flag = self.session.get_flag()
+        self.flag = self.session.get_question()
         self.show_question()

@@ -29,7 +29,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         super().draw()
 
         if (self.time_minutes > 0):
-            self.countdown = add_countdown_timer_to_top_menu(self)
+            self.countdown = add_countdown_timer_to_top_menu(self, self.time_minutes)
 
         self.container_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.container_frame.pack(fill="both", expand=True)
@@ -81,6 +81,8 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.is_answered = False
+        self.sentence = self.session.get_question()
+        print(self.sentence.cleaned_sentence)
 
         print(self.question.cleaned_sentence)
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
@@ -177,7 +179,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.show_next_button()
 
     def show_next_button(self):
-        next_exists = self.session.next_sentence()
+        next_exists = self.session.next_question()
         next_command = self.next_question if next_exists else self.finish
         next_text = "Nowe zdanie" if next_exists else "Wyniki"
         if (not next_exists):
@@ -190,5 +192,5 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.question_widgets.append(self.next_button)
 
     def next_question(self):
-        self.question = self.session.get_sentence()
+        self.flag = self.flagsen_session.get_question()
         self.show_question()

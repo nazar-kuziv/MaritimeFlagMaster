@@ -37,7 +37,7 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         super().draw()
 
         if (self.time_minutes > 0):
-            self.countdown = add_countdown_timer_to_top_menu(self)
+            self.countdown = add_countdown_timer_to_top_menu(self, self.time_minutes)
 
         self.top_menu = ctk.CTkFrame(self)
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
@@ -226,7 +226,7 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
             f.flag.unbind("<Button-1>")
             f.flag.configure(cursor='')
         
-        next_exists = self.session.next_flag()
+        next_exists = self.session.next_question()
         next_command = self.next_question if next_exists else self.finish
         next_text = "Następny" if next_exists else "Wyniki"
         if (not next_exists):
@@ -240,5 +240,5 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
 
     def next_question(self):
         self.selected_flags = []
-        self.flag = self.session.get_flag()
+        self.flag = self.session.get_question()
         self.show_question()

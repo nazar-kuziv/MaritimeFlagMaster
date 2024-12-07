@@ -10,18 +10,20 @@ class CodewordsSession(Session):
         super().__init__(number_of_flags)
         self.flags = Alphabet.get_characters_flags_shuffled(number_of_flags)
 
-    def get_flag(self) -> Flag:
-        """Returns the current flag"""
-        return self.flags[self.current_question]
+    def get_question(self) -> Flag | None:
+        """Returns the current flag, or None if there are no more flags"""
+        if not self.current_question >= self.number_of_questions:
+            return self.flags[self.current_question]
+        return None
 
     def check_answer(self, answer: str) -> bool:
         """Checks if the answer is correct and updates the number of correct answers if it is"""
-        if self.get_flag().check_code_word(answer):
+        if self.get_question().check_code_word(answer):
             self.number_of_correct_answers += 1
             return True
         return False
 
-    def next_flag(self):
+    def next_question(self):
         """Moves to the next flag"""
         self.current_question += 1
         if self.current_question >= self.number_of_questions:
@@ -30,4 +32,4 @@ class CodewordsSession(Session):
 
     def get_correct_answer(self) -> str:
         """Returns the correct answer for the current flag"""
-        return self.get_flag().code_word
+        return self.get_question().code_word

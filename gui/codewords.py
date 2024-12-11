@@ -102,6 +102,8 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
 
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(command=None)
+            self.answer_cell.entry.unbind("<Return>")
+            self.skip_button.configure(command=None)
             self.show_next_button()
 
     def show_next_button(self):
@@ -109,6 +111,7 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
         next_command = self.next_question if next_exists else self.finish
         next_text = "Następny" if next_exists else "Wyniki"
         if (not next_exists):
+            self.answer_cell.entry.unbind("<Return>")
             try:
                 self.countdown.pause()
             except AttributeError: pass

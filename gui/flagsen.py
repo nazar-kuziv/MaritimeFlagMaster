@@ -174,6 +174,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell.entry.configure(state="disabled")
         self.answer_cell.submit_button.configure(state="disabled")
         self.answer_cell.entry.unbind("<Return>")
+        self.skip_button.configure(command=None)
         
         self.update() # for internet delays, so that the user knows if it was right immediately
         self.show_next_button()

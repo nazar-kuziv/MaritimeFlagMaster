@@ -13,8 +13,11 @@ class Results(Util.AppPage):
     def draw(self):
         super().draw()
 
-        self.message = ctk.CTkLabel(self, text=self.message, fg_color='transparent')
+        self.message = ctk.CTkLabel(self, text=self.message, font=ctk.CTkFont(size=int(self.winfo_width()*0.022)), fg_color='transparent')
         self.message.pack(side="top")
+
+        if (self.session is None):
+            return
 
         self.plot_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.plot_frame.pack(side="top")
@@ -22,4 +25,25 @@ class Results(Util.AppPage):
         fig = self.session.get_statistics()
         canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
         canvas.draw()
-        canvas.get_tk_widget().pack()
+        bgcolor = self.plot_frame._bg_color
+        if (isinstance(bgcolor, list)): bgcolor = bgcolor[0 if ctk.get_appearance_mode() == "Light" else 1]
+        canvas.get_tk_widget().configure(bg=bgcolor)
+        canvas.get_tk_widget().pack(side="top", anchor="center")
+
+        def _quit(): # function to destroy this page when closing the window on this page
+            self.quit() # because FigureCanvasTkAgg throws an error and keeps the program running in backgound
+            self.destroy()
+        self.winfo_toplevel().protocol("WM_DELETE_WINDOW", _quit)
+        
+        percent = self.session.get_procent_of_correct_answers()
+        no_of_correct = self.session.number_of_correct_answers
+        no_of_questions = self.session.number_of_questions
+        self.percent_label = ctk.CTkLabel(self.plot_frame, text=f"{no_of_correct}/{no_of_questions}\n{percent}%",
+                                          font=ctk.CTkFont(size=int(self.winfo_width()*0.022)), width=0, fg_color='transparent')
+        self.percent_label.place(anchor="center", relx=0.5, rely=0.5)
+        
+        self.retry_button = ctk.CTkButton(self, text='Spróbuj ponownie', command=self.retry, font=ctk.CTkFont(size=int(self.winfo_width()*0.02)))
+        self.retry_button.pack(side="top", ipadx=2, ipady=2)
+    
+    def retry(self):
+        Util.refresh_page()

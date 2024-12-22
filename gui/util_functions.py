@@ -112,6 +112,7 @@ def delete_breadcrumb():
     if (len (_page_names) <= 0): return
     _page_names.pop()
     _page_class.pop()
+    _page_kwargs.pop()
 
 class BreadcrumbTrailWidget(ctk.CTkFrame):
     def __init__(self, master: ctk.CTkBaseClass, **kwargs):

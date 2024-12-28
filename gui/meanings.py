@@ -153,7 +153,8 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
                 flag_container.grid_rowconfigure(0, weight=1)
                 flag_container.grid_columnconfigure(0, weight=1)
                 flag_container.grid(row=i, column=j, sticky="nsew")
-                flag_container.flag = ctk.CTkLabel(flag_container, text='', image=self.images[alphabet_index], cursor="hand2")
+                flag_container.flag = ctk.CTkLabel(flag_container, text='', 
+                                          font=ctk.CTkFont(size=int(self.master.scale_size*0.033), weight='bold'), image=self.images[alphabet_index], cursor="hand2")
                 flag_container.flag.bind("<Button-1>", command=lambda event, i=alphabet_index: self.flag_input_handler(event, index=i))
                 flag_container.flag.grid(ipadx=10, ipady=10)
                 self.flag_images.append(flag_container)
@@ -172,14 +173,13 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
                 print("longer than 3")
                 return
             self.selected_flags.append(index)
-            event.widget.master.configure(fg_color=f"green{5 - len(self.selected_flags)}", text=len(self.selected_flags), 
-                                          font=ctk.CTkFont(size=int(self.master.scale_size*0.03), weight='bold'), text_color=f"green{5 - len(self.selected_flags)}")
+            event.widget.master.configure(fg_color=f"green{1 + len(self.selected_flags)}", text=len(self.selected_flags), text_color=f"green{1 + len(self.selected_flags)}")
         else:
             print("removing selection")
             self.selected_flags.remove(index)
             event.widget.master.configure(fg_color="transparent", text="")
             for i, indx in enumerate(self.selected_flags):
-                self.flag_images[indx].flag.configure(fg_color=f"green{4 - i}", text=(i+1), text_color=f"green{4 - i}")
+                self.flag_images[indx].flag.configure(fg_color=f"green{i}", text=(i+1), text_color=f"green{i}")
         if (len(self.selected_flags) > 0):
             self.top_menu.dict["clear_button"].configure(command=self.clear_checked_flags)
             self.update()

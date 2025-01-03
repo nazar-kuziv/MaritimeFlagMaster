@@ -78,7 +78,7 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         meaning_label.pack(padx=5, pady=5)
         self.top_menu.dict["meaning_label"] = meaning_label
 
-        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=None)
+        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer)
         check_button.grid(row=0, column=3, ipadx=10, ipady=10)
         self.top_menu.dict["check_button"] = check_button
         
@@ -86,7 +86,7 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         answer.grid(row=0, column=5, sticky="e", padx=10)
         self.top_menu.dict["answer"] = answer
 
-        clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=None)
+        clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.clear_checked_flags)
         clear_button.grid(row=0, column=0, sticky="w", ipadx=10, ipady=10)
         self.top_menu.dict["clear_button"] = clear_button
 
@@ -180,15 +180,16 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
             event.widget.master.configure(fg_color="transparent", text="")
             for i, indx in enumerate(self.selected_flags):
                 self.flag_images[indx].flag.configure(fg_color=f"green{i}", text=(i+1), text_color=f"green{i}")
-        if (len(self.selected_flags) > 0):
-            self.top_menu.dict["clear_button"].configure(command=self.clear_checked_flags)
-            self.update()
-            self.top_menu.dict["check_button"].configure(command=self.check_answer)
-        else: 
-            [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+        # if (len(self.selected_flags) > 0):
+        #     self.top_menu.dict["clear_button"].configure(command=self.clear_checked_flags)
+        #     self.update()
+        #     self.top_menu.dict["check_button"].configure(command=self.check_answer)
+        # else: 
+        #     [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         self.top_menu.dict["answer"].configure(text='')
 
     def clear_checked_flags(self):
+        if (len(self.selected_flags) <= 0): return
         for index in self.selected_flags:
             print("removing selection")
             self.flag_images[index].flag.configure(fg_color="transparent", text="")
@@ -197,10 +198,11 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         self.top_menu.dict["answer"].configure(text='')
 
     def check_answer(self):
+        if (len(self.selected_flags) == 0): return
         print(f"Checking, {self.flag}, {len(self.selected_flags)}")
         print(f"Selected list is {self.selected_flags}")
 
-        if (len(self.selected_flags) == 0 or len(self.selected_flags) > 3):
+        if (len(self.selected_flags) > 3):
             self.show_answer(False)
             return
         elif (len(self.selected_flags) == 1):

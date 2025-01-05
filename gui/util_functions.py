@@ -52,6 +52,7 @@ class AppQuizPage(AppPage):
     session = None
 
     def finish(self, message: str = None, **kwargs):
+        self.master.unbind("<Return>")
         if (message is not None):
             kwargs["message"] = message
         page = Results.Results(self.master, self.session, fg_color="transparent", **kwargs)

@@ -120,9 +120,24 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell.grid_columnconfigure(2, weight=1)
 
         validate_command = self.register(self.validate_answer)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=int(self.master.scale_size*0.6), font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), 
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=int(self.master.scale_size*0.6), font=ctk.CTkFont(size=int(self.master.scale_size*0.03)),
                                               validate="key", validatecommand=(validate_command,'%P'))
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
+        
+        self.answer_cell.scrollbar = ctk.CTkScrollbar(self.answer_cell, orientation="horizontal", 
+                                                      command=lambda moveto, index: self.answer_cell.entry.xview_moveto(index))
+        self.answer_cell.scrollbar.grid(row=1, column=1, sticky='ew')
+
+        def scrollbar_custom_function(start_value: float, end_value: float):
+            start_value = float(start_value)
+            end_value = float(end_value)
+            print(f"Start value: {start_value}, end value {end_value}")
+            if (start_value != 0 and end_value == 1.0):
+                print("Added 0.1 to start value")
+                start_value += 0.1
+            self.answer_cell.scrollbar.set(start_value, end_value)
+        
+        self.answer_cell.entry.configure(xscrollcommand=scrollbar_custom_function)
 
         self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.question.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
         self.text_length.grid(row=0, column=0, sticky="e", padx=10)
@@ -143,12 +158,13 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
 
     def skip_command(self):
         print("Skipped.")
-        self.skip_button.configure(command=None)
         self.answer_response.configure(text='Pominięto.')
         self.answer_cell.entry.delete(0, 'end')
         self.answer_cell.entry.insert(0, self.session.get_correct_answer())
         self.answer_cell.entry.configure(state="disabled")
         self.answer_cell.submit_button.configure(command=None)
+        self.answer_cell.entry.unbind("<Return>")
+        self.skip_button.configure(command=None)
         self.show_next_button()
 
     def validate_answer(self, new_text):
@@ -172,7 +188,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_response.configure(text='Poprawnie')
 
         self.answer_cell.entry.configure(state="disabled")
-        self.answer_cell.submit_button.configure(state="disabled")
+        self.answer_cell.submit_button.configure(command=None)
         self.answer_cell.entry.unbind("<Return>")
         self.skip_button.configure(command=None)
         

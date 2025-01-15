@@ -131,9 +131,9 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         def scrollbar_custom_function(start_value: float, end_value: float):
             start_value = float(start_value)
             end_value = float(end_value)
-            print(f"Start value: {start_value}, end value {end_value}")
+            # print(f"Start value: {start_value}, end value {end_value}")
             if (start_value != 0 and end_value == 1.0):
-                print("Added 0.1 to start value")
+                # print("Added 0.1 to start value")
                 start_value += 0.1
             self.answer_cell.scrollbar.set(start_value, end_value)
         

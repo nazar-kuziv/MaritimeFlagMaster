@@ -132,7 +132,7 @@ class BreadcrumbTrailWidget(ctk.CTkFrame):
             button.pack(side="left", padx=5)
 
             if (i < len(_page_names) - 1):
-                arrow = ctk.CTkLabel(self, text='〉', font=ctk.CTkFont(size=int(master.winfo_toplevel().winfo_width()*0.018), weight='bold'), fg_color='transparent')
+                arrow = ctk.CTkLabel(self, text='➤', font=ctk.CTkFont(size=int(master.winfo_toplevel().winfo_width()*0.018), weight='bold'), fg_color='transparent')
                 arrow.pack(side="left")
 
 _current_page: ctk.CTkBaseClass = None

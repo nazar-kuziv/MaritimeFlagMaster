@@ -69,7 +69,7 @@ class Flashcards(Util.AppQuizPage):
             self.next_button.destroy()
         except AttributeError: pass
         if (self.flag_index < len(self.flag_list)-1):
-            self.next_button = ctk.CTkButton(self.flashcard_frame, text="〉", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=self.next_question)
+            self.next_button = ctk.CTkButton(self.flashcard_frame, text="⮞", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=self.next_question)
             self.next_button.grid(row=0, column=2)
         
         # back button
@@ -77,7 +77,7 @@ class Flashcards(Util.AppQuizPage):
             self.back_button.destroy()
         except AttributeError: pass
         if (self.flag_index > 0):
-            self.back_button = ctk.CTkButton(self.flashcard_frame, text="〈", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=lambda: self.next_question(number=-1))
+            self.back_button = ctk.CTkButton(self.flashcard_frame, text="⮜", font=ctk.CTkFont(size=int(self.master.scale_size*0.08), weight="bold"), width=40, command=lambda: self.next_question(number=-1))
             self.back_button.grid(row=0, column=0)
         
         self.flashcard.grid_propagate(False)

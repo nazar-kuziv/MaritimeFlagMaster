@@ -81,10 +81,8 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.is_answered = False
-        self.sentence = self.session.get_question()
-        print(self.sentence)
 
-        print(self.question)
+        print(self.question.original_sentence)
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
         self.flag_sentence.flags = []
@@ -125,14 +123,16 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
         
         self.answer_cell.scrollbar = ctk.CTkScrollbar(self.answer_cell, orientation="horizontal", 
-                                                      command=lambda moveto, index: self.answer_cell.entry.xview_moveto(index))
+                                                      command=lambda moveto, index: self.answer_cell.entry.xview_scroll(index, "units"))
         self.answer_cell.scrollbar.grid(row=1, column=1, sticky='ew')
 
         def scrollbar_custom_function(start_value: float, end_value: float):
             start_value = float(start_value)
             end_value = float(end_value)
+            og_values = self.answer_cell.scrollbar.get()
             # print(f"Start value: {start_value}, end value {end_value}")
-            if (start_value != 0 and end_value == 1.0):
+            
+            if (start_value > 0 and end_value == 1.0):
                 # print("Added 0.1 to start value")
                 start_value += 0.1
             self.answer_cell.scrollbar.set(start_value, end_value)

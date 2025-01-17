@@ -113,36 +113,21 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell = ctk.CTkFrame(self.container_frame, fg_color="transparent")
         self.answer_cell.grid(row=2, column=0, columnspan=3, sticky="ew", pady=10)
         self.question_widgets.append(self.answer_cell)
-        self.answer_cell.grid_columnconfigure(0, weight=1)
+        self.answer_cell.grid_columnconfigure(0, weight=1, minsize=int(self.master.scale_size*0.1))
         self.answer_cell.grid_columnconfigure(1, weight=0)
-        self.answer_cell.grid_columnconfigure(2, weight=1)
+        self.answer_cell.grid_columnconfigure(2, weight=1, minsize=int(self.master.scale_size*0.4))
 
+        self.entry_font = ctk.CTkFont(size=int(self.master.scale_size*0.03))
         validate_command = self.register(self.validate_answer)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=int(self.master.scale_size*0.6), font=ctk.CTkFont(size=int(self.master.scale_size*0.03)),
+
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=int(self.master.scale_size*0.6), font=self.entry_font,
                                               validate="key", validatecommand=(validate_command,'%P'))
         self.answer_cell.entry.bind("<Return>", self.enter_answer)
-        
-        self.answer_cell.scrollbar = ctk.CTkScrollbar(self.answer_cell, orientation="horizontal", 
-                                                      command=lambda moveto, index: self.answer_cell.entry.xview_scroll(index, "units"))
-        self.answer_cell.scrollbar.grid(row=1, column=1, sticky='ew')
-
-        def scrollbar_custom_function(start_value: float, end_value: float):
-            start_value = float(start_value)
-            end_value = float(end_value)
-            og_values = self.answer_cell.scrollbar.get()
-            # print(f"Start value: {start_value}, end value {end_value}")
-            
-            if (start_value > 0 and end_value == 1.0):
-                # print("Added 0.1 to start value")
-                start_value += 0.1
-            self.answer_cell.scrollbar.set(start_value, end_value)
-        
-        self.answer_cell.entry.configure(xscrollcommand=scrollbar_custom_function)
+        self.answer_cell.entry.grid(row=0, column=1, sticky="ew")
+        self.answer_cell.entry.focus()
 
         self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.question.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
         self.text_length.grid(row=0, column=0, sticky="e", padx=10)
-        self.answer_cell.entry.grid(row=0, column=1)
-        self.answer_cell.entry.focus()
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
         self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
@@ -170,6 +155,10 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
     def validate_answer(self, new_text):
         if (len(new_text) > len(self.question.cleaned_sentence)): return False
         self.text_length.configure(text=f"{len(new_text)}/{len(self.question.cleaned_sentence)}")
+
+        text_pixel_length = self.entry_font.measure(new_text)
+        if (text_pixel_length > int(self.master.scale_size*0.58)):
+            self.answer_cell.entry.configure(width=text_pixel_length + 15)
         return True
 
     def enter_answer(self, event=None):

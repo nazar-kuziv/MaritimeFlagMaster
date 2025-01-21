@@ -90,10 +90,20 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         meaning_label.pack(side="left", padx=10)
         self.top_menu.dict["meaning_label"] = meaning_label
 
-        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer)
-        check_button.pack(side="left", ipadx=10, ipady=10)
-        self.top_menu.dict["check_button"] = check_button
+
+        self.check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer)
+        self.check_button.pack(side="left", ipadx=10, ipady=10, padx=10)
+        self.top_menu.dict["check_button"] = self.check_button
         
+        self.delete_button = ctk.CTkButton(self.top_menu, text="Kasuj", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.delete_input_flag)
+        self.delete_button.pack(side="left", ipadx=10, ipady=10, padx=10)
+        self.top_menu.dict["delete_button"] = self.delete_button
+        
+        self.clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.clear_inputs)
+        self.clear_button.pack(side="left", ipadx=10, ipady=10, padx=10)
+        self.top_menu.dict["clear_button"] = self.clear_button
+        
+
         self.answer_response = ctk.CTkLabel(self.top_menu, text="", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
         self.answer_response.pack(side="left", padx=10)
         self.top_menu.dict["answer_response"] = self.answer_response
@@ -104,8 +114,10 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
                                                        height=int(self.master.scale_size*0.055), fg_color='transparent')
         self.text_length.pack(side="left", padx=(0, 5))
         self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, height=int(self.master.scale_size*0.05), orientation="horizontal")
-        self.master.bind("<BackSpace>", self.delete_input_flag)
         self.flag_input_box.pack(side="left", fill="x", expand=True)
+
+        self.master.bind("<BackSpace>", self.delete_input_flag)
+        self.master.bind("<space>", lambda event: self.flag_input_handler(index="SPACJA"))
 
         self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.input_frame.pack(side="top", fill="both", expand=True)
@@ -118,7 +130,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
             self.input_frame.grid_columnconfigure(j, weight=1)
 
         # create svgs of flags the first time, after that shuffle both images and alphabet list
-        if (len(self.images) == 0):
+        if (not self.images):
             for f in self.alphabet:
                 if (self.master.winfo_height() < self.master.winfo_width()):
                     self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
@@ -213,12 +225,21 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
     
     def delete_input_flag(self, event = None):
         print("Backspace fired")
-        if (len(self.input_flag_labels) > 0):
+        if (self.input_flag_labels):
             flag = self.input_flag_labels.pop()
             flag.destroy()
             self.input_flag_objects.pop()
             self.text_length.configure(text=f"{len(self.input_flag_labels)}/{len(self.question.cleaned_sentence)}")
             self.answer_response.configure(text='')
+    
+    def clear_inputs(self, event = None):
+        while (self.input_flag_labels):
+            flag = self.input_flag_labels.pop()
+            flag.destroy()
+            self.input_flag_objects.pop()
+        self.text_length.configure(text=f"0/{len(self.question.cleaned_sentence)}")
+        self.answer_response.configure(text='')
+            
 
     def check_answer(self):
         # correct_answer = self.flag.letter[0].upper()
@@ -230,7 +251,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         
         print("Correct answer!")
         self.answer_response.configure(text='Poprawnie')
-        self.skip_button.configure(command=None)
+        self.top_menu.dict["skip"].configure(command=None)
 
         def save_image():
             if (Alphabet.saveFlagSentencePNG(self.question.flags)):
@@ -273,3 +294,8 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
     def next_question(self):
         self.question = self.session.get_question()
         self.show_question()
+    
+    def finish(self):
+        self.master.unbind("<BackSpace>")
+        self.master.unbind("<space>")
+        super().finish()

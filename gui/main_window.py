@@ -33,12 +33,12 @@ class MainMenu(Util.AppPage):
         self.tests_submenu = {
             "buttonNames": ["Słowo kodowe\n\nDopasuj słowo kodowe MKS do flagi", 
             "Znaczenie\n\nDopasuj flagi do komunikatu", 
-            "Flagi → Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
-            "Zdanie → Flagi\n\nZakoduj komunikat za pomocą flag"],
+            "Flagi->Zdanie\n\nPrzetłumacz zestaw flag na tekst", 
+            "Zdanie->Flagi\n\nZakoduj komunikat za pomocą flag"],
             "commands": [lambda: Util.new_page(OptionsMenu, "Słowo kodowe", master=self.window, next_page=Codewords), 
             lambda: Util.new_page(OptionsMenu, "Znaczenie", master=self.window, next_page=Meanings), 
-            lambda: Util.new_page(OptionsMenu, "Flagi→Zdanie", master=self.window, next_page=FlagSen, select_source=True, questions_number_choices=[5, 10, 15], questions_number_def_ind=0, time_minutes_choices=[5, 10, 15, 20],  time_minutes_def_ind=1), 
-            lambda: Util.new_page(OptionsMenu, "Zdanie → Flagi", master=self.window, next_page=SenFlag, select_source=True, questions_number_choices=[5, 10, 15], questions_number_def_ind=0, time_minutes_choices=[5, 10, 15, 20],  time_minutes_def_ind=1)]
+            lambda: Util.new_page(OptionsMenu, "Flagi->Zdanie", master=self.window, next_page=FlagSen, select_source=True, questions_number_choices=[5, 10, 15], questions_number_def_ind=0, time_minutes_choices=[5, 10, 15, 20],  time_minutes_def_ind=1), 
+            lambda: Util.new_page(OptionsMenu, "Zdanie->Flagi", master=self.window, next_page=SenFlag, select_source=True, questions_number_choices=[5, 10, 15], questions_number_def_ind=0, time_minutes_choices=[5, 10, 15, 20],  time_minutes_def_ind=1)]
         }
 
         self.about_window = None

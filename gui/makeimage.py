@@ -161,11 +161,11 @@ class MakeImage(Util.AppPage):
     
     def delete_input_flag(self, event = None):
         print("Backspace fired")
-        if (len(self.input_images) > 0):
+        if (self.input_images):
             flag = self.input_images.pop()
             flag.destroy()
             self.answer_flags.pop()
-            if (len(self.input_images) <= 0):
+            if (not self.input_images):
                 self.top_menu.check_button.configure(command=None)
 
     def save_image(self):

@@ -107,7 +107,7 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
             self.input_frame.grid_columnconfigure(j, weight=1)
 
         # create svgs of flags the first time, after that shuffle both images and alphabet list
-        if (len(self.images) == 0):
+        if (not self.images):
             for f in self.alphabet:
                 if (self.master.winfo_height() < self.master.winfo_width()):
                     self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
@@ -205,16 +205,16 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         self.top_menu.dict["answer"].configure(text='')
 
     def clear_checked_flags(self):
-        if (len(self.selected_flags) <= 0): return
+        if (not self.selected_flags): return
         for index in self.selected_flags:
             print("removing selection")
             self.flag_images[index].flag.configure(fg_color="transparent", text="")
         self.selected_flags.clear()
-        [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+        # [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         self.top_menu.dict["answer"].configure(text='')
 
     def check_answer(self):
-        if (len(self.selected_flags) == 0): return
+        if (not self.selected_flags): return
         print(f"Checking, {self.flag}, {len(self.selected_flags)}")
         print(f"Selected list is {self.selected_flags}")
 

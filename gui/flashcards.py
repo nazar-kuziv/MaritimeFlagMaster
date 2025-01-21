@@ -127,10 +127,10 @@ class Flashcards(Util.AppQuizPage):
 
         isSingleFlag = isinstance(self.flag, Flag)
         if (isSingleFlag):
-            if (self.flag.morse_code is ""): text = ""
+            if (self.flag.morse_code == ""): text = ""
             else: text = "Kod: " + self.flag.code_word
         else:
-            text = "Kod: " + " ".join([x.code_word if x.morse_code is not "" else x.meaning for x in self.flag.flags])
+            text = "Kod: " + " ".join([x.code_word if x.morse_code != "" else x.meaning for x in self.flag.flags])
         self.flashcard.code_word = ctk.CTkLabel(self.flashcard, text=text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)))
         self.flashcard.code_word.grid(row=0, column=0, sticky='w', padx=10, pady=10)
         self.flashcard.code_word.bind("<Button-1>", self.show_flashcard_front)

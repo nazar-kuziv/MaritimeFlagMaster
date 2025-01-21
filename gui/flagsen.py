@@ -113,9 +113,9 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell = ctk.CTkFrame(self.container_frame, fg_color="transparent")
         self.answer_cell.grid(row=2, column=0, columnspan=3, sticky="ew", pady=10)
         self.question_widgets.append(self.answer_cell)
-        self.answer_cell.grid_columnconfigure(0, weight=1, minsize=int(self.master.scale_size*0.1))
+        self.answer_cell.grid_columnconfigure(0, weight=1, minsize=int(self.master.scale_size*0.05))
         self.answer_cell.grid_columnconfigure(1, weight=0)
-        self.answer_cell.grid_columnconfigure(2, weight=1, minsize=int(self.master.scale_size*0.4))
+        self.answer_cell.grid_columnconfigure(2, weight=1, minsize=int(self.master.scale_size*0.1))
 
         self.entry_font = ctk.CTkFont(size=int(self.master.scale_size*0.03))
         validate_command = self.register(self.validate_answer)
@@ -130,7 +130,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.text_length.grid(row=0, column=0, sticky="e", padx=10)
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
-        self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
+        self.answer_cell.submit_button.grid(row=0, column=2, sticky="e", padx=5)
 
         self.skip_button = self.add_skip_button(self.skip_command)
         self.question_widgets.append(self.skip_button)
@@ -157,8 +157,8 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.text_length.configure(text=f"{len(new_text)}/{len(self.question.cleaned_sentence)}")
 
         text_pixel_length = self.entry_font.measure(new_text)
-        if (text_pixel_length > int(self.master.scale_size*0.58)):
-            self.answer_cell.entry.configure(width=text_pixel_length + 15)
+        if (text_pixel_length > int(self.master.scale_size*0.55)):
+            self.answer_cell.entry.configure(width=text_pixel_length + 35)
         return True
 
     def enter_answer(self, event=None):
@@ -177,7 +177,6 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_response.configure(text='Poprawnie')
 
         self.answer_cell.entry.configure(state="disabled")
-        self.answer_cell.submit_button.configure(command=None)
         self.answer_cell.entry.unbind("<Return>")
         self.skip_button.configure(command=None)
         
@@ -193,9 +192,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
                 self.countdown.pause()
             except AttributeError: pass
         
-        self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=next_command)
-        self.next_button.grid(row=2, column=2, sticky="e", padx=10)
-        self.question_widgets.append(self.next_button)
+        self.answer_cell.submit_button.configure(text=next_text, command=next_command)
 
     def next_question(self):
         self.question = self.session.get_question()

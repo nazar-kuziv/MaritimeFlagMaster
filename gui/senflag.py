@@ -233,6 +233,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
             self.answer_response.configure(text='')
     
     def clear_inputs(self, event = None):
+        print("Cleared input")
         while (self.input_flag_labels):
             flag = self.input_flag_labels.pop()
             flag.destroy()
@@ -295,7 +296,7 @@ class SenFlag(Util.AppQuizPage, Util.ISkippablePage):
         self.question = self.session.get_question()
         self.show_question()
     
-    def finish(self):
+    def unbind(self):
         self.master.unbind("<BackSpace>")
         self.master.unbind("<space>")
-        super().finish()
+        super().unbind()

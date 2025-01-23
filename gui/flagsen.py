@@ -122,9 +122,12 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
 
         self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=int(self.master.scale_size*0.6), font=self.entry_font,
                                               validate="key", validatecommand=(validate_command,'%P'))
-        self.answer_cell.entry.bind("<Return>", self.enter_answer)
         self.answer_cell.entry.grid(row=0, column=1, sticky="ew")
         self.answer_cell.entry.focus()
+
+        self.master.bind("<Return>", self.enter_answer)
+        self.master.bind("<Control-Key-a>", lambda event: Util.select_all(event, self.answer_cell.entry))
+        self.master.bind("<Control-Key-A>", lambda event: Util.select_all(event, self.answer_cell.entry))
 
         self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.question.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
         self.text_length.grid(row=0, column=0, sticky="e", padx=10)
@@ -197,3 +200,8 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
     def next_question(self):
         self.question = self.session.get_question()
         self.show_question()
+    
+    def unbind(self):
+        self.master.unbind("<Control-Key-a>")
+        self.master.unbind("<Control-Key-A>")
+        super().unbind()

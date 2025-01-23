@@ -31,6 +31,9 @@ class AppPage(ABC, ctk.CTkFrame):
         self.breadcrumb = BreadcrumbTrailWidget(self._top_menu)
         self.breadcrumb.pack(side="left", anchor="nw")
 
+    def unbind(self):
+        self.master.unbind("<Return>")
+
 import gui.results as Results # here to avoid circular import
 class AppQuizPage(AppPage):
     """Base class for quiz pages
@@ -52,7 +55,7 @@ class AppQuizPage(AppPage):
     session = None
 
     def finish(self, message: str = None, **kwargs):
-        self.master.unbind("<Return>")
+        self.unbind()
         if (message is not None):
             kwargs["message"] = message
         page = Results.Results(self.master, self.session, fg_color="transparent", **kwargs)
@@ -135,7 +138,7 @@ class BreadcrumbTrailWidget(ctk.CTkFrame):
                 arrow = ctk.CTkLabel(self, text='➤', font=ctk.CTkFont(size=int(master.winfo_toplevel().winfo_width()*0.018), weight='bold'), fg_color='transparent')
                 arrow.pack(side="left")
 
-_current_page: ctk.CTkBaseClass = None
+_current_page = None
 
 def change_page(page: AppPage) -> ctk.CTkBaseClass:
     """Shows an app page with double buffering
@@ -162,6 +165,7 @@ def new_page(page: Type[AppPage], breadcrumb_name: str, **kwargs) -> ctk.CTkBase
     :rtype: ctk.CTkBaseClass
     """
     # print(f"Adding new page {page.__class__} to breadcrumb trail")
+    if (_current_page): _current_page.unbind()
     page = page(**kwargs)
     add_breadcrumb(breadcrumb_name, page.__class__, **kwargs)
     return change_page(page)
@@ -170,6 +174,7 @@ def refresh_page():
     return change_page(_page_class[-1](**_page_kwargs[-1]))
 
 def previous_page(index: int) -> ctk.CTkBaseClass:
+    if (_current_page): _current_page.unbind()
     for i in range(index + 1, len(_page_class)):
             delete_breadcrumb()
     return change_page(_page_class[index](**_page_kwargs[index]))
@@ -190,3 +195,14 @@ def double_buffer_frame(frame: ctk.CTkBaseClass, buffer_frame: ctk.CTkBaseClass 
     
     frame.update_idletasks()
     buffer_frame.destroy()
+
+def select_all(event, text_widget: ctk.CTkEntry | ctk.CTkTextbox):
+    """Selects all text in a text widget (entry, textbox)
+    """
+    if (isinstance(text_widget, ctk.CTkTextbox)):
+        text_widget.tag_add("sel", "1.0", "end")
+        text_widget.mark_set("insert", "1.0")
+        text_widget.see("insert")
+    else:
+        text_widget.select_to("end")
+    return "break"

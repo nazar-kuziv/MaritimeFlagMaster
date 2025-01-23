@@ -262,7 +262,6 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         self.master.bind("<Return>", lambda event: next_command())
 
     def next_question(self):
-        self.master.unbind("<Return>")
         self.selected_flags = []
         self.flag = self.session.get_question()
         self.show_question()

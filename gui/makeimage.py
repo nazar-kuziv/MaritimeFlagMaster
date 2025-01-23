@@ -64,8 +64,11 @@ class MakeImage(Util.AppPage):
         
         self.top_menu.input_text = ctk.CTkTextbox(self.top_menu, width=400, height=0)
         self.top_menu.input_text.pack(side="left", fill="y", padx=10)
-        self.top_menu.input_text.bind("<KeyRelease>", textbox_callback)
         self.top_menu.input_text.focus()
+
+        self.master.bind("<KeyRelease>", textbox_callback)
+        self.master.bind("<Control-Key-a>", lambda event: Util.select_all(event, self.top_menu.input_text))
+        self.master.bind("<Control-Key-A>", lambda event: Util.select_all(event, self.top_menu.input_text))
 
         self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)))
         self.top_menu.check_button.pack(side="right", ipadx=10, ipady=10)
@@ -174,7 +177,8 @@ class MakeImage(Util.AppPage):
             label.pack(side="right", padx=10)
             label.after(4000, lambda: label.destroy())
     
-    def exit(self):
-        self.master.unbind("<BackSpace>")
-        self.master.main_menu()
-        self.destroy()
+    def unbind(self):
+        self.master.unbind("<KeyRelease>")
+        self.master.unbind("<Control-Key-a>")
+        self.master.unbind("<Control-Key-A>")
+        super().unbind()

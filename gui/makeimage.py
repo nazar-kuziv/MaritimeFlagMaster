@@ -137,27 +137,27 @@ class MakeImage(Util.AppPage):
         loading_label.destroy()
 
     def place_input_flags(self):
-        alphabet_index = 0
+        alphabet_iter = enumerate(self.alphabet.keys())
         for i in range(self.input_rows):
             for j in range(self.input_columns):
+                tuple = next(alphabet_iter, None)
                 
                 flag_container = ctk.CTkFrame(self.input_frame, fg_color="transparent")
                 flag_container.grid_rowconfigure(0, weight=1)
                 flag_container.grid_columnconfigure(0, weight=1)
 
-                if (alphabet_index == len(self.alphabet)):
+                if (not tuple):
                     flag_container.grid(row=i, column=j, columnspan=self.input_columns, sticky="nsew")
                     flag_container.flag = ctk.CTkLabel(flag_container, text='SPACJA', text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), cursor="hand2")
                     flag_container.flag.bind("<Button-1>", command=lambda event, i='SPACJA': self.flag_input_handler(event, char=i))
                 else:
                     flag_container.grid(row=i, column=j, sticky="nsew")
-                    flag_container.flag = ctk.CTkLabel(flag_container, text='', image=self.images[alphabet_index], cursor="hand2")
-                    flag_container.flag.bind("<Button-1>", command=lambda event, i=self.alphabet.values()[alphabet_index]: self.flag_input_handler(event, char=i))
+                    flag_container.flag = ctk.CTkLabel(flag_container, text='', image=self.images[tuple[0]], cursor="hand2")
+                    flag_container.flag.bind("<Button-1>", command=lambda event, i=tuple[1]: self.flag_input_handler(event, char=i))
                 flag_container.flag.grid(ipadx=10, ipady=10)
                 self.flag_images.append(flag_container)
 
-                if (alphabet_index == len(self.alphabet)): return
-                alphabet_index += 1
+                if (not tuple): return
 
     def flag_input_handler(self, event=None, char: str = "", pos: int = -1):
         """Handler function for clicking on flags.

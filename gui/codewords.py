@@ -71,8 +71,8 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell.entry.focus()
         
         self.master.bind("<Return>", lambda x: self.enter_answer())
-        self.master.bind("<Control-Key-a>", lambda event: Util.select_all(event, self.answer_cell.entry))
-        self.master.bind("<Control-Key-A>", lambda event: Util.select_all(event, self.answer_cell.entry))
+        self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.answer_cell.entry))
+        self.master.bind("<Control-Key-A>", lambda event: Util.text_select_all(event, self.answer_cell.entry))
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')

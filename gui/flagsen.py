@@ -126,8 +126,8 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell.entry.focus()
 
         self.master.bind("<Return>", self.enter_answer)
-        self.master.bind("<Control-Key-a>", lambda event: Util.select_all(event, self.answer_cell.entry))
-        self.master.bind("<Control-Key-A>", lambda event: Util.select_all(event, self.answer_cell.entry))
+        self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.answer_cell.entry))
+        self.master.bind("<Control-Key-A>", lambda event: Util.text_select_all(event, self.answer_cell.entry))
 
         self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.question.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
         self.text_length.grid(row=0, column=0, sticky="e", padx=10)

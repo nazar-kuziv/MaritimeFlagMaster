@@ -21,7 +21,7 @@ class MakeImage(Util.AppPage):
         self.is_transparent = "grey"
         self.flag_images = []
         self.answer_flags = []
-        self.input_images = []
+        self.input_image_labels = []
     
     def draw(self):
         super().draw()
@@ -45,14 +45,20 @@ class MakeImage(Util.AppPage):
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
         def input_callback(event: Event):
+            if (event.state & 4 and event.keysym in "vV"):
+                Util.text_paste(event, self.top_menu.input_text)
             new_text = self.top_menu.input_text.get("1.0", "end")
+            if (new_text == self.text): return
+            
+            print(f"New text: {new_text}")
             seq_mat = difflib.SequenceMatcher(None, self.text, new_text)
             for tag, i1, i2, j1, j2 in seq_mat.get_opcodes():
+                print(f"Opcode: {tag}, {i1}, {i2}, {j1}, {j2}")
 
                 if (tag in ["delete", "replace"]):
                     for i in reversed(range(i1, i2)):
-                        self.input_images[i].destroy()
-                        del self.input_images[i]
+                        self.input_image_labels[i].destroy()
+                        del self.input_image_labels[i]
                         del self.answer_flags[i]
                 
                 if (tag in ["insert", "replace"]):
@@ -94,8 +100,8 @@ class MakeImage(Util.AppPage):
 
         self.text = self.top_menu.input_text.get("1.0", "end")
         self.master.bind("<KeyPress>", input_callback)
-        self.master.bind("<Control-Key-a>", lambda event: Util.select_all(event, self.top_menu.input_text))
-        self.master.bind("<Control-Key-A>", lambda event: Util.select_all(event, self.top_menu.input_text))
+        self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
+        self.master.bind("<Control-Key-A>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
 
         self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)))
         self.top_menu.check_button.pack(side="right", ipadx=10, ipady=10)
@@ -170,18 +176,26 @@ class MakeImage(Util.AppPage):
         if (char == "SPACJA"):
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text='␣', font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
             new_input_flag.pack(side="left", padx=1)
-            self.input_images.insert(pos, new_input_flag)
+            self.input_image_labels.insert(pos, new_input_flag)
             self.answer_flags.insert(pos, None)
             if (event is not None):
                 self.top_menu.input_text.insert('end', ' ')
+        elif (char == "\n"):
+            pass
         else:
-            input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[char].img_path), scaletoheight=int(self.master.scale_size*0.04))
-            new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
-            new_input_flag.pack(side="left", padx=1)
-            self.input_images.insert(pos, new_input_flag)
-            self.answer_flags.insert(pos, self.alphabet[char])
-            if (event is not None):
-                self.top_menu.input_text.insert('end', self.alphabet[char].code_word[0])
+            try:
+                input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[char].img_path), scaletoheight=int(self.master.scale_size*0.04))
+                new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
+                before = {"before": self.input_image_labels[pos]} if (pos < len(self.answer_flags)) else {}
+                new_input_flag.pack(side="left", padx=1, **before)
+
+                self.input_image_labels.insert(pos, new_input_flag)
+                self.answer_flags.insert(pos, self.alphabet[char])
+                if (event is not None):
+                    self.top_menu.input_text.insert('end', self.alphabet[char].code_word[0])
+            except KeyError:
+                print("Invalid character")
+                self.top_menu.input_text.delete(f"1.{pos}")
             
         self.text = self.top_menu.input_text.get("1.0", "end")
 
@@ -193,7 +207,7 @@ class MakeImage(Util.AppPage):
             label.after(4000, lambda: label.destroy())
     
     def unbind(self):
-        self.master.unbind("<KeyRelease>")
+        self.master.unbind("<KeyPress>")
         self.master.unbind("<Control-Key-a>")
         self.master.unbind("<Control-Key-A>")
         super().unbind()

@@ -47,7 +47,7 @@ class MakeImage(Util.AppPage):
         def input_callback(event: Event):
             if (event.state & 4 and event.keysym in "vV"):
                 Util.text_paste(event, self.top_menu.input_text)
-            new_text = self.top_menu.input_text.get("1.0", "end")
+            new_text = self.top_menu.input_text.get("1.0", "end - 1c")
             if (new_text == self.text): return
             
             print(f"New text: {new_text}")
@@ -67,8 +67,8 @@ class MakeImage(Util.AppPage):
                         self.flag_input_handler(None, inputChar, i1)
                         i1 += 1
 
-            self.text = self.top_menu.input_text.get("1.0", "end")
-            # length = len(self.top_menu.input_text.get("1.0", "end-1c"))
+            self.text = self.top_menu.input_text.get("1.0", "end - 1c")
+            # length = len(self.top_menu.input_text.get("1.0", "end - 1c"))
             # if (self.top_menu.input_text.edit_modified()):
             #     print("Textbox callback ", length)
             #     if (length < self.text_length):
@@ -98,7 +98,7 @@ class MakeImage(Util.AppPage):
         self.top_menu.input_text.pack(side="left", fill="y", padx=10)
         self.top_menu.input_text.focus()
 
-        self.text = self.top_menu.input_text.get("1.0", "end")
+        self.text = self.top_menu.input_text.get("1.0", "end - 1c")
         self.master.bind("<KeyPress>", input_callback)
         self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
         self.master.bind("<Control-Key-A>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
@@ -197,7 +197,7 @@ class MakeImage(Util.AppPage):
                 print("Invalid character")
                 self.top_menu.input_text.delete(f"1.{pos}")
             
-        self.text = self.top_menu.input_text.get("1.0", "end")
+        self.text = self.top_menu.input_text.get("1.0", "end - 1c")
 
     def save_image(self):
         if (not self.text): return

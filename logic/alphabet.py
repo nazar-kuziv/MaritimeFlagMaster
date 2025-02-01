@@ -278,7 +278,7 @@ class Alphabet:
                 sentences_str = [line.strip() for line in file]
                 print(sentences_str)
                 for sentence_str in sentences_str:
-                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()
+                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()[:51]
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._default_sentences.append(FlagSentence(flags, sentence_str, cleaned_sentence))
         except Exception:
@@ -335,7 +335,7 @@ class Alphabet:
                 sentences_str = [line.strip() for line in file]
                 print(sentences_str)
                 for sentence_str in sentences_str:
-                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()
+                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()[:51]
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._sentences_from_user_file.append(FlagSentence(flags, sentence_str, cleaned_sentence))
         except Exception:

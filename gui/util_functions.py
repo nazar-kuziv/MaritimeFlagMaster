@@ -196,13 +196,24 @@ def double_buffer_frame(frame: ctk.CTkBaseClass, buffer_frame: ctk.CTkBaseClass 
     frame.update_idletasks()
     buffer_frame.destroy()
 
-def select_all(event, text_widget: ctk.CTkEntry | ctk.CTkTextbox):
+def text_select_all(event, text_widget: ctk.CTkEntry | ctk.CTkTextbox):
     """Selects all text in a text widget (entry, textbox)
     """
     if (isinstance(text_widget, ctk.CTkTextbox)):
-        text_widget.tag_add("sel", "1.0", "end")
+        text_widget.tag_add("sel", "1.0", "end - 1 chars")
         text_widget.mark_set("insert", "1.0")
         text_widget.see("insert")
     else:
         text_widget.select_to("end")
     return "break"
+
+def text_paste(event, text_widget: ctk.CTkTextbox | ctk.CTkEntry):
+    """Pastes from clipboard to position or selection in a text widget (entry, textbox)
+    """
+    print("Custom paste")
+    try:
+        text_widget.delete("sel.first", "sel.last")
+    except:
+        pass
+    # text_widget.insert("insert", text_widget.clipboard_get())
+    # return "break"

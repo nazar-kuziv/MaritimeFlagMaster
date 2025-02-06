@@ -173,15 +173,14 @@ class MakeImage(Util.AppPage):
         
         print(f"New flag {char}")
         if (pos == -1): pos = len(self.answer_flags)
-        if (char == "SPACJA"):
-            new_input_flag = ctk.CTkLabel(self.flag_input_box, text='␣', font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
+        if (char in ["SPACJA", "\n"]):
+            txt = '  ' if char == "\n" else "␣"
+            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=txt, font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
             new_input_flag.pack(side="left", padx=1)
             self.input_image_labels.insert(pos, new_input_flag)
             self.answer_flags.insert(pos, None)
             if (event is not None):
                 self.top_menu.input_text.insert('end', ' ')
-        elif (char == "\n"):
-            pass
         else:
             try:
                 input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[char].img_path), scaletoheight=int(self.master.scale_size*0.04))

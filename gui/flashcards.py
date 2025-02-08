@@ -94,14 +94,7 @@ class Flashcards(Util.AppQuizPage):
         self.images = []
         for i, flag in enumerate(self.flags):
             self.flashcard.grid_columnconfigure(i, weight=1)
-            if (self.flashcard.winfo_height() < self.flashcard.winfo_width() * len(self.flags)):
-                # print("height smaller than width")
-                # print(self.flashcard.winfo_height())
-                img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletoheight=int(self.flashcard.winfo_height()*0.9/len(self.flags)))
-            else:
-                # print("height bigger than width")
-                # print(self.flashcard.winfo_width())
-                img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.9/len(self.flags)))
+            img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.5/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
             label.grid(row=0, column=i, padx=5, pady=5, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_back)

@@ -56,13 +56,13 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_response.grid(row=0, column=1)
         self.question_widgets.append(self.answer_response)
         
-        img = tksvg.SvgImage(file=Environment.resource_path(self.flag.img_path), scaletoheight=int(self.master.scale_size*0.5))
+        img = tksvg.SvgImage(file=Environment.resource_path(self.flag.img_path), scaletowidth=int(self.master.scale_size*0.5))
         self.image = ctk.CTkLabel(self.container_frame, text='', image=img)
-        self.image.grid(row=1, column=0, columnspan=3, sticky="n")
+        self.image.grid(row=1, column=0, columnspan=3, pady=5)
         self.question_widgets.append(self.image)
 
         self.answer_cell = ctk.CTkFrame(self.container_frame, fg_color="transparent")
-        self.answer_cell.grid(row=2, column=1, pady=10)
+        self.answer_cell.grid(row=2, column=1, pady=30, sticky="s")
         self.question_widgets.append(self.answer_cell)
 
         print(self.flag.code_word)

@@ -132,10 +132,7 @@ class MakeImage(Util.AppPage):
             self.input_frame.grid_columnconfigure(j, weight=1)
 
         for f in self.alphabet.values():
-            if (self.master.winfo_height() < self.master.winfo_width()):
-                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
-            else:
-                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
+            self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size/self.input_columns)))
             
         
         self.place_input_flags()

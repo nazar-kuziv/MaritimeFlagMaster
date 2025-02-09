@@ -278,7 +278,7 @@ class Alphabet:
                 sentences_str = [line.strip() for line in file]
                 print(sentences_str)
                 for sentence_str in sentences_str:
-                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()[:51]
+                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()[:50]
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._default_sentences.append(FlagSentence(flags, sentence_str, cleaned_sentence))
         except Exception:
@@ -335,7 +335,7 @@ class Alphabet:
                 sentences_str = [line.strip() for line in file]
                 print(sentences_str)
                 for sentence_str in sentences_str:
-                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()[:51]
+                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()[:50]
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
                     Alphabet._sentences_from_user_file.append(FlagSentence(flags, sentence_str, cleaned_sentence))
         except Exception:
@@ -351,12 +351,13 @@ class Alphabet:
 
     @staticmethod
     def saveFlagSentencePNG(sentence: list[Flag | None], background: str = 'grey',
-                            suggest_file_name: bool = True) -> bool:
+                            suggest_file_name: bool = True, max_row_characters: int = 0) -> bool:
         """Saves FlagSentence as PNG file.
 
         :param sentence: Sentence to save
         :param background: Background color, either 'grey' or 'transparent'
-        :param suggest_file_name: If True, suggests file name based on sentence
+        :param suggest_file_name: If True, suggests file name based on sentence:
+        :param max_row_characters: Maximum number of characters in a row
         :return True if everything is ok, False if user didn't select file
         :rtype: bool
         """
@@ -364,7 +365,7 @@ class Alphabet:
 
         if suggest_file_name:
             for flag in sentence:
-                if flag is None:
+                if flag is None or flag == '':
                     file_name += ' '
                 elif isinstance(flag, Flag) and flag.code_word == 'Nadazero':
                     file_name += '0'
@@ -412,8 +413,8 @@ class Alphabet:
             png_files = []
 
             for flag in sentence:
-                if flag is None:
-                    png_files.append(None)
+                if flag is None or flag == '':
+                    png_files.append(flag)
                 else:
                     png_files.append(flag.png_img_path)
 
@@ -425,7 +426,11 @@ class Alphabet:
                 if png_file is not None:
                     current_columns += 1
                     if current_columns > max_columns:
-                        max_columns = current_columns
+                        if max_row_characters == 0 or current_columns <= max_row_characters:
+                            max_columns = current_columns
+                        else:
+                            max_rows += 1
+                            current_columns = 1
                 else:
                     current_columns = 0
                     max_rows += 1
@@ -438,6 +443,7 @@ class Alphabet:
             else:
                 bg_color = (255, 255, 255, 0)
 
+
             # Create empty image
             collage = PILImage.new('RGBA', (total_width, total_height), bg_color)
 
@@ -447,6 +453,9 @@ class Alphabet:
                 if png_file is None:
                     x = 0
                     y += cell_height + y_padding
+                    continue
+                if png_file == "":
+                    x += cell_width + x_padding
                     continue
 
                 Alphabet._embed_png(Environment.resource_path(png_file), x, y, cell_width, cell_height, collage,

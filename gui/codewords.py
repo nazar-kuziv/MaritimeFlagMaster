@@ -56,20 +56,23 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_response.grid(row=0, column=1)
         self.question_widgets.append(self.answer_response)
         
-        img = tksvg.SvgImage(file=Environment.resource_path(self.flag.img_path), scaletoheight=int(self.master.scale_size*0.5))
+        img = tksvg.SvgImage(file=Environment.resource_path(self.flag.img_path), scaletowidth=int(self.master.scale_size*0.5))
         self.image = ctk.CTkLabel(self.container_frame, text='', image=img)
-        self.image.grid(row=1, column=0, columnspan=3, sticky="n")
+        self.image.grid(row=1, column=0, columnspan=3, pady=5)
         self.question_widgets.append(self.image)
 
         self.answer_cell = ctk.CTkFrame(self.container_frame, fg_color="transparent")
-        self.answer_cell.grid(row=2, column=1, pady=10)
+        self.answer_cell.grid(row=2, column=1, pady=30, sticky="s")
         self.question_widgets.append(self.answer_cell)
 
         print(self.flag.code_word)
         self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), width=int(self.master.scale_size*0.3))
-        self.answer_cell.entry.bind("<Return>", lambda x: self.enter_answer())
         self.answer_cell.entry.pack(side="left")
         self.answer_cell.entry.focus()
+        
+        self.master.bind("<Return>", lambda x: self.enter_answer())
+        self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.answer_cell.entry))
+        self.master.bind("<Control-Key-A>", lambda event: Util.text_select_all(event, self.answer_cell.entry))
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.025)), width=0, command=self.enter_answer)
         self.answer_cell.submit_button.pack(side="left", padx=5, fill='y')
@@ -102,7 +105,7 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
 
             self.answer_cell.entry.configure(state="disabled")
             self.answer_cell.submit_button.configure(command=None)
-            self.answer_cell.entry.unbind("<Return>")
+            self.master.unbind("<Return>")
             self.skip_button.configure(command=None)
             self.show_next_button()
 
@@ -111,7 +114,7 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
         next_command = self.next_question if next_exists else self.finish
         next_text = "Następny" if next_exists else "Wyniki"
         if (not next_exists):
-            self.answer_cell.entry.unbind("<Return>")
+            self.master.unbind("<Return>")
             try:
                 self.countdown.pause()
             except AttributeError: pass
@@ -127,3 +130,8 @@ class Codewords(Util.AppQuizPage, Util.ISkippablePage):
         self.master.unbind("<Return>")
         self.flag = self.session.get_question()
         self.show_question()
+    
+    def unbind(self):
+        self.master.unbind("<Control-Key-a>")
+        self.master.unbind("<Control-Key-A>")
+        super().unbind()

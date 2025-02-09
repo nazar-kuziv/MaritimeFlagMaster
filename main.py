@@ -1,5 +1,9 @@
 from gui.main_window import *
 import gui.util_functions as Util
+import warnings
+
+# Ignore warnings for using tksvg.SvgImage
+warnings.filterwarnings("ignore", message=".*SvgImage.*")
 
 # Set up the Tkinter window
 app = MainWindow()

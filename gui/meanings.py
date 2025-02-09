@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import tksvg
 import random
+from math import floor
 
 from logic.environment import Environment
 from logic.flags import *
@@ -78,17 +79,22 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         meaning_label.pack(padx=5, pady=5)
         self.top_menu.dict["meaning_label"] = meaning_label
 
-        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=None)
+        check_button = ctk.CTkButton(self.top_menu, text="Sprawdź", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.check_answer)
         check_button.grid(row=0, column=3, ipadx=10, ipady=10)
+        self.master.bind("<Return>", lambda event: self.check_answer())
         self.top_menu.dict["check_button"] = check_button
         
         answer = ctk.CTkLabel(self.top_menu, text='', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), fg_color='transparent')
         answer.grid(row=0, column=5, sticky="e", padx=10)
         self.top_menu.dict["answer"] = answer
 
-        clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=None)
+        clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.clear_checked_flags)
         clear_button.grid(row=0, column=0, sticky="w", ipadx=10, ipady=10)
         self.top_menu.dict["clear_button"] = clear_button
+
+        next_button = ctk.CTkButton(self.top_menu, text='', fg_color="transparent")
+        next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
+        self.top_menu.dict["next_button"] = next_button
 
         self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.input_frame.pack(side="bottom", fill="both", expand=True)
@@ -101,12 +107,9 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
             self.input_frame.grid_columnconfigure(j, weight=1)
 
         # create svgs of flags the first time, after that shuffle both images and alphabet list
-        if (len(self.images) == 0):
+        if (not self.images):
             for f in self.alphabet:
-                if (self.master.winfo_height() < self.master.winfo_width()):
-                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletoheight=int(self.master.scale_size*0.8/self.input_columns)))
-                else:
-                    self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
+                self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size*0.8/self.input_columns)))
         else:
             temp = list(zip(self.images, self.alphabet))
             random.shuffle(temp)
@@ -116,6 +119,16 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
             kwargs = { "scaletoheight":int(self.master.scale_size*0.8/self.input_columns) } if (self.master.winfo_height() < self.master.winfo_width()) else { "scaletowidth":int(self.master.scale_size*0.8/self.input_columns) }
             f.configure(**kwargs)
         self.place_input_flags()
+        
+        answer = [self.session.get_correct_answer()]
+        if (isinstance(answer[0], FlagMultiple)):
+            answer = answer[0].flags
+        flag_indices = []
+        for f in answer:
+            flag_indices.extend(i for i, item in enumerate(self.alphabet) if item.code_word == f.code_word)
+        print("CORRECT FLAGS:")
+        for i in flag_indices:
+            print(f"Row {floor(i / self.input_columns) + 1}, column {i % self.input_columns + 1}")
 
         self.top_menu.dict["skip"] = self.add_skip_button(self.skip_command)
 
@@ -153,7 +166,8 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
                 flag_container.grid_rowconfigure(0, weight=1)
                 flag_container.grid_columnconfigure(0, weight=1)
                 flag_container.grid(row=i, column=j, sticky="nsew")
-                flag_container.flag = ctk.CTkLabel(flag_container, text='', image=self.images[alphabet_index], cursor="hand2")
+                flag_container.flag = ctk.CTkLabel(flag_container, text='', 
+                                          font=ctk.CTkFont(size=int(self.master.scale_size*0.033), weight='bold'), image=self.images[alphabet_index], cursor="hand2")
                 flag_container.flag.bind("<Button-1>", command=lambda event, i=alphabet_index: self.flag_input_handler(event, index=i))
                 flag_container.flag.grid(ipadx=10, ipady=10)
                 self.flag_images.append(flag_container)
@@ -165,42 +179,43 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         """Handler function for clicking on flags, 3 max at once. Indices of the selected flags are added to self.selected_flags
         """
         if (index < 0): return
-        print(f"{len(self.selected_flags)}, {index}")
+        print(f"Selected flag number {len(self.selected_flags)} at row {floor(index / self.input_columns) + 1}, column {index % self.input_columns + 1}")
         print(self.alphabet[index].code_word)
         if (index not in self.selected_flags):
             if (len(self.selected_flags) >= 3):
                 print("longer than 3")
                 return
             self.selected_flags.append(index)
-            event.widget.master.configure(fg_color=f"green{5 - len(self.selected_flags)}", text=len(self.selected_flags), 
-                                          font=ctk.CTkFont(size=int(self.master.scale_size*0.03), weight='bold'), text_color=f"green{5 - len(self.selected_flags)}")
+            event.widget.master.configure(fg_color=f"green{1 + len(self.selected_flags)}", text=len(self.selected_flags), text_color=f"green{1 + len(self.selected_flags)}")
         else:
             print("removing selection")
             self.selected_flags.remove(index)
             event.widget.master.configure(fg_color="transparent", text="")
             for i, indx in enumerate(self.selected_flags):
-                self.flag_images[indx].flag.configure(fg_color=f"green{4 - i}", text=(i+1), text_color=f"green{4 - i}")
-        if (len(self.selected_flags) > 0):
-            self.top_menu.dict["clear_button"].configure(command=self.clear_checked_flags)
-            self.update()
-            self.top_menu.dict["check_button"].configure(command=self.check_answer)
-        else: 
-            [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+                self.flag_images[indx].flag.configure(fg_color=f"green{2 + i}", text=(i+1), text_color=f"green{2 + i}")
+        # if (len(self.selected_flags) > 0):
+        #     self.top_menu.dict["clear_button"].configure(command=self.clear_checked_flags)
+        #     self.update()
+        #     self.top_menu.dict["check_button"].configure(command=self.check_answer)
+        # else: 
+        #     [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         self.top_menu.dict["answer"].configure(text='')
 
     def clear_checked_flags(self):
+        if (not self.selected_flags): return
         for index in self.selected_flags:
             print("removing selection")
             self.flag_images[index].flag.configure(fg_color="transparent", text="")
         self.selected_flags.clear()
-        [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
+        # [ x.configure(command=None) for x in list(map(self.top_menu.dict.get, ["check_button", "clear_button"]))]
         self.top_menu.dict["answer"].configure(text='')
 
     def check_answer(self):
+        if (not self.selected_flags): return
         print(f"Checking, {self.flag}, {len(self.selected_flags)}")
         print(f"Selected list is {self.selected_flags}")
 
-        if (len(self.selected_flags) == 0 or len(self.selected_flags) > 3):
+        if (len(self.selected_flags) > 3):
             self.show_answer(False)
             return
         elif (len(self.selected_flags) == 1):
@@ -218,7 +233,8 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         
         if (not isCorrect): return
         
-        self.skip_button.configure(command=None)
+        self.master.unbind("<Return>")
+        self.top_menu.dict["skip"].configure(command=None)
         self.show_next_button()
 
     def show_next_button(self):
@@ -235,9 +251,12 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
                 self.countdown.pause()
             except AttributeError: pass
 
+
         next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=next_command)
         next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
+        self.top_menu.dict["next_button"].destroy()
         self.top_menu.dict["next_button"] = next_button
+        self.master.bind("<Return>", lambda event: next_command())
 
     def next_question(self):
         self.selected_flags = []

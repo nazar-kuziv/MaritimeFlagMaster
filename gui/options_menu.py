@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import gui.util_functions as Util
 from typing import Type
+from logic.environment import Environment as env
 
 class OptionsMenu(Util.AppPage):
     def __init__(self, master, next_page: Type[Util.AppPage], select_source: bool = False, questions_number_choices: list[int] = [5, 10, 20], questions_number_def_ind: int = 1, time_minutes_choices: list[int] = [5, 10, 0], time_minutes_def_ind: int = 0):
@@ -32,7 +33,7 @@ class OptionsMenu(Util.AppPage):
         menu.questions_number = self.questions_number_choices[self.questions_number_def_ind]
         menu.time_minutes = self.time_minutes_choices[self.time_minutes_def_ind]
 
-        def numbers_to_labels(nums: list):
+        def numbers_to_labels(nums: list[str]):
             labels = []
             for n in nums:
                 if (n <= 0):
@@ -51,10 +52,13 @@ class OptionsMenu(Util.AppPage):
             try:
                 menu.questions_number = int(choice)
             except ValueError: menu.questions_number = 0
-        # self.number_options = tk.OptionMenu(menu, number_var, *numbers)
+            env.write_user_configuration_variable(f"{self.next_page.__mro__[0].__name__}_number", choice)
+        
         self.number_options = ctk.CTkOptionMenu(menu, values=numbers,
                                             command=optionmenu_callback, font=ctk.CTkFont(size=int(self.winfo_width()*0.015)),
                                             variable=number_var)
+        curr_number = env.get_user_configuration_variable(f"{self.next_page.__mro__[0].__name__}_number")
+        if (curr_number): self.number_options.set(curr_number)
         self.number_options.grid(column=1, row=0, padx=5, pady=5, sticky="sw")
 
         times = numbers_to_labels(self.time_minutes_choices)
@@ -67,10 +71,13 @@ class OptionsMenu(Util.AppPage):
             try:
                 menu.time_minutes = int(choice)
             except ValueError: menu.time_minutes = 0
-        # self.time_options = tk.OptionMenu(menu, time_var, *times)
+            env.write_user_configuration_variable(f"{self.next_page.__mro__[0].__name__}_time", choice)
+        
         self.time_options = ctk.CTkOptionMenu(menu, values=times,
                                                 command=optionmenu_callback, font=ctk.CTkFont(size=int(self.winfo_width()*0.015)),
                                                 variable=time_var)
+        curr_time = env.get_user_configuration_variable(f"{self.next_page.__mro__[0].__name__}_time")
+        if (curr_time): self.time_options.set(curr_time)
         self.time_options.grid(column=1, row=1, padx=5, pady=5, sticky="nw")
 
         if (not self.select_source):

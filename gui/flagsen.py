@@ -81,10 +81,8 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.update()
         self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
         self.is_answered = False
-        self.sentence = self.session.get_question()
-        print(self.sentence)
 
-        print(self.question)
+        print(self.question.original_sentence)
         self.flag_sentence = ctk.CTkFrame(self.container_frame, fg_color=None)
         self.flag_sentence.grid(row=1, column=0, columnspan=3)
         self.flag_sentence.flags = []
@@ -102,10 +100,7 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
 
         for i, flag in enumerate(self.question.flags):
             img = None
-            if (self.master.winfo_height() < self.master.winfo_width()):
-                img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletoheight=int(self.master.scale_size*0.1)) if (flag is not None) else None
-            else:
-                img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.master.scale_size*0.05)) if (flag is not None) else None
+            img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.master.scale_size*0.1)) if (flag is not None) else None
             image = ctk.CTkLabel(self.flag_sentence, text='', image=img, fg_color="transparent")
             image.grid(row=math.floor(i/(flag_columns+1)), column=(i%(flag_columns+1)), padx=2, pady=10)
             self.flag_sentence.flags.append(image)
@@ -115,22 +110,27 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_cell = ctk.CTkFrame(self.container_frame, fg_color="transparent")
         self.answer_cell.grid(row=2, column=0, columnspan=3, sticky="ew", pady=10)
         self.question_widgets.append(self.answer_cell)
-        self.answer_cell.grid_columnconfigure(0, weight=1)
+        self.answer_cell.grid_columnconfigure(0, weight=1, minsize=int(self.master.scale_size*0.05))
         self.answer_cell.grid_columnconfigure(1, weight=0)
-        self.answer_cell.grid_columnconfigure(2, weight=1)
+        self.answer_cell.grid_columnconfigure(2, weight=1, minsize=int(self.master.scale_size*0.1))
 
+        self.entry_font = ctk.CTkFont(size=int(self.master.scale_size*0.03))
         validate_command = self.register(self.validate_answer)
-        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=int(self.master.scale_size*0.6), font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), 
+
+        self.answer_cell.entry = ctk.CTkEntry(self.answer_cell, width=int(self.master.scale_size*0.6), font=self.entry_font,
                                               validate="key", validatecommand=(validate_command,'%P'))
-        self.answer_cell.entry.bind("<Return>", self.enter_answer)
+        self.answer_cell.entry.grid(row=0, column=1, sticky="ew")
+        self.answer_cell.entry.focus()
+
+        self.master.bind("<Return>", self.enter_answer)
+        self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.answer_cell.entry))
+        self.master.bind("<Control-Key-A>", lambda event: Util.text_select_all(event, self.answer_cell.entry))
 
         self.text_length = ctk.CTkLabel(self.answer_cell, text=f"0/{len(self.question.cleaned_sentence)}", width=int(self.master.scale_size*0.05), fg_color='transparent')
         self.text_length.grid(row=0, column=0, sticky="e", padx=10)
-        self.answer_cell.entry.grid(row=0, column=1)
-        self.answer_cell.entry.focus()
         
         self.answer_cell.submit_button = ctk.CTkButton(self.answer_cell, text='Sprawdź', font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=self.enter_answer)
-        self.answer_cell.submit_button.grid(row=0, column=2, sticky="w", padx=5)
+        self.answer_cell.submit_button.grid(row=0, column=2, sticky="e", padx=5)
 
         self.skip_button = self.add_skip_button(self.skip_command)
         self.question_widgets.append(self.skip_button)
@@ -143,17 +143,22 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
 
     def skip_command(self):
         print("Skipped.")
-        self.skip_button.configure(command=None)
         self.answer_response.configure(text='Pominięto.')
         self.answer_cell.entry.delete(0, 'end')
         self.answer_cell.entry.insert(0, self.session.get_correct_answer())
         self.answer_cell.entry.configure(state="disabled")
         self.answer_cell.submit_button.configure(command=None)
+        self.answer_cell.entry.unbind("<Return>")
+        self.skip_button.configure(command=None)
         self.show_next_button()
 
     def validate_answer(self, new_text):
         if (len(new_text) > len(self.question.cleaned_sentence)): return False
         self.text_length.configure(text=f"{len(new_text)}/{len(self.question.cleaned_sentence)}")
+
+        text_pixel_length = self.entry_font.measure(new_text)
+        if (text_pixel_length > int(self.master.scale_size*0.55)):
+            self.answer_cell.entry.configure(width=text_pixel_length + 35)
         return True
 
     def enter_answer(self, event=None):
@@ -172,7 +177,6 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
         self.answer_response.configure(text='Poprawnie')
 
         self.answer_cell.entry.configure(state="disabled")
-        self.answer_cell.submit_button.configure(state="disabled")
         self.answer_cell.entry.unbind("<Return>")
         self.skip_button.configure(command=None)
         
@@ -188,10 +192,13 @@ class FlagSen(Util.AppQuizPage, Util.ISkippablePage):
                 self.countdown.pause()
             except AttributeError: pass
         
-        self.next_button = ctk.CTkButton(self.container_frame, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), height=40, command=next_command)
-        self.next_button.grid(row=2, column=2, sticky="e", padx=10)
-        self.question_widgets.append(self.next_button)
+        self.answer_cell.submit_button.configure(text=next_text, command=next_command)
 
     def next_question(self):
         self.question = self.session.get_question()
         self.show_question()
+    
+    def unbind(self):
+        self.master.unbind("<Control-Key-a>")
+        self.master.unbind("<Control-Key-A>")
+        super().unbind()

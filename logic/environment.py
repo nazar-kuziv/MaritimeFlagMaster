@@ -1,9 +1,12 @@
 import json
 import os, sys
 
+from dotenv import load_dotenv
+
 
 class Environment:
     user_conf = None
+    load_dotenv()
 
     @staticmethod
     def resource_path(relative_path):
@@ -27,7 +30,7 @@ class Environment:
         if Environment.user_conf is None:
             Environment._load_configuration()
         Environment.user_conf[key] = value
-        configuration_file_path = os.path.expanduser(r"~\AppData\Local\MaritimeFlagMaster\configuration.json")
+        configuration_file_path = os.path.expanduser(os.getenv("LOCAL_APP_DATA_CONF"))
         with open(configuration_file_path, "w") as file:
             json.dump(Environment.user_conf, file)
 
@@ -35,19 +38,19 @@ class Environment:
     def _load_configuration():
         if not Environment._is_configuration_file_exists():
             Environment._create_configuration_file()
-        configuration_file_path = os.path.expanduser(r"~\AppData\Local\MaritimeFlagMaster\configuration.json")
+        configuration_file_path = os.path.expanduser(os.getenv("LOCAL_APP_DATA_CONF"))
         with open(configuration_file_path, "r") as file:
             Environment.user_conf = json.load(file)
 
     @staticmethod
     def _is_configuration_file_exists():
-        configuration_file_path = os.path.expanduser(r"~\AppData\Local\MaritimeFlagMaster\configuration.json")
+        configuration_file_path = os.path.expanduser(os.getenv("LOCAL_APP_DATA_CONF"))
         return os.path.exists(configuration_file_path)
 
     @staticmethod
     def _create_configuration_file():
-        config_dir = os.path.expanduser(r"~\AppData\Local\MaritimeFlagMaster")
-        config_file = os.path.expanduser(r"~\AppData\Local\MaritimeFlagMaster\configuration.json")
+        config_dir = os.path.expanduser(os.getenv("LOCAL_APP_DATA_DIR"))
+        config_file = os.path.expanduser(os.getenv("LOCAL_APP_DATA_CONF"))
         os.makedirs(config_dir, exist_ok=True)
         with open(config_file, "w") as file:
             data = {}

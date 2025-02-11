@@ -63,8 +63,7 @@ class MakeImage(Util.AppPage):
                 
                 if (tag in ["insert", "replace"]):
                     for j in range(j1, j2):
-                        inputChar = "SPACJA" if new_text[j] == " " else new_text[j].upper()
-                        self.flag_input_handler(None, inputChar, i1)
+                        self.flag_input_handler(None, new_text[j].upper(), i1)
                         i1 += 1
 
             self.text = self.top_menu.input_text.get("1.0", "end - 1c")
@@ -103,7 +102,7 @@ class MakeImage(Util.AppPage):
         self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
         self.master.bind("<Control-Key-A>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
 
-        self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)))
+        self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.save_image)
         self.top_menu.check_button.pack(side="right", ipadx=10, ipady=10)
 
         def checkbox_event():
@@ -152,7 +151,7 @@ class MakeImage(Util.AppPage):
                 if (not tuple):
                     flag_container.grid(row=i, column=j, columnspan=self.input_columns, sticky="nsew")
                     flag_container.flag = ctk.CTkLabel(flag_container, text='SPACJA', text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), cursor="hand2")
-                    flag_container.flag.bind("<Button-1>", command=lambda event, i='SPACJA': self.flag_input_handler(event, char=i))
+                    flag_container.flag.bind("<Button-1>", command=lambda event, i='': self.flag_input_handler(event, char=i))
                 else:
                     flag_container.grid(row=i, column=j, sticky="nsew")
                     flag_container.flag = ctk.CTkLabel(flag_container, text='', image=self.images[tuple[0]], cursor="hand2")
@@ -170,12 +169,12 @@ class MakeImage(Util.AppPage):
         
         print(f"New flag {char}")
         if (pos == -1): pos = len(self.answer_flags)
-        if (char in ["SPACJA", "\n"]):
-            txt = '  ' if char == "\n" else "␣"
+        if (char in [" ", "\n"]):
+            txt = '⏎' if char == "\n" else "␣"
             new_input_flag = ctk.CTkLabel(self.flag_input_box, text=txt, font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
             new_input_flag.pack(side="left", padx=1)
             self.input_image_labels.insert(pos, new_input_flag)
-            self.answer_flags.insert(pos, None)
+            self.answer_flags.insert(pos, (None if char == '\n' else ""))
             if (event is not None):
                 self.top_menu.input_text.insert('end', ' ')
         else:

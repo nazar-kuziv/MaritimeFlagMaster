@@ -53,6 +53,10 @@ class MakeImage(Util.AppPage):
             if (new_text == self.text): return
 
             print(f"New text: {new_text}")
+            diffs = difflib.Differ().compare(self.text, new_text)
+            for line in diffs:
+                if (line[0] in "+-"):
+                    pass
             seq_mat = difflib.SequenceMatcher(None, self.text, new_text)
             for tag, i1, i2, j1, j2 in seq_mat.get_opcodes():
                 print(f"Opcode: {tag}, {i1}, {i2}, {j1}, {j2}")
@@ -119,25 +123,25 @@ class MakeImage(Util.AppPage):
                                                  variable=check_var, onvalue="on", offvalue="off")
         self.top_menu.checkbox.pack(side="right", padx=10)
 
-        self.input_parent = ctk.CTkFrame(self, height=int(self.winfo_width() * 0.1), fg_color="transparent")
-        self.input_parent.pack(side="top", fill="x", padx=10)
-        self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, height=int(self.master.scale_size*0.05), orientation="horizontal")
-        self.flag_input_box.pack(side="top", fill="x")
+        self.input_frame = ctk.CTkFrame(self, fg_color="transparent", width=400)
+        self.input_frame.pack(side="left", fill="both", padx=15)
 
-        self.input_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.input_frame.pack(side="top", fill="both", expand=True)
-
-        self.input_rows = 5
-        self.input_columns = 9
+        self.input_rows = 7
+        self.input_columns = 7
         for i in range(self.input_rows):
             self.input_frame.grid_rowconfigure(i, weight=1)
         for j in range(self.input_columns):
             self.input_frame.grid_columnconfigure(j, weight=1)
 
         for f in self.alphabet.values():
-            self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path),
-                                              scaletowidth=int(self.master.scale_size / self.input_columns)))
+            self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size/self.input_columns)*0.5))
 
+        self.input_parent = ctk.CTkFrame(self, fg_color="transparent")
+        self.input_parent.pack(side="left", fill="both", expand=True, padx=10)
+        self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, orientation="horizontal", label_anchor="center")
+        self.flag_input_box.pack(side="top", fill="both", expand=True)
+        
+        
         self.place_input_flags()
         self.update_idletasks()
         loading_label.destroy()
@@ -152,23 +156,25 @@ class MakeImage(Util.AppPage):
                 flag_container.grid_rowconfigure(0, weight=1)
                 flag_container.grid_columnconfigure(0, weight=1)
 
+                flag_container.grid(row=i, column=j, sticky="nsew")
                 if (not tuple):
-                    flag_container.grid(row=i, column=j, columnspan=self.input_columns, sticky="nsew")
-                    flag_container.flag = ctk.CTkLabel(flag_container, text="SPACJA", text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), cursor="hand2")
+                    flag_container.flag = ctk.CTkLabel(flag_container, text="␣", text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.025)), justify="center", cursor="hand2")
                     flag_container.flag.bind("<Button-1>", command=lambda event, i=" ": self.flag_input_handler(event, char=i))
                 else:
-                    flag_container.grid(row=i, column=j, sticky="nsew")
                     flag_container.flag = ctk.CTkLabel(flag_container, text="", image=self.images[tuple[0]], cursor="hand2")
                     flag_container.flag.bind("<Button-1>", command=lambda event, i=tuple[1]: self.flag_input_handler(event, char=i))
-                flag_container.flag.grid(ipadx=10, ipady=10)
+                flag_container.flag.grid(ipadx=8, ipady=10, sticky="nsew")
                 self.flag_images.append(flag_container)
 
                 if (not tuple):
-                    flag_container.flag.grid(ipadx=10, ipady=10, sticky="e")
-                    flag_container.grid_columnconfigure(1, weight=1)
-                    flag_container.rtrn = ctk.CTkLabel(flag_container, text="NOWA LINIA", text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), cursor="hand2")
-                    flag_container.rtrn.bind("<Button-1>", command=lambda event, i="\n": self.flag_input_handler(event, char=i))
-                    flag_container.rtrn.grid(row=0, column=1, ipadx=10, ipady=10, sticky="w")
+                    flag_container2 = ctk.CTkFrame(self.input_frame, fg_color="transparent")
+                    flag_container2.grid_rowconfigure(0, weight=1)
+                    flag_container2.grid_columnconfigure(0, weight=1)
+                    flag_container2.grid(row=i, column=j+1, sticky="nsew")
+                    flag_container2.rtrn = ctk.CTkLabel(flag_container2, text="⏎", text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.025)), justify="center", cursor="hand2")
+                    flag_container2.rtrn.bind("<Button-1>", command=lambda event, i="\n": self.flag_input_handler(event, char=i))
+                    flag_container2.rtrn.grid(row=0, column=1, ipadx=8, ipady=10, sticky="nsew")
+                    self.flag_images.append(flag_container2)
                     return
 
     def flag_input_handler(self, event=None, char: str = "", pos: int = -1):
@@ -179,12 +185,13 @@ class MakeImage(Util.AppPage):
 
         print(f"New flag {char}")
         if (pos == -1): pos = len(self.answer_flags)
-        if (char in [" ", "\n"]):
-            txt = "⏎" if char == "\n" else "␣"
-            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=txt, font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight="bold"), text_color="blue", fg_color="transparent")
-            new_input_flag.pack(side="left", padx=1)
-            self.input_image_labels.insert(pos, new_input_flag)
+        if (char == "\n"):
             self.answer_flags.insert(pos, (None if char == "\n" else ""))
+        elif (char == " "):
+            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=" ", font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight="bold"), text_color="blue", fg_color="transparent")
+            new_input_flag.grid(side="left", padx=1)
+            self.input_image_labels.insert(pos, new_input_flag)
+            self.answer_flags.insert(pos, "")
             if (event is not None):
                 self.top_menu.input_text.insert("end", char)
         else:
@@ -192,7 +199,7 @@ class MakeImage(Util.AppPage):
                 input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[char].img_path), scaletoheight=int(self.master.scale_size*0.04))
                 new_input_flag = ctk.CTkLabel(self.flag_input_box, text="", image=input_image)
                 before = {"before": self.input_image_labels[pos]} if (pos < len(self.answer_flags)) else {}
-                new_input_flag.pack(side="left", padx=1, **before)
+                new_input_flag.grid(row=self.image_rows, padx=1, **before)
 
                 self.input_image_labels.insert(pos, new_input_flag)
                 self.answer_flags.insert(pos, self.alphabet[char])

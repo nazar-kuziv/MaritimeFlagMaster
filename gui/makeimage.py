@@ -21,9 +21,9 @@ class MakeImage(Util.AppPage):
         self.images = []
         self.is_transparent = "gray"
         self.flag_images = []
-        self.answer_flags = []
-        self.input_image_labels = []
-
+        self.answer_flags = [[]]
+        self.input_image_labels = [[]]
+    
     def draw(self):
         super().draw()
         self.show_question()
@@ -49,53 +49,38 @@ class MakeImage(Util.AppPage):
         def input_callback(event: Event):
             if (event.state & 4 and event.keysym in "vV"):
                 Util.text_paste(event, self.top_menu.input_text)
-            new_text = self.top_menu.input_text.get("1.0", "end - 1c")
+            new_text: str = self.top_menu.input_text.get("1.0", "end - 1c")
             if (new_text == self.text): return
 
             print(f"New text: {new_text}")
-            diffs = difflib.Differ().compare(self.text, new_text)
-            for line in diffs:
-                if (line[0] in "+-"):
-                    pass
             seq_mat = difflib.SequenceMatcher(None, self.text, new_text)
             for tag, i1, i2, j1, j2 in seq_mat.get_opcodes():
                 print(f"Opcode: {tag}, {i1}, {i2}, {j1}, {j2}")
 
+                def get_pos(i) -> list[int]:
+                    pos = new_text[:i+1].splitlines(keepends=True)
+                    return [len(pos)-1, len(pos[-1])-1]
+                pos1, pos2, posj1, posj2 = list(map(get_pos, [i1, i2, j1, j2]))
+                # pos1 = get_pos(i1)
+                length = sum(len(x) for x in self.input_image_labels)
+
                 if (tag in ["delete", "replace"]):
                     for i in reversed(range(i1, i2)):
-                        if (i >= len(self.input_image_labels)): i = len(self.input_image_labels) - 1
-                        self.input_image_labels[i].destroy()
-                        del self.input_image_labels[i]
-                        del self.answer_flags[i]
-
+                        if (i >= length): i = length - 1
+                        pos = get_pos(i)
+                        self.input_image_labels[pos[0]][pos[1]].destroy()
+                        del self.input_image_labels[pos[0]][pos[1]]
+                        del self.answer_flags[pos[0]][pos[1]]
+                
                 if (tag in ["insert", "replace"]):
                     for j in range(j1, j2):
-                        self.flag_input_handler(None, new_text[j].upper(), i1)
-                        i1 += 1
+                        self.flag_input_handler(None, new_text[j].upper(), tuple(pos1))
+                        if (new_text[pos1[1]] == "\n"):
+                            pos1[0] += 1
+                            pos1[1] = -1
+                        pos1[1] += 1
 
             self.text = self.top_menu.input_text.get("1.0", "end - 1c")
-            # length = len(self.top_menu.input_text.get("1.0", "end - 1c"))
-            # if (self.top_menu.input_text.edit_modified()):
-            #     print("Textbox callback ", length)
-            #     if (length < self.text_length):
-            #         for i in reversed(range(length, self.text_length)):
-            #             self.input_images[i].destroy()
-            #             del self.input_images[i]
-            #             del self.answer_flags[i]
-
-            #     for i in reversed(range(length)):
-            #         char = self.top_menu.input_text.get(f"1.0+{i}c").upper()
-            #         if (i < len(self.answer_flags)):
-            #             flagChar = " " if self.answer_flags[i] is None else self.answer_flags[i].code_word[0].upper()
-            #             if (char != flagChar):
-            #                 self.input_images[i].destroy()
-            #                 del self.input_images[i]
-            #                 del self.answer_flags[i]
-            #             else: continue
-            #         inputChar = "SPACJA" if char == " " else ord(char) - 65
-            #         self.flag_input_handler(None, inputChar, i)
-            #     self.top_menu.input_text.edit_modified(False)
-            # self.text_length = length
 
         self.top_menu = ctk.CTkFrame(self, fg_color="transparent")
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
@@ -139,7 +124,7 @@ class MakeImage(Util.AppPage):
         self.input_parent = ctk.CTkFrame(self, fg_color="transparent")
         self.input_parent.pack(side="left", fill="both", expand=True, padx=10)
         self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, orientation="horizontal", label_anchor="center")
-        self.flag_input_box.pack(side="top", fill="both", expand=True)
+        self.flag_input_box.pack(side="left", fill="both", expand=True)
         
         
         self.place_input_flags()
@@ -177,43 +162,57 @@ class MakeImage(Util.AppPage):
                     self.flag_images.append(flag_container2)
                     return
 
-    def flag_input_handler(self, event=None, char: str = "", pos: int = -1):
+    def flag_input_handler(self, event=None, char: str = "", pos: tuple[int, int] = (-1, -1)):
         """Handler function for clicking on flags.
         """
         if (char == ""):
             return
+        
+        print(f"New flag {char} at position {pos[0]}.{pos[1]}")
+        if (pos == (-1, -1)):
+            pos = (len(self.input_image_labels)-1, len(self.input_image_labels[-1])-1)
 
-        print(f"New flag {char}")
-        if (pos == -1): pos = len(self.answer_flags)
-        if (char == "\n"):
-            self.answer_flags.insert(pos, (None if char == "\n" else ""))
-        elif (char == " "):
-            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=" ", font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight="bold"), text_color="blue", fg_color="transparent")
-            new_input_flag.grid(side="left", padx=1)
-            self.input_image_labels.insert(pos, new_input_flag)
-            self.answer_flags.insert(pos, "")
+        # if (char == "\n"):
+        #     self.answer_flags.insert(pos[2], (None if char == "\n" else ""))
+        if (char in " \n"):
+            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=("␣" if char == " " else "⏎"), font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight="bold"), text_color="blue", fg_color="transparent")
+            self.answer_flags[pos[0]].insert(pos[1], (None if char == "\n" else ""))
+
+            if (char == "\n" and pos[1] < len(self.input_image_labels[pos[0]])):      # If newline and there are characters after it
+                for col in range(len(self.input_image_labels[pos[0]])-1 - pos[1]):    # Put the next characters in a new row
+                    self.input_image_labels[pos[0]+1].insert(col, self.input_image_labels[pos[0]][pos[1]+col])
+                    self.input_image_labels[pos[0]+1][col].grid(row=pos[0]+1, column=col, padx=1)
+                    del self.input_image_labels[pos[0]][pos[1]]
+
+                    self.answer_flags[pos[0]+1].insert(col, self.answer_flags[pos[0]][pos[1]+col])
+                    del self.answer_flags[pos[0]][pos[1]]
+            
             if (event is not None):
                 self.top_menu.input_text.insert("end", char)
         else:
             try:
                 input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[char].img_path), scaletoheight=int(self.master.scale_size*0.04))
                 new_input_flag = ctk.CTkLabel(self.flag_input_box, text="", image=input_image)
-                before = {"before": self.input_image_labels[pos]} if (pos < len(self.answer_flags)) else {}
-                new_input_flag.grid(row=self.image_rows, padx=1, **before)
-
-                self.input_image_labels.insert(pos, new_input_flag)
-                self.answer_flags.insert(pos, self.alphabet[char])
+                self.answer_flags[pos[0]].insert(pos[1], self.alphabet[char])
                 if (event is not None):
                     self.top_menu.input_text.insert("end", self.alphabet[char].code_word[0])
             except KeyError:
                 print("Invalid character")
-                self.top_menu.input_text.delete(f"1.{pos}")
+                self.top_menu.input_text.delete(f"{pos[0]+1}.{pos[1]}")
+
+        if (pos[1] < len(self.input_image_labels[pos[0]])):
+            for i in range(pos[1], len(self.input_image_labels[pos[0]])):
+                self.input_image_labels[pos[0]][i].grid(row=pos[0], column=i+1, padx=1)
+
+        new_input_flag.grid(row=pos[0], column=pos[1], padx=1)
+        self.input_image_labels[pos[0]].insert(pos[1], new_input_flag)
 
         self.text = self.top_menu.input_text.get("1.0", "end - 1c")
+        print()
 
     def save_image(self):
         if (not self.text): return
-        if Alphabet.saveFlagSentencePNG(self.answer_flags, background=self.is_transparent):
+        if Alphabet.saveFlagSentencePNG([x for xs in self.answer_flags for x in xs], background=self.is_transparent):
             label = ctk.CTkLabel(self.top_menu, text="Zapisano.", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="transparent")
             label.pack(side="right", padx=10)
             label.after(4000, lambda: label.destroy())

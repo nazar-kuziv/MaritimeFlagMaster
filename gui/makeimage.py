@@ -121,10 +121,10 @@ class MakeImage(Util.AppPage):
         for f in self.alphabet.values():
             self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size/self.input_columns)*0.5))
 
-        self.input_parent = ctk.CTkFrame(self, fg_color="transparent")
+        self.input_parent = ctk.CTkScrollableFrame(self, orientation="horizontal", label_anchor="center")
         self.input_parent.pack(side="left", fill="both", expand=True, padx=10)
-        self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, orientation="horizontal", label_anchor="center")
-        self.flag_input_box.pack(side="left", fill="both", expand=True)
+        self.flag_input_box = ctk.CTkFrame(self.input_parent, fg_color="transparent", width=0, height=0)
+        self.flag_input_box.pack(side="left")
         
         
         self.place_input_flags()
@@ -141,7 +141,7 @@ class MakeImage(Util.AppPage):
                 flag_container.grid_rowconfigure(0, weight=1)
                 flag_container.grid_columnconfigure(0, weight=1)
 
-                flag_container.grid(row=i, column=j, sticky="nsew")
+                flag_container.grid(row=i, column=j)
                 if (not tuple):
                     flag_container.flag = ctk.CTkLabel(flag_container, text="␣", text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.025)), justify="center", cursor="hand2")
                     flag_container.flag.bind("<Button-1>", command=lambda event, i=" ": self.flag_input_handler(event, char=i))
@@ -175,8 +175,11 @@ class MakeImage(Util.AppPage):
         # if (char == "\n"):
         #     self.answer_flags.insert(pos[2], (None if char == "\n" else ""))
         if (char in " \n"):
-            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=("␣" if char == " " else "⏎"), font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight="bold"), text_color="blue", fg_color="transparent")
+            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=("␣" if char == " " else "⏎"), font=ctk.CTkFont(size=int(self.master.scale_size*0.03), weight="bold"), text_color="blue", fg_color="transparent")
             self.answer_flags[pos[0]].insert(pos[1], (None if char == "\n" else ""))
+            if (char == "\n"):
+                self.answer_flags.insert(pos[0]+1, [])
+                self.input_image_labels.insert(pos[0]+1, [])
 
             if (char == "\n" and pos[1] < len(self.input_image_labels[pos[0]])):      # If newline and there are characters after it
                 for col in range(len(self.input_image_labels[pos[0]])-1 - pos[1]):    # Put the next characters in a new row

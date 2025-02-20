@@ -89,6 +89,12 @@ class MakeImage(Util.AppPage):
         self.top_menu.input_text.pack(side="left", fill="y", padx=10)
         self.top_menu.input_text.focus()
 
+        self.top_menu.backspace_button = ctk.CTkButton(self.top_menu, text="Kasuj", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.flag_delete_handler)
+        self.top_menu.backspace_button.pack(side="left", ipadx=10, ipady=10, padx=5)
+
+        self.top_menu.clear_button = ctk.CTkButton(self.top_menu, text="Wyczyść", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.flag_clear_handler)
+        self.top_menu.clear_button.pack(side="left", ipadx=10, ipady=10, padx=5)
+
         self.text = self.top_menu.input_text.get("1.0", "end - 1c")
         self.master.bind("<KeyPress>", input_callback)
         self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
@@ -168,9 +174,9 @@ class MakeImage(Util.AppPage):
         if (char == ""):
             return
         
-        print(f"New flag {char} at position {pos[0]}.{pos[1]}")
         if (pos == (-1, -1)):
-            pos = (len(self.input_image_labels)-1, len(self.input_image_labels[-1])-1)
+            pos = (len(self.input_image_labels)-1, len(self.input_image_labels[-1]))
+        print(f"New flag {char} at position {pos[0]}.{pos[1]}")
 
         # if (char == "\n"):
         #     self.answer_flags.insert(pos[2], (None if char == "\n" else ""))
@@ -212,6 +218,18 @@ class MakeImage(Util.AppPage):
 
         self.text = self.top_menu.input_text.get("1.0", "end - 1c")
         print()
+
+    def flag_delete_handler(self, event=None, pos: tuple[int, int] = (-1, -1), num: int = 1):
+        if (sum(len(x) for x in self.input_image_labels) >= num):
+            self.flag_clear_handler()
+            return
+
+        if (pos == (-1, -1)):
+            pos = (len(self.input_image_labels)-1, len(self.input_image_labels[-1]))
+        print(f"Deleting {num} characters from position {pos[0]}.{pos[1]}")
+
+    def flag_clear_handler(self, event=None):
+        print(f"Clearing input")
 
     def save_image(self):
         if (not self.text): return

@@ -54,31 +54,29 @@ class MakeImage(Util.AppPage):
 
             print(f"New text: {new_text}")
             seq_mat = difflib.SequenceMatcher(None, self.text, new_text)
+            shift = 0   # opcodes indices don't take into account changes after insert and delete operations
+
+            def get_pos(i) -> list[int]: # starts from 0.0
+                i += shift
+                pos = new_text[:i+1].splitlines(keepends=True)
+                return [len(pos)-1, len(pos[-1])-1]
+
             for tag, i1, i2, j1, j2 in seq_mat.get_opcodes():
                 print(f"Opcode: {tag}, {i1}, {i2}, {j1}, {j2}")
-
-                def get_pos(i) -> list[int]:
-                    pos = new_text[:i+1].splitlines(keepends=True)
-                    return [len(pos)-1, len(pos[-1])-1]
-                pos1, pos2, posj1, posj2 = list(map(get_pos, [i1, i2, j1, j2]))
-                # pos1 = get_pos(i1)
-                length = sum(len(x) for x in self.input_image_labels)
-
+                
                 if (tag in ["delete", "replace"]):
-                    for i in reversed(range(i1, i2)):
-                        if (i >= length): i = length - 1
-                        pos = get_pos(i)
-                        self.input_image_labels[pos[0]][pos[1]].destroy()
-                        del self.input_image_labels[pos[0]][pos[1]]
-                        del self.answer_flags[pos[0]][pos[1]]
+                    self.flag_delete_handler(get_pos(i1+1), i2-i1, False)
+                    if (tag == "delete"): shift -= i2-i1
                 
                 if (tag in ["insert", "replace"]):
+                    pos1 = get_pos(i1)
                     for j in range(j1, j2):
                         self.flag_input_handler(None, new_text[j].upper(), tuple(pos1))
                         if (new_text[pos1[1]] == "\n"):
                             pos1[0] += 1
                             pos1[1] = -1
                         pos1[1] += 1
+                    if (tag == "insert"): shift += j2-j1
 
             self.text = self.top_menu.input_text.get("1.0", "end - 1c")
 
@@ -87,7 +85,7 @@ class MakeImage(Util.AppPage):
 
         self.top_menu.input_text = ctk.CTkTextbox(self.top_menu, width=400, height=0)
         self.top_menu.input_text.pack(side="left", fill="y", padx=10)
-        self.top_menu.input_text.focus()
+        self.top_menu.input_text.focus_set()
 
         self.top_menu.backspace_button = ctk.CTkButton(self.top_menu, text="Kasuj", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.flag_delete_handler)
         self.top_menu.backspace_button.pack(side="left", ipadx=10, ipady=10, padx=5)
@@ -219,17 +217,45 @@ class MakeImage(Util.AppPage):
         self.text = self.top_menu.input_text.get("1.0", "end - 1c")
         print()
 
-    def flag_delete_handler(self, event=None, pos: tuple[int, int] = (-1, -1), num: int = 1):
-        if (sum(len(x) for x in self.input_image_labels) >= num):
+    def flag_delete_handler(self, pos: tuple[int, int] = (-1, -1), num: int = 1, delete_text=True):
+        if (sum(len(x) for x in self.input_image_labels) <= num):
             self.flag_clear_handler()
             return
 
         if (pos == (-1, -1)):
-            pos = (len(self.input_image_labels)-1, len(self.input_image_labels[-1]))
+            pos1 = len(self.answer_flags)-1
+            pos2 = len(self.answer_flags[-1])-1
+            if (pos2 < 0):
+                pos1 -= 1
+                pos2 = len(self.answer_flags[-2])-1
+            if (pos1 < 0): return
+            pos = (pos1, pos2)
         print(f"Deleting {num} characters from position {pos[0]}.{pos[1]}")
 
-    def flag_clear_handler(self, event=None):
+        for _ in range(num):
+            self.input_image_labels[pos[0]][pos[1]].destroy()
+            del self.input_image_labels[pos[0]][pos[1]]
+            del self.answer_flags[pos[0]][pos[1]]
+            if (pos[1] < len(self.answer_flags[pos[0]])): continue
+            
+            if (pos[0]+1 >= len(self.answer_flags)): break
+            self.input_image_labels.extend(self.input_image_labels[pos[0]+1].pop())
+            self.answer_flags.extend(self.answer_flags[pos[0]+1].pop())
+
+        if (delete_text):
+            self.top_menu.input_text.delete(f"{pos[0]+1}.{pos[1]}")
+            self.text = self.top_menu.input_text.get("1.0", "end - 1c")
+
+    def flag_clear_handler(self):
         print(f"Clearing input")
+        for xs in self.input_image_labels:
+            for x in xs:
+                x.destroy()
+        
+        self.input_image_labels = [[]]
+        self.answer_flags = [[]]
+        self.top_menu.input_text.delete("1.0", "end")
+        self.text = ""
 
     def save_image(self):
         if (not self.text): return

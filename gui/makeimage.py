@@ -56,27 +56,27 @@ class MakeImage(Util.AppPage):
             seq_mat = difflib.SequenceMatcher(None, self.text, new_text)
             shift = 0   # opcodes indices don't take into account changes after insert and delete operations
 
-            def get_pos(i) -> list[int]: # starts from 0.0
+            def get_pos(i, text) -> list[int]: # starts from 0.0
                 i += shift
-                pos = new_text[:i+1].splitlines(keepends=True)
+                pos = text[:i+1].splitlines(keepends=True)
                 return [len(pos)-1, len(pos[-1])-1]
 
             for tag, i1, i2, j1, j2 in seq_mat.get_opcodes():
                 print(f"Opcode: {tag}, {i1}, {i2}, {j1}, {j2}")
                 
                 if (tag in ["delete", "replace"]):
-                    self.flag_delete_handler(get_pos(i1+1), i2-i1, False)
-                    if (tag == "delete"): shift -= i2-i1
+                    self.flag_delete_handler(get_pos(i1, self.text), i2-i1, False)
+                    shift -= i2-i1
                 
                 if (tag in ["insert", "replace"]):
-                    pos1 = get_pos(i1)
+                    pos1 = get_pos(i1, new_text)
                     for j in range(j1, j2):
                         self.flag_input_handler(None, new_text[j].upper(), tuple(pos1))
                         if (new_text[pos1[1]] == "\n"):
                             pos1[0] += 1
                             pos1[1] = -1
                         pos1[1] += 1
-                    if (tag == "insert"): shift += j2-j1
+                    shift += j2-j1
 
             self.text = self.top_menu.input_text.get("1.0", "end - 1c")
 
@@ -236,7 +236,8 @@ class MakeImage(Util.AppPage):
             self.input_image_labels[pos[0]][pos[1]].destroy()
             del self.input_image_labels[pos[0]][pos[1]]
             del self.answer_flags[pos[0]][pos[1]]
-            if (pos[1] < len(self.answer_flags[pos[0]])): continue
+            if (pos[1] < len(self.answer_flags[pos[0]]) or 
+                pos[0]+2 >= len(self.answer_flags) or len(self.answer_flags[pos[0]+1]) > 0): continue
             
             if (pos[0]+1 >= len(self.answer_flags)): break
             self.input_image_labels.extend(self.input_image_labels[pos[0]+1].pop())

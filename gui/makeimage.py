@@ -237,11 +237,17 @@ class MakeImage(Util.AppPage):
             del self.input_image_labels[pos[0]][pos[1]]
             del self.answer_flags[pos[0]][pos[1]]
             if (pos[1] < len(self.answer_flags[pos[0]]) or 
-                pos[0]+2 >= len(self.answer_flags) or len(self.answer_flags[pos[0]+1]) > 0): continue
+                pos[0]+1 >= len(self.answer_flags) or len(self.answer_flags[pos[0]+1]) <= 0): continue
             
             if (pos[0]+1 >= len(self.answer_flags)): break
-            self.input_image_labels.extend(self.input_image_labels[pos[0]+1].pop())
-            self.answer_flags.extend(self.answer_flags[pos[0]+1].pop())
+            self.answer_flags[pos[0]].extend(self.answer_flags.pop(pos[0]+1))
+            self.input_image_labels[pos[0]].extend(self.input_image_labels.pop(pos[0]+1))
+
+        start_col = pos[1]
+        for row in range(pos[0], len(self.input_image_labels)):
+            for col in range(start_col, len(self.input_image_labels[row])):
+                self.input_image_labels[row][col].grid(row=row, column=col, padx=1)
+            start_col = 0
 
         if (delete_text):
             self.top_menu.input_text.delete(f"{pos[0]+1}.{pos[1]}")

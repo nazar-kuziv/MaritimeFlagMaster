@@ -41,7 +41,7 @@ jobs:
         run: .venv/Scripts/pyinstaller --noconfirm --onefile --windowed --add-data ".venv/Lib/site-packages/tksvg;tksvg\." --add-data "static;static\." main.py
 
       - name: Deploy artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app
           path: dist/main*

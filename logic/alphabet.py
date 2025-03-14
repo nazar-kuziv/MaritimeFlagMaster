@@ -1,6 +1,9 @@
+import xml.etree.ElementTree as et
+
 import copy
 import random
 import re
+from datetime import datetime
 
 import requests
 from PIL import Image as PILImage
@@ -228,13 +231,13 @@ class Alphabet:
         return flags
 
     @staticmethod
-    def get_flag_using_character(character: str) -> Flag | None | str:
+    def get_flag_using_character(character: str) -> Flag | None:
         """Returns a Flag object using a character.
         Returns None if space character is passed.
 
         :raise InputCharacterException if character is not found.
         :param character: Character to search for
-        :rtype: Flag|None|str
+        :rtype: Flag|None
         """
         if character in ['?', '!']:
             return Alphabet._additionalFlags[character]
@@ -350,6 +353,38 @@ class Alphabet:
         return len(Alphabet._sentences_from_user_file)
 
     @staticmethod
+    def get_FlagSentence_svg(sentence: str) -> str:
+        new_img_height = ((sentence.count("\n") + 1) * 650) - 50
+        new_img_width = (max(len(line) for line in sentence.split('\n')) * 650) - 50
+        new_svg = et.Element("svg", {
+            "xmlns": "http://www.w3.org/2000/svg",
+            "xmlns:xlink": "http://www.w3.org/1999/xlink",
+            "width": str(new_img_width),
+            "height": str(new_img_height),
+            "viewBox": f"0 0 {new_img_width} {new_img_height}"
+        })
+        row, column = 0, 0
+        for symbol in sentence:
+            if symbol == '\n':
+                row += 1
+                column = 0
+            elif symbol == ' ':
+                column += 1
+            else:
+                current_flag = Alphabet.get_flag_using_character(symbol)
+                if isinstance(current_flag, Flag):
+                    current_flag_svg = et.parse(Environment.resource_path(current_flag.img_path)).getroot()
+                    current_flag_group = et.Element("g", {"transform": f"translate({column * 650},{row * 650})"})
+                    current_flag_group.append(current_flag_svg)
+                    column += 1
+                    new_svg.append(current_flag_group)
+        tree = et.ElementTree(new_svg)
+        file_name = f"output_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.svg"
+        file_path = Environment.resource_path(f"static/tmp/{file_name}")
+        tree.write(file_path, encoding="utf-8", xml_declaration=True)
+        return file_path
+
+    @staticmethod
     def saveFlagSentencePNG(sentence: list[Flag | None], background: str = 'grey',
                             suggest_file_name: bool = True, max_row_characters: int = 0) -> bool:
         """Saves FlagSentence as PNG file.
@@ -442,7 +477,6 @@ class Alphabet:
                 bg_color = (128, 128, 128, 255)
             else:
                 bg_color = (255, 255, 255, 0)
-
 
             # Create empty image
             collage = PILImage.new('RGBA', (total_width, total_height), bg_color)

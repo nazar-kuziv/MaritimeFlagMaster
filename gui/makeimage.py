@@ -1,8 +1,8 @@
+import difflib
 from tkinter import Event
 
 import customtkinter as ctk
 import tksvg
-import difflib
 
 import gui.util_functions as Util
 from logic.alphabet import Alphabet
@@ -13,20 +13,21 @@ class MakeImage(Util.AppPage):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         print("Initializing meanings frame")
-        self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
+        self.master.scale_size = self.master.winfo_height() if (
+                    self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
         self.alphabet = dict(Alphabet._characters, **Alphabet._additionalFlags)
         self.flag_index = 0
         self.images = []
-        self.is_transparent = "grey"
+        self.is_transparent = "gray"
         self.flag_images = []
         self.answer_flags = []
         self.input_image_labels = []
-    
+
     def draw(self):
         super().draw()
         self.show_question()
-    
+
     def show_question(self):
         loading_label = Util.loading_widget(self.master)
         # for widget in self.flag_images:
@@ -42,14 +43,15 @@ class MakeImage(Util.AppPage):
         #     self.input_parent.destroy()
         # except AttributeError: print("Couldn't destroy flag_input_box")
         self.update_idletasks()
-        self.master.scale_size = self.master.winfo_height() if (self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
+        self.master.scale_size = self.master.winfo_height() if (
+                    self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
 
         def input_callback(event: Event):
             if (event.state & 4 and event.keysym in "vV"):
                 Util.text_paste(event, self.top_menu.input_text)
             new_text = self.top_menu.input_text.get("1.0", "end - 1c")
             if (new_text == self.text): return
-            
+
             print(f"New text: {new_text}")
             seq_mat = difflib.SequenceMatcher(None, self.text, new_text)
             for tag, i1, i2, j1, j2 in seq_mat.get_opcodes():
@@ -60,7 +62,7 @@ class MakeImage(Util.AppPage):
                         self.input_image_labels[i].destroy()
                         del self.input_image_labels[i]
                         del self.answer_flags[i]
-                
+
                 if (tag in ["insert", "replace"]):
                     for j in range(j1, j2):
                         self.flag_input_handler(None, new_text[j].upper(), i1)
@@ -92,7 +94,7 @@ class MakeImage(Util.AppPage):
 
         self.top_menu = ctk.CTkFrame(self, fg_color="transparent")
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
-        
+
         self.top_menu.input_text = ctk.CTkTextbox(self.top_menu, width=400, height=0)
         self.top_menu.input_text.pack(side="left", fill="y", padx=10)
         self.top_menu.input_text.focus()
@@ -102,21 +104,26 @@ class MakeImage(Util.AppPage):
         self.master.bind("<Control-Key-a>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
         self.master.bind("<Control-Key-A>", lambda event: Util.text_select_all(event, self.top_menu.input_text))
 
-        self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0, font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), command=self.save_image)
+        self.top_menu.check_button = ctk.CTkButton(self.top_menu, text="Zapisz...", width=0,
+                                                   font=ctk.CTkFont(size=int(self.master.winfo_width() * 0.015)),
+                                                   command=self.save_image)
         self.top_menu.check_button.pack(side="right", ipadx=10, ipady=10)
 
         def checkbox_event():
             print('checkbox toggled, current value:', check_var.get())
-            self.is_transparent = 'transparent' if check_var.get() == 'on' else 'grey'
-        
+            self.is_transparent = 'transparent' if check_var.get() == 'on' else 'gray'
+
         check_var = ctk.StringVar(value='off')
-        self.top_menu.checkbox = ctk.CTkCheckBox(self.top_menu, text='Transparentne tło', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.01)), command=checkbox_event, 
+        self.top_menu.checkbox = ctk.CTkCheckBox(self.top_menu, text='Transparentne tło',
+                                                 font=ctk.CTkFont(size=int(self.master.winfo_width() * 0.01)),
+                                                 command=checkbox_event,
                                                  variable=check_var, onvalue='on', offvalue='off')
         self.top_menu.checkbox.pack(side="right", padx=10)
 
-        self.input_parent = ctk.CTkFrame(self, height=int(self.winfo_width()*0.1), fg_color="transparent")
+        self.input_parent = ctk.CTkFrame(self, height=int(self.winfo_width() * 0.1), fg_color="transparent")
         self.input_parent.pack(side="top", fill="x", padx=10)
-        self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, height=int(self.master.scale_size*0.05), orientation="horizontal")
+        self.flag_input_box = ctk.CTkScrollableFrame(self.input_parent, height=int(self.master.scale_size * 0.05),
+                                                     orientation="horizontal")
         # self.master.bind("<BackSpace>", self.delete_input_flag)
         self.flag_input_box.pack(side="top", fill="x")
 
@@ -131,9 +138,9 @@ class MakeImage(Util.AppPage):
             self.input_frame.grid_columnconfigure(j, weight=1)
 
         for f in self.alphabet.values():
-            self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size/self.input_columns)))
-            
-        
+            self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path),
+                                              scaletowidth=int(self.master.scale_size / self.input_columns)))
+
         self.place_input_flags()
         self.update_idletasks()
         loading_label.destroy()
@@ -143,19 +150,24 @@ class MakeImage(Util.AppPage):
         for i in range(self.input_rows):
             for j in range(self.input_columns):
                 tuple = next(alphabet_iter, None)
-                
+
                 flag_container = ctk.CTkFrame(self.input_frame, fg_color="transparent")
                 flag_container.grid_rowconfigure(0, weight=1)
                 flag_container.grid_columnconfigure(0, weight=1)
 
                 if (not tuple):
                     flag_container.grid(row=i, column=j, columnspan=self.input_columns, sticky="nsew")
-                    flag_container.flag = ctk.CTkLabel(flag_container, text='SPACJA', text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), cursor="hand2")
-                    flag_container.flag.bind("<Button-1>", command=lambda event, i='': self.flag_input_handler(event, char=i))
+                    flag_container.flag = ctk.CTkLabel(flag_container, text='SPACJA', text_color="blue",
+                                                       font=ctk.CTkFont(size=int(self.master.winfo_width() * 0.015)),
+                                                       cursor="hand2")
+                    flag_container.flag.bind("<Button-1>",
+                                             command=lambda event, i='': self.flag_input_handler(event, char=i))
                 else:
                     flag_container.grid(row=i, column=j, sticky="nsew")
-                    flag_container.flag = ctk.CTkLabel(flag_container, text='', image=self.images[tuple[0]], cursor="hand2")
-                    flag_container.flag.bind("<Button-1>", command=lambda event, i=tuple[1]: self.flag_input_handler(event, char=i))
+                    flag_container.flag = ctk.CTkLabel(flag_container, text='', image=self.images[tuple[0]],
+                                                       cursor="hand2")
+                    flag_container.flag.bind("<Button-1>",
+                                             command=lambda event, i=tuple[1]: self.flag_input_handler(event, char=i))
                 flag_container.flag.grid(ipadx=10, ipady=10)
                 self.flag_images.append(flag_container)
 
@@ -166,12 +178,14 @@ class MakeImage(Util.AppPage):
         """
         if (char == ""):
             return
-        
+
         print(f"New flag {char}")
         if (pos == -1): pos = len(self.answer_flags)
         if (char in [" ", "\n"]):
             txt = '⏎' if char == "\n" else "␣"
-            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=txt, font=ctk.CTkFont(size=int(self.master.scale_size*0.05), weight='bold'), text_color="blue", fg_color='transparent')
+            new_input_flag = ctk.CTkLabel(self.flag_input_box, text=txt,
+                                          font=ctk.CTkFont(size=int(self.master.scale_size * 0.05), weight='bold'),
+                                          text_color="blue", fg_color='transparent')
             new_input_flag.pack(side="left", padx=1)
             self.input_image_labels.insert(pos, new_input_flag)
             self.answer_flags.insert(pos, (None if char == '\n' else ""))
@@ -179,7 +193,8 @@ class MakeImage(Util.AppPage):
                 self.top_menu.input_text.insert('end', ' ')
         else:
             try:
-                input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[char].img_path), scaletoheight=int(self.master.scale_size*0.04))
+                input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[char].img_path),
+                                             scaletoheight=int(self.master.scale_size * 0.04))
                 new_input_flag = ctk.CTkLabel(self.flag_input_box, text='', image=input_image)
                 before = {"before": self.input_image_labels[pos]} if (pos < len(self.answer_flags)) else {}
                 new_input_flag.pack(side="left", padx=1, **before)
@@ -191,16 +206,17 @@ class MakeImage(Util.AppPage):
             except KeyError:
                 print("Invalid character")
                 self.top_menu.input_text.delete(f"1.{pos}")
-            
+
         self.text = self.top_menu.input_text.get("1.0", "end - 1c")
 
     def save_image(self):
         if (not self.text): return
-        if Alphabet.saveFlagSentencePNG(self.answer_flags, background=self.is_transparent):
-            label = ctk.CTkLabel(self.top_menu, text='Zapisano.', font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color='transparent')
+        if Alphabet.save_flag_sentence_png(self.answer_flags, background=self.is_transparent):
+            label = ctk.CTkLabel(self.top_menu, text='Zapisano.',
+                                 font=ctk.CTkFont(size=int(self.master.winfo_width() * 0.015)), fg_color='transparent')
             label.pack(side="right", padx=10)
             label.after(4000, lambda: label.destroy())
-    
+
     def unbind(self):
         self.master.unbind("<KeyPress>")
         self.master.unbind("<Control-Key-a>")

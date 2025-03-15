@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import xml.etree.ElementTree as et
-
 import copy
 import random
 import re
+import xml.etree.ElementTree as et
 from datetime import datetime
 
 import requests
@@ -355,7 +354,14 @@ class Alphabet:
         return len(Alphabet._sentences_from_user_file)
 
     @staticmethod
-    def get_FlagSentence_svg(sentence: str) -> str:
+    def get_flag_sentence_svg(sentence: str, background_color: str = 'gray') -> str:
+        """Creates SVG file with flags from sentence.
+
+        :param sentence: Sentence to save
+        :param background_color: If 'gray', background will be gray, otherwise transparent
+        :return Path to the created file
+        :rtype: str
+        """
         new_img_height = ((sentence.count("\n") + 1) * 650) - 50
         new_img_width = (max(len(line) for line in sentence.split('\n')) * 650) - 50
         new_svg = et.Element("svg", {
@@ -365,6 +371,9 @@ class Alphabet:
             "height": str(new_img_height),
             "viewBox": f"0 0 {new_img_width} {new_img_height}"
         })
+        if background_color == 'gray':
+            new_svg.append(et.Element("rect", {"width": str(new_img_width), "height": str(new_img_height),
+                                               "fill": "rgb(128, 128, 128)"}))
         row, column = 0, 0
         for symbol in sentence:
             if symbol == '\n':
@@ -387,12 +396,12 @@ class Alphabet:
         return file_path
 
     @staticmethod
-    def saveFlagSentencePNG(sentence: list[Flag | None], background: str = 'grey',
-                            suggest_file_name: bool = True, max_row_characters: int = 0) -> bool:
+    def save_flag_sentence_png(sentence: list[Flag | None], background: str = 'gray',
+                               suggest_file_name: bool = True, max_row_characters: int = 0) -> bool:
         """Saves FlagSentence as PNG file.
 
         :param sentence: Sentence to save
-        :param background: Background color, either 'grey' or 'transparent'
+        :param background: Background color, either 'gray' or 'transparent'
         :param suggest_file_name: If True, suggests file name based on sentence:
         :param max_row_characters: Maximum number of characters in a row
         :return True if everything is ok, False if user didn't select file
@@ -475,7 +484,7 @@ class Alphabet:
             total_width = max_columns * cell_width + (max_columns - 1) * x_padding
             total_height = (max_rows + 1) * cell_height + max_rows * y_padding
 
-            if background == 'grey':
+            if background == 'gray':
                 bg_color = (128, 128, 128, 255)
             else:
                 bg_color = (255, 255, 255, 0)
@@ -511,11 +520,11 @@ class Alphabet:
         :param cell_width: Width of the cell
         :param cell_height: Height of the cell
         :param output_image: Image to embed PNG in
-        :param background: Background color, either 'grey' or 'transparent'
+        :param background: Background color, either 'gray' or 'transparent'
         """
         with PILImage.open(png_file) as img:
             img = img.resize((cell_width, cell_height))
-            if background == 'grey':
+            if background == 'gray':
                 background_img = PILImage.new('RGBA', (cell_width, cell_height), (128, 128, 128, 255))
                 img = img.convert('RGBA')
                 ready_flag = PILImage.alpha_composite(background_img, img)

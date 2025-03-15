@@ -4,3 +4,4 @@ tksvg~=0.7.4
 matplotlib~=3.9.2
 Custom-Tooltip~=1.4.1
 requests~=2.32.3
+pyinstaller~=6.9.0

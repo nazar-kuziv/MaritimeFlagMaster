@@ -184,15 +184,49 @@ class MakeImage(Util.AppPage):
             if (char == "\n"):
                 self.answer_flags.insert(pos[0]+1, [])
                 self.input_image_labels.insert(pos[0]+1, [])
+            
+            # def move_row(img_list: list, char_list: list, pos1: int, pos2: int):
+            #     move_number = 1
+            #     col = 0
+            #     for _ in range(len(img_list[pos1])-1 - pos2):    # Put the next characters in a new row
+            #         img_list[pos1+move_number].insert(col, img_list[pos1][pos2+col])
+            #         img_list[pos1+move_number][col].grid(row=pos1+move_number, column=col, padx=1)
+            #         del img_list[pos1][pos2]
+
+            #         char_list[pos1+move_number].insert(col, char_list[pos1][pos2+col])
+            #         del char_list[pos1][pos2]
+
+            #         col += 1
+            #         if (char_list[pos1] is None):
+            #             move_number += 1
+            #             col = 0
 
             if (char == "\n" and pos[1] < len(self.input_image_labels[pos[0]])):      # If newline and there are characters after it
-                for col in range(len(self.input_image_labels[pos[0]])-1 - pos[1]):    # Put the next characters in a new row
-                    self.input_image_labels[pos[0]+1].insert(col, self.input_image_labels[pos[0]][pos[1]+col])
-                    self.input_image_labels[pos[0]+1][col].grid(row=pos[0]+1, column=col, padx=1)
-                    del self.input_image_labels[pos[0]][pos[1]]
+                print(f"newline inserted, {len(self.input_image_labels[pos[0]]) - pos[1]}")
+                # for col in range(len(self.input_image_labels[pos[0]])-1 - pos[1]):    # Put the next characters in a new row
+                #     self.input_image_labels[pos[0]+1].insert(col, self.input_image_labels[pos[0]][pos[1]+col])
+                #     self.input_image_labels[pos[0]+1][col].grid(row=pos[0]+1, column=col, padx=1)
+                #     del self.input_image_labels[pos[0]][pos[1]]
 
-                    self.answer_flags[pos[0]+1].insert(col, self.answer_flags[pos[0]][pos[1]+col])
-                    del self.answer_flags[pos[0]][pos[1]]
+                #     self.answer_flags[pos[0]+1].insert(col, self.answer_flags[pos[0]][pos[1]+col])
+                #     del self.answer_flags[pos[0]][pos[1]]
+                move_number = 1
+                col = 0
+                for _ in range(len(self.input_image_labels[pos[0]]) - pos[1]):    # Put the next characters in a new row
+                    # if (len(self.input_image_labels) <= pos[0]+move_number):
+                    #     self.input_image_labels[pos[0]+move_number] = []
+                    #     self.answer_flags[pos[0]+move_number] = []
+                    self.input_image_labels[pos[0]+move_number].insert(col, self.input_image_labels[pos[0]].pop(pos[1]))
+                    self.input_image_labels[pos[0]+move_number][col].grid(row=pos[0]+move_number, column=col, padx=1)
+                    # del self.input_image_labels[pos[0]][pos[1]]
+
+                    self.answer_flags[pos[0]+move_number].insert(col, self.answer_flags[pos[0]].pop(pos[1]))
+                    # del self.answer_flags[pos[0]][pos[1]]
+
+                    col += 1
+                    if (self.answer_flags[pos[0]] is None):
+                        move_number += 1
+                        col = 0
             
             if (event is not None):
                 self.top_menu.input_text.insert("end", char)

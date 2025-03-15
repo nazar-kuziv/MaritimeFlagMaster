@@ -1,18 +1,19 @@
 import json
-import os, sys
+import os
+import sys
 
-from dotenv import load_dotenv
+from appdirs import user_data_dir
+
+CONFIGURATION_DIR = user_data_dir("MaritimeFlagMaster", "NoName")
+CONFIGURATION_FILE_PATH = os.path.join(CONFIGURATION_DIR, "configuration.json")
 
 
 class Environment:
     user_conf = None
-    load_dotenv()
 
     @staticmethod
     def resource_path(relative_path):
-        """ Get absolute path to resource, works for dev and for PyInstaller """
         try:
-            # PyInstaller creates a temp folder and stores path in _MEIPASS
             base_path = sys._MEIPASS
         except Exception:
             base_path = os.path.abspath(".")
@@ -30,28 +31,23 @@ class Environment:
         if Environment.user_conf is None:
             Environment._load_configuration()
         Environment.user_conf[key] = value
-        configuration_file_path = os.path.expanduser(os.getenv("LOCAL_APP_DATA_CONF"))
-        with open(configuration_file_path, "w") as file:
+        with open(CONFIGURATION_FILE_PATH, "w") as file:
             json.dump(Environment.user_conf, file)
 
     @staticmethod
     def _load_configuration():
         if not Environment._is_configuration_file_exists():
             Environment._create_configuration_file()
-        configuration_file_path = os.path.expanduser(os.getenv("LOCAL_APP_DATA_CONF"))
-        with open(configuration_file_path, "r") as file:
+        with open(CONFIGURATION_FILE_PATH, "r") as file:
             Environment.user_conf = json.load(file)
 
     @staticmethod
     def _is_configuration_file_exists():
-        configuration_file_path = os.path.expanduser(os.getenv("LOCAL_APP_DATA_CONF"))
-        return os.path.exists(configuration_file_path)
+        return os.path.exists(CONFIGURATION_FILE_PATH)
 
     @staticmethod
     def _create_configuration_file():
-        config_dir = os.path.expanduser(os.getenv("LOCAL_APP_DATA_DIR"))
-        config_file = os.path.expanduser(os.getenv("LOCAL_APP_DATA_CONF"))
-        os.makedirs(config_dir, exist_ok=True)
-        with open(config_file, "w") as file:
+        os.makedirs(CONFIGURATION_DIR, exist_ok=True)
+        with open(CONFIGURATION_FILE_PATH, "w") as file:
             data = {}
             json.dump(data, file)

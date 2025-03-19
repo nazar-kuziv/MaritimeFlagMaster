@@ -21,6 +21,7 @@ class MakeImage(Util.AppPage):
         self.images = []
         self.bg_color = "grey"
         self.flag_images = []
+        self.preview = None
     
     def draw(self):
         super().draw()
@@ -38,15 +39,27 @@ class MakeImage(Util.AppPage):
         #     self.input_frame.destroy()
         # except AttributeError: print("Couldn't destroy input_frame")
         # try:
-        #     self.input_parent.destroy()
-        # except AttributeError: print("Couldn't destroy flag_input_box")
+        #     self.preview_frame.destroy()
+        # except AttributeError: print("Couldn't destroy preview_label")
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (
                     self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
+        
+        def show_preview():
+            text = self.top_menu.input_text.get("1.0", "end - 1c")
+            img_path = Alphabet.get_flag_sentence_svg(text, self.bg_color)
+            scale_size = ({"scaletowidth": int(self.preview_frame.winfo_width())*0.5} if (self.preview_frame.winfo_width() < self.preview_frame.winfo_height())
+                          else {"scaletoheight": int(self.preview_frame.winfo_height())*0.5})
+            preview_img = tksvg.SvgImage(file=Environment.resource_path(img_path), **scale_size)
+            self.preview_label.configure(image=preview_img)
 
         def input_callback(event: Event):
             if (event.state & 4 and event.keysym in "vV"):
                 Util.text_paste(event, self.top_menu.input_text)
+
+            if (self.preview):
+                self.after_cancel(self.preview)
+            self.preview = self.after(750, show_preview)
             # new_text: str = self.top_menu.input_text.get("1.0", "end - 1c")
             # if (new_text == self.text): return
             
@@ -123,10 +136,10 @@ class MakeImage(Util.AppPage):
         for f in self.alphabet.values():
             self.images.append(tksvg.SvgImage(file=Environment.resource_path(f.img_path), scaletowidth=int(self.master.scale_size/self.input_columns)*0.5))
 
-        self.input_parent = ctk.CTkScrollableFrame(self, orientation="horizontal", label_anchor="center")
-        self.input_parent.pack(side="left", fill="both", expand=True, padx=10)
-        self.flag_input_box = ctk.CTkFrame(self.input_parent, fg_color="transparent", width=0, height=0)
-        self.flag_input_box.pack(side="left")
+        self.preview_frame = ctk.CTkFrame(self)
+        self.preview_frame.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+        self.preview_label = ctk.CTkLabel(self.preview_frame, text="")
+        self.preview_label.pack(side="left")
         
         
         self.place_input_flags()
@@ -177,7 +190,7 @@ class MakeImage(Util.AppPage):
     #     # if (char == "\n"):
     #     #     self.answer_flags.insert(pos[2], (None if char == "\n" else ""))
     #     if (char in " \n"):
-    #         new_input_flag = ctk.CTkLabel(self.flag_input_box, text=("␣" if char == " " else "⏎"), font=ctk.CTkFont(size=int(self.master.scale_size*0.03), weight="bold"), text_color="blue", fg_color="transparent")
+    #         new_input_flag = ctk.CTkLabel(self.preview_label, text=("␣" if char == " " else "⏎"), font=ctk.CTkFont(size=int(self.master.scale_size*0.03), weight="bold"), text_color="blue", fg_color="transparent")
     #         self.answer_flags[pos[0]].insert(pos[1], (None if char == "\n" else ""))
     #         if (char == "\n"):
     #             self.answer_flags.insert(pos[0]+1, [])
@@ -231,7 +244,7 @@ class MakeImage(Util.AppPage):
     #     else:
     #         try:
     #             input_image = tksvg.SvgImage(file=Environment.resource_path(self.alphabet[char].img_path), scaletoheight=int(self.master.scale_size*0.04))
-    #             new_input_flag = ctk.CTkLabel(self.flag_input_box, text="", image=input_image)
+    #             new_input_flag = ctk.CTkLabel(self.preview_label, text="", image=input_image)
     #             self.answer_flags[pos[0]].insert(pos[1], self.alphabet[char])
     #             if (event is not None):
     #                 self.top_menu.input_text.insert("end", self.alphabet[char].code_word[0])

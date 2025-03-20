@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import os
 import random
 import re
 import xml.etree.ElementTree as et
@@ -391,6 +392,7 @@ class Alphabet:
                     new_svg.append(current_flag_group)
         tree = et.ElementTree(new_svg)
         file_name = f"output_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.svg"
+        os.makedirs(Environment.resource_path(f"static/tmp"), exist_ok=True)
         file_path = Environment.resource_path(f"static/tmp/{file_name}")
         tree.write(file_path, encoding="utf-8", xml_declaration=True)
         return file_path

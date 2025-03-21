@@ -52,6 +52,7 @@ class MakeImage(Util.AppPage):
                           else {"scaletoheight": int(self.preview_frame.winfo_height())*0.5})
             preview_img = tksvg.SvgImage(file=Environment.resource_path(img_path), **scale_size)
             self.preview_label.configure(image=preview_img)
+            print(preview_img)
 
         def input_callback(event: Event):
             if (event.state & 4 and event.keysym in "vV"):

@@ -11,4 +11,24 @@ app.update()
 print(f"MAIN WINDOW WIDTH: {app.winfo_width()}")
 main_menu = Util.new_page(MainMenu, "Start", master=app, fg_color="transparent")
 
+# FOR DEV RUNNING///
+import os, shutil
+from logic.environment import Environment
+
+def clear_tmp():
+    try:
+        with os.scandir(Environment.resource_path(f"static/tmp")) as entries:
+            for entry in entries:
+                if entry.is_file():
+                    os.unlink(entry.path)
+                else:
+                    shutil.rmtree(entry.path)
+            print("All files and subdirectories deleted successfully.")
+    except OSError:
+        print("Error occurred while deleting files and subdirectories.")
+    app.destroy()
+
+app.protocol("WM_DELETE_WINDOW", clear_tmp)
+# ///FOR DEV RUNNING
+
 app.mainloop()

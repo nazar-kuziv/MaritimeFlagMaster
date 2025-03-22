@@ -365,8 +365,8 @@ class Alphabet:
         """
         new_img_height = ((sentence.count("\n") + 1) * 650) - 50
         new_img_width = (max(len(line) for line in sentence.split('\n')) * 650) - 50
+        et.register_namespace("","http://www.w3.org/2000/svg")
         new_svg = et.Element("svg", {
-            "xmlns": "http://www.w3.org/2000/svg",
             "xmlns:xlink": "http://www.w3.org/1999/xlink",
             "width": str(new_img_width),
             "height": str(new_img_height),

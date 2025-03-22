@@ -48,11 +48,16 @@ class MakeImage(Util.AppPage):
         def show_preview():
             text = self.top_menu.input_text.get("1.0", "end - 1c")
             img_path = Alphabet.get_flag_sentence_svg(text, self.bg_color)
-            scale_size = ({"scaletowidth": int(self.preview_frame.winfo_width())*0.5} if (self.preview_frame.winfo_width() < self.preview_frame.winfo_height())
-                          else {"scaletoheight": int(self.preview_frame.winfo_height())*0.5})
-            preview_img = tksvg.SvgImage(file=Environment.resource_path(img_path), **scale_size)
-            self.preview_label.configure(image=preview_img)
-            print(preview_img)
+
+            scale_size = ({"scaletowidth": int(self.preview_frame.winfo_width()*0.9)}
+                          if (self.preview_frame.winfo_width() > self.preview_frame.winfo_height())
+                          else {"scaletoheight": int(self.preview_frame.winfo_height()*0.9)})
+
+            # self.preview_img = tksvg.SvgImage(file=img_path, **scale_size)
+            self.preview_img = tksvg.SvgImage(file=r'C:\Users\firek\Desktop\repos\MaritimeFlagMaster\static\graphics\example.svg', **scale_size)
+            self.preview_label.configure(image=self.preview_img, text="")
+
+            print("Preview updated")
 
         def input_callback(event: Event):
             if (event.state & 4 and event.keysym in "vV"):
@@ -139,8 +144,8 @@ class MakeImage(Util.AppPage):
 
         self.preview_frame = ctk.CTkFrame(self)
         self.preview_frame.pack(side="left", fill="both", expand=True, padx=10, pady=10)
-        self.preview_label = ctk.CTkLabel(self.preview_frame, text="")
-        self.preview_label.pack(side="left")
+        self.preview_label = ctk.CTkLabel(self.preview_frame, text="Zacznij pisać...")
+        self.preview_label.pack(side="left", fill="both", expand=True)
         
         
         self.place_input_flags()

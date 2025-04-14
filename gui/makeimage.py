@@ -53,8 +53,8 @@ class MakeImage(Util.AppPage):
                           if (self.preview_frame.winfo_width() > self.preview_frame.winfo_height())
                           else {"scaletoheight": int(self.preview_frame.winfo_height()*0.9)})
 
-            # self.preview_img = tksvg.SvgImage(file=img_path, **scale_size)
-            self.preview_img = tksvg.SvgImage(file=r'C:\Users\firek\Desktop\repos\MaritimeFlagMaster\static\graphics\example.svg', **scale_size)
+            self.preview_img = tksvg.SvgImage(file=img_path, **scale_size)
+            # self.preview_img = tksvg.SvgImage(file=r'C:\Users\firek\Desktop\repos\MaritimeFlagMaster\static\graphics\example.svg', **scale_size)
             self.preview_label.configure(image=self.preview_img, text="")
 
             print("Preview updated")

@@ -5,6 +5,7 @@ import os
 import random
 import re
 import xml.etree.ElementTree as et
+from svgpathtools import svg2paths2, Path
 from datetime import datetime
 
 import requests
@@ -363,8 +364,9 @@ class Alphabet:
         :return Path to the created file
         :rtype: str
         """
-        new_img_height = ((sentence.count("\n") + 1) * 650) - 50
-        new_img_width = (max(len(line) for line in sentence.split('\n')) * 650) - 50
+        target_flag_dimension = 650
+        new_img_width = (max(len(line) for line in sentence.split('\n')) * target_flag_dimension) - 50
+        new_img_height = ((sentence.count("\n") + 1) * target_flag_dimension) - 50
         et.register_namespace("","http://www.w3.org/2000/svg")
         new_svg = et.Element("svg", {
             "xmlns:xlink": "http://www.w3.org/1999/xlink",
@@ -375,6 +377,20 @@ class Alphabet:
         if background_color == 'gray':
             new_svg.append(et.Element("rect", {"width": str(new_img_width), "height": str(new_img_height),
                                                "fill": "rgb(128, 128, 128)"}))
+
+        ns = {"svg": "http://www.w3.org/2000/svg"}
+            
+        def get_svg_bbox(paths: list[Path]):
+            xmin, xmax, ymin, ymax = paths.pop(0).bbox()
+            for path in paths:
+                p_xmin, p_xmax, p_ymin, p_ymax = path.bbox()
+                xmin = min(xmin, p_xmin)
+                xmax = max(xmax, p_xmax)
+                ymin = min(ymin, p_ymin)
+                ymax = max(ymax, p_ymax)
+
+            return xmin, xmax, ymin, ymax
+
         row, column = 0, 0
         for symbol in sentence:
             if symbol == '\n':
@@ -385,11 +401,23 @@ class Alphabet:
             else:
                 current_flag = Alphabet.get_flag_using_character(symbol)
                 if isinstance(current_flag, Flag):
-                    current_flag_svg = et.parse(Environment.resource_path(current_flag.img_path)).getroot()
-                    current_flag_group = et.Element("g", {"transform": f"translate({column * 650},{row * 650})"})
-                    current_flag_group.append(current_flag_svg)
-                    column += 1
+                    paths, _, svg_attributes = svg2paths2(Environment.resource_path(current_flag.img_path))
+                    svg_width = float(svg_attributes["width"])
+                    svg_height = float(svg_attributes["height"])
+
+                    bbox = get_svg_bbox(paths)
+                    scale_x = new_img_width / (bbox[1] - bbox[0])
+                    scale_y = new_img_height / (bbox[3] - bbox[2])
+
+                    scale = min(scale_x, scale_y)
+
+                    current_flag_group = et.Element("g", {"transform": f"translate({column * target_flag_dimension}, {row * target_flag_dimension}) scale({scale}, {scale})"})
+                    svg = et.parse(Environment.resource_path(current_flag.img_path)).getroot()
+                    for child in list(svg):
+                        current_flag_group.append(child)
+
                     new_svg.append(current_flag_group)
+                    column += 1
         tree = et.ElementTree(new_svg)
         file_name = f"output_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.svg"
         os.makedirs(Environment.resource_path(f"static/tmp"), exist_ok=True)

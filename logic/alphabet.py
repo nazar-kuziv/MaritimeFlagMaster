@@ -365,8 +365,8 @@ class Alphabet:
         :rtype: str
         """
         target_flag_dimension = 650
-        new_img_width = (max(len(line) for line in sentence.split('\n')) * target_flag_dimension) - 50
-        new_img_height = ((sentence.count("\n") + 1) * target_flag_dimension) - 50
+        new_img_width = ((max(len(line) for line in sentence.split('\n'))) * (target_flag_dimension + 50)) # - 50
+        new_img_height = ((sentence.count("\n") + 1) * (target_flag_dimension + 50)) # - 50
         et.register_namespace("","http://www.w3.org/2000/svg")
         new_svg = et.Element("svg", {
             "xmlns:xlink": "http://www.w3.org/1999/xlink",
@@ -406,12 +406,12 @@ class Alphabet:
                     svg_height = float(svg_attributes["height"])
 
                     bbox = get_svg_bbox(paths)
-                    scale_x = new_img_width / (bbox[1] - bbox[0])
-                    scale_y = new_img_height / (bbox[3] - bbox[2])
+                    scale_x = target_flag_dimension / (bbox[1] - bbox[0])
+                    scale_y = target_flag_dimension / (bbox[3] - bbox[2])
 
                     scale = min(scale_x, scale_y)
 
-                    current_flag_group = et.Element("g", {"transform": f"translate({column * target_flag_dimension}, {row * target_flag_dimension}) scale({scale}, {scale})"})
+                    current_flag_group = et.Element("g", {"transform": f"translate({column * (target_flag_dimension + 50)}, {row * (target_flag_dimension + 50)}) scale({scale}, {scale})"})
                     svg = et.parse(Environment.resource_path(current_flag.img_path)).getroot()
                     for child in list(svg):
                         current_flag_group.append(child)

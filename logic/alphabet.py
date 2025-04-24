@@ -166,6 +166,10 @@ class Alphabet:
     _sentences_from_user_file = []
     _default_sentences = []
 
+    _loaded_flag_ets: dict[str, et.ElementTree] = {}
+    _loaded_flag_paths: dict[str, tuple[list[Path], dict[str, str]]] = {}
+    _created_grouped_flag_ets: dict[str, et.Element] = {}
+
     @staticmethod
     def get_all_flags(size: int = 0) -> list[Flag | FlagMultiple]:
         """Returns a list of a specified size of all possible flags. If size is not provided, returns all existing ones.
@@ -381,7 +385,7 @@ class Alphabet:
         ns = {"svg": "http://www.w3.org/2000/svg"}
             
         def get_svg_bbox(paths: list[Path]):
-            xmin, xmax, ymin, ymax = paths.pop(0).bbox()
+            xmin, xmax, ymin, ymax = paths[0].bbox()
             for path in paths:
                 p_xmin, p_xmax, p_ymin, p_ymax = path.bbox()
                 xmin = min(xmin, p_xmin)
@@ -398,12 +402,19 @@ class Alphabet:
                 column = 0
             elif symbol == ' ':
                 column += 1
+            elif (symbol in Alphabet._created_grouped_flag_ets):
+                current_flag_group = Alphabet._created_grouped_flag_ets[symbol]
+                current_flag_group.set("transform", re.sub(r"translate\(.*?\)",
+                                                           f"translate({column * (target_flag_dimension + 50)}, {row * (target_flag_dimension + 50)})",
+                                                           current_flag_group.get("transform")))
+                new_svg.append(copy.deepcopy(current_flag_group))
+                column += 1
             else:
                 current_flag = Alphabet.get_flag_using_character(symbol)
                 if isinstance(current_flag, Flag):
-                    paths, _, svg_attributes = svg2paths2(Environment.resource_path(current_flag.img_path))
-                    svg_width = float(svg_attributes["width"])
-                    svg_height = float(svg_attributes["height"])
+                    paths, svg_attributes = Alphabet._loaded_flag_paths[symbol.upper()]
+                    # svg_width = float(svg_attributes["width"])
+                    # svg_height = float(svg_attributes["height"])
 
                     bbox = get_svg_bbox(paths)
                     scale_x = target_flag_dimension / (bbox[1] - bbox[0])
@@ -412,11 +423,12 @@ class Alphabet:
                     scale = min(scale_x, scale_y)
 
                     current_flag_group = et.Element("g", {"transform": f"translate({column * (target_flag_dimension + 50)}, {row * (target_flag_dimension + 50)}) scale({scale}, {scale})"})
-                    svg = et.parse(Environment.resource_path(current_flag.img_path)).getroot()
+                    svg = Alphabet._loaded_flag_ets[symbol.upper()].getroot()
                     for child in list(svg):
                         current_flag_group.append(child)
 
                     new_svg.append(current_flag_group)
+                    Alphabet._created_grouped_flag_ets[symbol] = current_flag_group
                     column += 1
         tree = et.ElementTree(new_svg)
         file_name = f"output_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.svg"
@@ -540,6 +552,20 @@ class Alphabet:
             collage.save(file_path, format='PNG')
             return True
         return False
+
+    @staticmethod
+    def load_flags():
+        if (Alphabet._loaded_flag_ets and Alphabet._loaded_flag_paths):
+            return
+        print("Loading all flags...")
+
+        for char, flag in Alphabet._characters.items():
+            paths, _, svg_attributes = svg2paths2(Environment.resource_path(flag.img_path))
+            Alphabet._loaded_flag_paths[char] = (paths, svg_attributes)
+            Alphabet._loaded_flag_ets[char] = et.parse(Environment.resource_path(flag.img_path))
+
+        print("Loaded all flags.")
+
 
     @staticmethod
     def _embed_png(png_file, x, y, cell_width, cell_height, output_image, background: str):

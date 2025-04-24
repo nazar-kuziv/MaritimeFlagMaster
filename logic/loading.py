@@ -1,9 +1,10 @@
 from threading import Thread
 from collections.abc import Callable
 
+loaded_data = {}
 loader_thread: Thread = None
 
-def load_thread(loading_function: Callable):
+def start_load_thread(loading_function: Callable):
     global loader_thread
     loader_thread = Thread(target=loading_function, daemon=True)
     loader_thread.start()

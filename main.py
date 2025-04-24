@@ -1,4 +1,6 @@
 from gui.main_window import *
+import logic.loading as Loading
+from logic.alphabet import Alphabet
 import gui.util_functions as Util
 import warnings
 
@@ -10,6 +12,9 @@ app = MainWindow()
 app.update()
 print(f"MAIN WINDOW WIDTH: {app.winfo_width()}")
 main_menu = Util.new_page(MainMenu, "Start", master=app, fg_color="transparent")
+
+# Load svg flags for makeimage
+Loading.start_load_thread(Alphabet.load_flags)
 
 # FOR DEV RUNNING///
 import os, shutil

@@ -1,4 +1,4 @@
-import difflib
+import cProfile
 from tkinter import Event
 
 import customtkinter as ctk
@@ -47,10 +47,10 @@ class MakeImage(Util.AppPage):
         
         def show_preview():
             text = self.top_menu.input_text.get("1.0", "end - 1c")
-            img_path = Alphabet.get_flag_sentence_svg(text, self.bg_color)
+            img_path, height, width = Alphabet.get_flag_sentence_svg(text, self.bg_color)
 
             scale_size = ({"scaletowidth": int(self.preview_frame.winfo_width()*0.9)}
-                          if (self.preview_frame.winfo_width() > self.preview_frame.winfo_height())
+                          if (width > height)
                           else {"scaletoheight": int(self.preview_frame.winfo_height()*0.9)})
 
             self.preview_img = tksvg.SvgImage(file=img_path, **scale_size)

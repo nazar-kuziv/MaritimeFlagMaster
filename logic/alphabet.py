@@ -4,6 +4,7 @@ import copy
 import os
 import random
 import re
+from typing import Tuple
 import xml.etree.ElementTree as et
 from svgpathtools import svg2paths2, Path
 from datetime import datetime
@@ -360,7 +361,7 @@ class Alphabet:
         return len(Alphabet._sentences_from_user_file)
 
     @staticmethod
-    def get_flag_sentence_svg(sentence: str, background_color: str = 'gray') -> str:
+    def get_flag_sentence_svg(sentence: str, background_color: str = 'gray') -> Tuple[str, int, int]:
         """Creates SVG file with flags from sentence.
 
         :param sentence: Sentence to save
@@ -369,8 +370,8 @@ class Alphabet:
         :rtype: str
         """
         target_flag_dimension = 650
-        new_img_width = ((max(len(line) for line in sentence.split('\n'))) * (target_flag_dimension + 50)) # - 50
-        new_img_height = ((sentence.count("\n") + 1) * (target_flag_dimension + 50)) # - 50
+        new_img_width = ((max(len(line) for line in sentence.split('\n'))) * (target_flag_dimension + 50))
+        new_img_height = ((sentence.count("\n") + 1) * (target_flag_dimension + 50))
         et.register_namespace("","http://www.w3.org/2000/svg")
         new_svg = et.Element("svg", {
             "xmlns:xlink": "http://www.w3.org/1999/xlink",
@@ -403,11 +404,11 @@ class Alphabet:
             elif symbol == ' ':
                 column += 1
             elif (symbol in Alphabet._created_grouped_flag_ets):
-                current_flag_group = Alphabet._created_grouped_flag_ets[symbol]
+                current_flag_group = copy.deepcopy(Alphabet._created_grouped_flag_ets[symbol])
                 current_flag_group.set("transform", re.sub(r"translate\(.*?\)",
-                                                           f"translate({column * (target_flag_dimension + 50)}, {row * (target_flag_dimension + 50)})",
+                                                           f"translate({column * (target_flag_dimension + 50) + 25}, {row * (target_flag_dimension + 50) + 25})",
                                                            current_flag_group.get("transform")))
-                new_svg.append(copy.deepcopy(current_flag_group))
+                new_svg.append(current_flag_group)
                 column += 1
             else:
                 current_flag = Alphabet.get_flag_using_character(symbol)
@@ -422,7 +423,7 @@ class Alphabet:
 
                     scale = min(scale_x, scale_y)
 
-                    current_flag_group = et.Element("g", {"transform": f"translate({column * (target_flag_dimension + 50)}, {row * (target_flag_dimension + 50)}) scale({scale}, {scale})"})
+                    current_flag_group = et.Element("g", {"transform": f"translate({column * (target_flag_dimension + 50) + 25}, {row * (target_flag_dimension + 50) + 25}) scale({scale}, {scale})"})
                     svg = Alphabet._loaded_flag_ets[symbol.upper()].getroot()
                     for child in list(svg):
                         current_flag_group.append(child)
@@ -435,7 +436,7 @@ class Alphabet:
         os.makedirs(Environment.resource_path(f"static/tmp"), exist_ok=True)
         file_path = Environment.resource_path(f"static/tmp/{file_name}")
         tree.write(file_path, encoding="utf-8", xml_declaration=True)
-        return file_path
+        return (file_path, new_img_height, new_img_width)
 
     @staticmethod
     def save_flag_sentence_png(sentence: list[Flag | None], background: str = 'gray',

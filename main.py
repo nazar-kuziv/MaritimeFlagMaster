@@ -5,7 +5,7 @@ import gui.util_functions as Util
 import warnings
 
 # Ignore warnings for using tksvg.SvgImage
-warnings.filterwarnings("ignore", message=".*SvgImage.*")
+warnings.filterwarnings("ignore", message=".*Given image is not CTKImage.*")
 
 # Set up the Tkinter window
 app = MainWindow()

@@ -210,7 +210,7 @@ def text_select_all(event, text_widget: ctk.CTkEntry | ctk.CTkTextbox):
 def text_paste(event, text_widget: ctk.CTkTextbox | ctk.CTkEntry):
     """Deletes selection in a text widget (entry, textbox) when pasting
     """
-    print("Paste delete")
+    print("Paste delete selection")
     try:
         text_widget.delete("sel.first", "sel.last")
     except:

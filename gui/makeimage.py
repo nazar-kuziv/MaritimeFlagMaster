@@ -35,23 +35,6 @@ class MakeImage(Util.AppPage):
         self.update_idletasks()
         self.master.scale_size = self.master.winfo_height() if (
                     self.master.winfo_height() < self.master.winfo_width()) else self.master.winfo_width()
-        
-        def show_preview():
-            self.preview_label.configure(text="Ładowanie obrazu...", image='')
-            self.update_idletasks()
-            while (check_thread_active_status()):
-                self.after(100)
-            text = self.top_menu.input_text.get("1.0", "end - 1c")
-            img_path, height, width = Alphabet.get_flag_sentence_svg(text, self.bg_color)
-
-            scale_size = ({"scaletowidth": int(self.preview_frame.winfo_width()*0.9)}
-                          if (width > height)
-                          else {"scaletoheight": int(self.preview_frame.winfo_height()*0.9)})
-
-            self.preview_img = tksvg.SvgImage(file=img_path, **scale_size)
-            self.preview_label.configure(image=self.preview_img, text="")
-
-            print("Preview updated")
 
         def delete_illegal_chars():
             text = self.top_menu.input_text.get("1.0", "end - 1 chars")
@@ -80,7 +63,7 @@ class MakeImage(Util.AppPage):
             if (not event.char):
                 return
 
-            self.preview = self.after(750, show_preview)
+            self.preview = self.after(750, self.show_preview)
 
         self.top_menu = ctk.CTkFrame(self, fg_color="transparent")
         self.top_menu.pack(side="top", anchor="w", fill="x", padx=10, pady=10)
@@ -149,10 +132,10 @@ class MakeImage(Util.AppPage):
                 flag_container.grid(row=i, column=j)
                 if (not tuple):
                     flag_container.flag = ctk.CTkLabel(flag_container, text="␣", text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.025)), justify="center", cursor="hand2")
-                    flag_container.flag.bind("<Button-1>", command=lambda event, i=" ": self.flag_input_handler(event, char=i))
+                    flag_container.flag.bind("<Button-1>", command=lambda event, i=" ": self.flag_input_handler(char=i))
                 else:
                     flag_container.flag = ctk.CTkLabel(flag_container, text="", image=self.images[tuple[0]], cursor="hand2")
-                    flag_container.flag.bind("<Button-1>", command=lambda event, i=tuple[1]: self.flag_input_handler(event, char=i))
+                    flag_container.flag.bind("<Button-1>", command=lambda event, i=tuple[1]: self.flag_input_handler(char=i))
                 flag_container.flag.grid(ipadx=8, ipady=10, sticky="nsew")
                 self.flag_images.append(flag_container)
 
@@ -162,10 +145,34 @@ class MakeImage(Util.AppPage):
                     flag_container2.grid_columnconfigure(0, weight=1)
                     flag_container2.grid(row=i, column=j+1, sticky="nsew")
                     flag_container2.rtrn = ctk.CTkLabel(flag_container2, text="⏎", text_color="blue", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.025)), justify="center", cursor="hand2")
-                    flag_container2.rtrn.bind("<Button-1>", command=lambda event, i="\n": self.flag_input_handler(event, char=i))
+                    flag_container2.rtrn.bind("<Button-1>", command=lambda event, i="\n": self.flag_input_handler(char=i))
                     flag_container2.rtrn.grid(row=0, column=1, ipadx=8, ipady=10, sticky="nsew")
                     self.flag_images.append(flag_container2)
                     return
+        
+    def show_preview(self):
+        self.preview_label.configure(text="Ładowanie obrazu...", image='')
+        self.update_idletasks()
+        while (check_thread_active_status()):
+            self.after(100)
+        text = self.top_menu.input_text.get("1.0", "end - 1c")
+        img_path, height, width = Alphabet.get_flag_sentence_svg(text, self.bg_color)
+
+        scale_size = ({"scaletowidth": int(self.preview_frame.winfo_width()*0.9)}
+                        if (width > height)
+                        else {"scaletoheight": int(self.preview_frame.winfo_height()*0.9)})
+
+        self.preview_img = tksvg.SvgImage(file=img_path, **scale_size)
+        self.preview_label.configure(image=self.preview_img, text="")
+
+        print("Preview updated")
+
+    def flag_input_handler(self, char):
+        self.top_menu.input_text.insert('insert', char)
+
+        if (self.preview):
+            self.after_cancel(self.preview)
+        self.preview = self.after(750, self.show_preview)
 
     def flag_delete_handler(self):
         self.top_menu.input_text.delete("end - 2c")

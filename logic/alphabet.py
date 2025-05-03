@@ -413,10 +413,7 @@ class Alphabet:
             else:
                 current_flag = Alphabet.get_flag_using_character(symbol)
                 if isinstance(current_flag, Flag):
-                    # paths, svg_attributes = Alphabet._loaded_flag_paths[symbol.upper()]
                     paths, svg_attributes = next(value for key, value in Alphabet._loaded_flag_paths.items() if symbol.upper() in key)
-                    # svg_width = float(svg_attributes["width"])
-                    # svg_height = float(svg_attributes["height"])
 
                     bbox = get_svg_bbox(paths)
                     scale_x = target_flag_dimension / (bbox[1] - bbox[0])
@@ -425,7 +422,6 @@ class Alphabet:
                     scale = min(scale_x, scale_y)
 
                     current_flag_group = et.Element("g", {"transform": f"translate({column * (target_flag_dimension + 50) + 25}, {row * (target_flag_dimension + 50) + 25}) scale({scale}, {scale})"})
-                    # svg = Alphabet._loaded_flag_ets[symbol.upper()].getroot()
                     svg = next(value for key, value in Alphabet._loaded_flag_ets.items() if symbol.upper() in key).getroot()
                     for child in list(svg):
                         current_flag_group.append(child)
@@ -558,6 +554,8 @@ class Alphabet:
 
     @staticmethod
     def load_flags():
+        """Loads all flags into 2 arrays containing their paths/svg attributes and their Element tree representation
+        """
         if (Alphabet._loaded_flag_ets and Alphabet._loaded_flag_paths):
             return
         print("Loading all flags...")

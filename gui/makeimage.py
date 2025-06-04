@@ -6,6 +6,7 @@ import customtkinter as ctk
 import tksvg
 
 import gui.util_functions as Util
+from logic import exceptions
 from logic.alphabet import Alphabet
 from logic.environment import Environment
 from logic.loading import check_thread_active_status
@@ -22,7 +23,7 @@ class MakeImage(Util.AppPage):
         self.alphabet = dict(Alphabet._characters, **Alphabet._additionalFlags)
         self.flag_index = 0
         self.images = []
-        self.bg_color = "grey"
+        self.bg_color = "transparent"
         self.flag_images = []
         self.preview = None
     
@@ -89,9 +90,9 @@ class MakeImage(Util.AppPage):
 
         def checkbox_event():
             print("checkbox toggled, current value:", check_var.get())
-            self.bg_color = "transparent" if check_var.get() == "on" else "grey"
+            self.bg_color = "transparent" if check_var.get() == "on" else "gray"
         
-        check_var = ctk.StringVar(value="off")
+        check_var = ctk.StringVar(value="on")
         self.top_menu.checkbox = ctk.CTkCheckBox(self.top_menu, text="Transparentne tło", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.01)), command=checkbox_event, 
                                                  variable=check_var, onvalue="on", offvalue="off")
         self.top_menu.checkbox.pack(side="right", padx=10)
@@ -181,9 +182,25 @@ class MakeImage(Util.AppPage):
         self.top_menu.input_text.delete("1.0", "end")
 
     def save_image(self):
-        if (not self.top_menu.input_text.get("1.0", "end - 1c")): return
-        if Alphabet.saveFlagSentencePNG([x for xs in self.answer_flags for x in xs], background=self.bg_color):
-            label = ctk.CTkLabel(self.top_menu, text="Zapisano.", font=ctk.CTkFont(size=int(self.master.winfo_width()*0.015)), fg_color="transparent")
+        text = self.top_menu.input_text.get("1.0", "end - 1c")
+        if not text:
+            return
+
+        flags = []
+        for char in text:
+            if char == ' ':
+                flags.append(None)
+            else:
+                try:
+                    flag = Alphabet.get_flag_using_character(char)
+                    flags.append(flag)
+                except exceptions.InputCharacterException:
+                    flags.append(None)
+
+        if Alphabet.save_flag_sentence_png(flags, background=self.bg_color):
+            label = ctk.CTkLabel(self.top_menu, text="Zapisano.",
+                                 font=ctk.CTkFont(size=int(self.master.winfo_width() * 0.015)),
+                                 fg_color="transparent")
             label.pack(side="right", padx=10)
             label.after(4000, lambda: label.destroy())
 

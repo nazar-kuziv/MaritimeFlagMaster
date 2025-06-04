@@ -4,7 +4,9 @@ import copy
 import os
 import random
 import re
+from typing import Tuple
 import xml.etree.ElementTree as et
+from svgpathtools import svg2paths2, Path
 from datetime import datetime
 
 import requests
@@ -164,6 +166,10 @@ class Alphabet:
     _allFlags = list(_characters.values()) + list(_additionalFlags.values()) + _multipleFlags
     _sentences_from_user_file = []
     _default_sentences = []
+
+    _loaded_flag_ets: dict[str, et.ElementTree] = {}
+    _loaded_flag_paths: dict[str, tuple[list[Path], dict[str, str]]] = {}
+    _created_grouped_flag_ets: dict[str, et.Element] = {}
 
     @staticmethod
     def get_all_flags(size: int = 0) -> list[Flag | FlagMultiple]:
@@ -355,7 +361,7 @@ class Alphabet:
         return len(Alphabet._sentences_from_user_file)
 
     @staticmethod
-    def get_flag_sentence_svg(sentence: str, background_color: str = 'gray') -> str:
+    def get_flag_sentence_svg(sentence: str, background_color: str = 'gray') -> Tuple[str, int, int]:
         """Creates SVG file with flags from sentence.
 
         :param sentence: Sentence to save
@@ -363,10 +369,11 @@ class Alphabet:
         :return Path to the created file
         :rtype: str
         """
-        new_img_height = ((sentence.count("\n") + 1) * 650) - 50
-        new_img_width = (max(len(line) for line in sentence.split('\n')) * 650) - 50
+        target_flag_dimension = 650
+        new_img_width = ((max(len(line) for line in sentence.split('\n'))) * (target_flag_dimension + 50))
+        new_img_height = ((sentence.count("\n") + 1) * (target_flag_dimension + 50))
+        et.register_namespace("","http://www.w3.org/2000/svg")
         new_svg = et.Element("svg", {
-            "xmlns": "http://www.w3.org/2000/svg",
             "xmlns:xlink": "http://www.w3.org/1999/xlink",
             "width": str(new_img_width),
             "height": str(new_img_height),
@@ -375,6 +382,20 @@ class Alphabet:
         if background_color == 'gray':
             new_svg.append(et.Element("rect", {"width": str(new_img_width), "height": str(new_img_height),
                                                "fill": "rgb(128, 128, 128)"}))
+
+        ns = {"svg": "http://www.w3.org/2000/svg"}
+            
+        def get_svg_bbox(paths: list[Path]):
+            xmin, xmax, ymin, ymax = paths[0].bbox()
+            for path in paths:
+                p_xmin, p_xmax, p_ymin, p_ymax = path.bbox()
+                xmin = min(xmin, p_xmin)
+                xmax = max(xmax, p_xmax)
+                ymin = min(ymin, p_ymin)
+                ymax = max(ymax, p_ymax)
+
+            return xmin, xmax, ymin, ymax
+
         row, column = 0, 0
         for symbol in sentence:
             if symbol == '\n':
@@ -382,20 +403,38 @@ class Alphabet:
                 column = 0
             elif symbol == ' ':
                 column += 1
+            elif (symbol in Alphabet._created_grouped_flag_ets):
+                current_flag_group = copy.deepcopy(Alphabet._created_grouped_flag_ets[symbol])
+                current_flag_group.set("transform", re.sub(r"translate\(.*?\)",
+                                                           f"translate({column * (target_flag_dimension + 50) + 25}, {row * (target_flag_dimension + 50) + 25})",
+                                                           current_flag_group.get("transform")))
+                new_svg.append(current_flag_group)
+                column += 1
             else:
                 current_flag = Alphabet.get_flag_using_character(symbol)
                 if isinstance(current_flag, Flag):
-                    current_flag_svg = et.parse(Environment.resource_path(current_flag.img_path)).getroot()
-                    current_flag_group = et.Element("g", {"transform": f"translate({column * 650},{row * 650})"})
-                    current_flag_group.append(current_flag_svg)
-                    column += 1
+                    paths, svg_attributes = next(value for key, value in Alphabet._loaded_flag_paths.items() if symbol.upper() in key)
+
+                    bbox = get_svg_bbox(paths)
+                    scale_x = target_flag_dimension / (bbox[1] - bbox[0])
+                    scale_y = target_flag_dimension / (bbox[3] - bbox[2])
+
+                    scale = min(scale_x, scale_y)
+
+                    current_flag_group = et.Element("g", {"transform": f"translate({column * (target_flag_dimension + 50) + 25}, {row * (target_flag_dimension + 50) + 25}) scale({scale}, {scale})"})
+                    svg = next(value for key, value in Alphabet._loaded_flag_ets.items() if symbol.upper() in key).getroot()
+                    for child in list(svg):
+                        current_flag_group.append(child)
+
                     new_svg.append(current_flag_group)
+                    Alphabet._created_grouped_flag_ets[symbol] = current_flag_group
+                    column += 1
         tree = et.ElementTree(new_svg)
         file_name = f"output_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.svg"
         os.makedirs(Environment.resource_path(f"static/tmp"), exist_ok=True)
         file_path = Environment.resource_path(f"static/tmp/{file_name}")
         tree.write(file_path, encoding="utf-8", xml_declaration=True)
-        return file_path
+        return (file_path, new_img_height, new_img_width)
 
     @staticmethod
     def save_flag_sentence_png(sentence: list[Flag | None], background: str = 'gray',
@@ -512,6 +551,22 @@ class Alphabet:
             collage.save(file_path, format='PNG')
             return True
         return False
+
+    @staticmethod
+    def load_flags():
+        """Loads all flags into 2 arrays containing their paths/svg attributes and their Element tree representation
+        """
+        if (Alphabet._loaded_flag_ets and Alphabet._loaded_flag_paths):
+            return
+        print("Loading all flags...")
+
+        for char, flag in dict(Alphabet._characters, **Alphabet._additionalFlags).items():
+            paths, _, svg_attributes = svg2paths2(Environment.resource_path(flag.img_path))
+            Alphabet._loaded_flag_paths[char] = (paths, svg_attributes)
+            Alphabet._loaded_flag_ets[char] = et.parse(Environment.resource_path(flag.img_path))
+
+        print("Loaded all flags.")
+
 
     @staticmethod
     def _embed_png(png_file, x, y, cell_width, cell_height, output_image, background: str):

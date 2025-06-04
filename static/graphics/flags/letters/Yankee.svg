@@ -1,6 +1,20 @@
 <?xml version="1.0" standalone="no"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
 <rect fill="#F00" width="600" height="600"/>
-<path stroke="#FF0" stroke-width="850" stroke-dasharray="84,86" d="M0,0 600,600"/>
+  <path
+     fill="#FF0"
+     d="M 600,362.03907 362.03907,600 H 480.83203 L 600,480.83203 Z"/>
+  <path
+     fill="#FF0"
+     d="M 600,121.6211 121.6211,600 H 240.41602 L 600,240.41602 Z"/>
+  <path
+     fill="#FF0"
+     d="M 481.20704,0 0,481.20704 V 600 L 600,0 Z"/>
+  <path
+     fill="#FF0"
+     d="M 240.78907,0 0,240.78907 V 359.58203 L 359.58203,0 Z"/>
+  <path
+     fill="#FF0"
+     d="M 0,0 V 119.16797 L 119.16797,0 Z"/>
 <path fill="none" stroke="#000" stroke-width="2.5" d="M0,0H600V600H0z"/>
 </svg>

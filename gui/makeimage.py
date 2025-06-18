@@ -11,7 +11,7 @@ from logic.alphabet import Alphabet
 from logic.environment import Environment
 from logic.loading import check_thread_active_status
 
-input_text_allowed_chars = r" a-zA-Z0-9?!@\"#£\u0016\u0008"
+input_text_allowed_chars = r" a-zA-Z0-9?!@\"#£\u0016\u0008\r\n"
 
 class MakeImage(Util.AppPage):
     def __init__(self, master, **kwargs):

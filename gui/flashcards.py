@@ -110,8 +110,9 @@ class Flashcards(Util.AppQuizPage):
 
         self.flashcard.rowconfigure(0, weight=1, uniform="yes")
         self.flashcard.rowconfigure(1, weight=3)
-        self.flashcard.rowconfigure(2, weight=1, uniform="yes")
+        self.flashcard.rowconfigure(1, weight=1, uniform="yes")
         self.flashcard.columnconfigure(0, weight=1)
+        self.flashcard.columnconfigure(1, weight=1)
         # print(f"Back flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
 
         self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.scale_size*0.035)), wraplength=int(self.flashcard.winfo_width()*0.75))
@@ -144,6 +145,16 @@ class Flashcards(Util.AppQuizPage):
         self.flashcard.flag_mnemonic.grid(row=0, column=0, sticky='ne', padx=10, pady=10)
         CustomTooltipLabel(self.flashcard.flag_mnemonic, text=f"Skojarzenie mnemotechniczne:\n{self.flag.flag_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
         self.flashcard.flag_mnemonic.bind("<Button-1>", self.show_flashcard_front)
+
+        self.flashcard.flag_mini = ctk.CTkFrame(self.flashcard, fg_color='transparent', width=200, height=200)
+        self.flashcard.flag_mini.grid(row=1, column=0, sticky='w', padx=10, pady=10)
+
+        for i, flag in enumerate(self.flags):
+            self.flashcard.flag_mini.grid_columnconfigure(i, weight=1)
+            img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.15/len(self.flags)))
+            label = ctk.CTkLabel(self.flashcard.flag_mini, text='', image=img)
+            label.grid(row=0, column=i, padx=5, pady=5, sticky="nsew")
+            label.bind("<Button-1>", self.show_flashcard_front)
 
         self.flashcard.morse.morse_mnemonic = ctk.CTkLabel(self.flashcard.morse, text='', image=infoicon)
         self.flashcard.morse.morse_mnemonic.pack(side="left")

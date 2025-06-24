@@ -10,6 +10,7 @@ from svgpathtools import svg2paths2, Path
 from datetime import datetime
 
 import requests
+from unidecode import unidecode
 from PIL import Image as PILImage
 from customtkinter import filedialog
 
@@ -342,13 +343,15 @@ class Alphabet:
         try:
             if not filename:
                 raise exceptions.NoFileSelectedException()
-            with open(filename, 'r') as file:
+            with open(filename, 'r', encoding='utf-8') as file:
                 sentences_str = [line.strip() for line in file]
-                print(sentences_str)
                 for sentence_str in sentences_str:
-                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', sentence_str).upper().strip()[:50]
+                    print(f"1. {sentence_str}")
+                    normalized_sentence = unidecode(sentence_str)
+                    print(f"2. {normalized_sentence}")
+                    cleaned_sentence = re.sub(r'[^a-zA-Z0-9\s]', '', normalized_sentence).upper().strip()[:50]
                     flags = Alphabet._translate_sentence_to_flags(cleaned_sentence)
-                    Alphabet._sentences_from_user_file.append(FlagSentence(flags, sentence_str, cleaned_sentence))
+                    Alphabet._sentences_from_user_file.append(FlagSentence(flags, normalized_sentence, cleaned_sentence))
         except Exception:
             raise exceptions.SmthWrongWithFileException()
 
@@ -558,7 +561,6 @@ class Alphabet:
         """
         if (Alphabet._loaded_flag_ets and Alphabet._loaded_flag_paths):
             return
-        print("Loading all flags...")
 
         for char, flag in dict(Alphabet._characters, **Alphabet._additionalFlags).items():
             paths, _, svg_attributes = svg2paths2(Environment.resource_path(flag.img_path))

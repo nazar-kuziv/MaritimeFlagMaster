@@ -63,6 +63,8 @@ class Flashcards(Util.AppQuizPage):
         
         self.flashcard = ctk.CTkFrame(self.flashcard_frame, cursor="hand2")
         self.flashcard.grid(row=0, column=1, ipady=50, ipadx=50, sticky="ew")
+        self.update_idletasks()
+        self.flashcard.scale_size = self.flashcard.winfo_height() if (self.flashcard.winfo_height() < self.flashcard.winfo_width()) else self.flashcard.winfo_width()
 
         # next button
         try:
@@ -94,7 +96,7 @@ class Flashcards(Util.AppQuizPage):
         self.images = []
         for i, flag in enumerate(self.flags):
             self.flashcard.grid_columnconfigure(i, weight=1)
-            img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.5/len(self.flags)))
+            img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.scale_size*0.7/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard, text='', image=img)
             label.grid(row=0, column=i, padx=5, pady=5, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_back)
@@ -108,25 +110,38 @@ class Flashcards(Util.AppQuizPage):
         self.show_question()
         self.flashcard.bind("<Button-1>", self.show_flashcard_front)
 
-        self.flashcard.rowconfigure(0, weight=1, uniform="yes")
-        self.flashcard.rowconfigure(1, weight=3)
-        self.flashcard.rowconfigure(1, weight=1, uniform="yes")
+        self.flashcard.rowconfigure(0, weight=0, uniform="yes")
+        self.flashcard.rowconfigure(1, weight=1)
+        self.flashcard.rowconfigure(2, weight=0, uniform="yes")
         self.flashcard.columnconfigure(0, weight=1)
         self.flashcard.columnconfigure(1, weight=1)
         # print(f"Back flashcard height={self.flashcard.winfo_height()} width={self.flashcard.winfo_width()}")
 
-        self.flashcard.meaning = ctk.CTkLabel(self.flashcard, text=self.flag.meaning, font=ctk.CTkFont(size=int(self.master.scale_size*0.035)), wraplength=int(self.flashcard.winfo_width()*0.75))
-        self.flashcard.meaning.grid(row=1, column=0, padx=10)
+        if ("\n" in self.flag.meaning):
+            letter, description = self.flag.meaning.split("\n", 1)
+            self.flashcard.letter = ctk.CTkLabel(self.flashcard, text=letter, font=ctk.CTkFont(size=int(self.flashcard.scale_size*0.1)))
+            self.flashcard.letter.grid(column=1, row=0, sticky="w")
+        else:
+            description = self.flag.meaning
+
+        self.flashcard.codescr_frame = ctk.CTkFrame(self.flashcard, fg_color="transparent")
+        self.flashcard.codescr_frame.grid(column=1, row=1, rowspan=2, sticky="new")
+        self.flashcard.codescr_frame.bind("<Button-1>", self.show_flashcard_front)
+
+        self.flashcard.meaning = ctk.CTkLabel(self.flashcard.codescr_frame, text=description, font=ctk.CTkFont(size=int(self.flashcard.scale_size*0.055)),
+                                              wraplength=int(self.flashcard.winfo_width()*0.4), justify="left")
+        self.flashcard.meaning.pack(side="bottom", anchor="nw", pady=10)
         self.flashcard.meaning.bind("<Button-1>", self.show_flashcard_front)
 
         isSingleFlag = isinstance(self.flag, Flag)
         if (isSingleFlag):
-            if (self.flag.morse_code == ""): text = ""
+            if (self.flag.morse_code == ""): return
             else: text = "Kod: " + self.flag.code_word
         else:
             text = "Kod: " + " ".join([x.code_word if x.morse_code != "" else x.meaning for x in self.flag.flags])
-        self.flashcard.code_word = ctk.CTkLabel(self.flashcard, text=text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)))
-        self.flashcard.code_word.grid(row=0, column=0, sticky='w', padx=10, pady=10)
+
+        self.flashcard.code_word = ctk.CTkLabel(self.flashcard.codescr_frame, text=text, font=ctk.CTkFont(size=int(self.flashcard.scale_size*0.055)), justify="left")
+        self.flashcard.code_word.pack(side="top", anchor="sw", pady=10)
         self.flashcard.code_word.bind("<Button-1>", self.show_flashcard_front)
         if (not isSingleFlag): return
 
@@ -135,12 +150,12 @@ class Flashcards(Util.AppQuizPage):
         morse_text = self.flag.morse_code
         if (morse_text != ""): morse_text = "Morse:  " + morse_text
 
-        self.flashcard.morse.morse_code = ctk.CTkLabel(self.flashcard.morse, text=morse_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)))
+        self.flashcard.morse.morse_code = ctk.CTkLabel(self.flashcard.morse, text=morse_text, font=ctk.CTkFont(size=int(self.flashcard.scale_size*0.06)))
         self.flashcard.morse.morse_code.pack(side="left", padx=10, pady=10)
         self.flashcard.morse.morse_code.bind("<Button-1>", self.show_flashcard_front)
         if (text == ""): return
 
-        infoicon = tksvg.SvgImage(file=Environment.resource_path("static/graphics/icons/lightbulb-icon.svg"), scaletoheight=int(self.master.scale_size*0.04))
+        infoicon = tksvg.SvgImage(file=Environment.resource_path("static/graphics/icons/lightbulb-icon.svg"), scaletoheight=int(self.flashcard.scale_size*0.07))
         self.flashcard.flag_mnemonic = ctk.CTkLabel(self.flashcard, text='', image=infoicon)
         self.flashcard.flag_mnemonic.grid(row=0, column=0, sticky='ne', padx=10, pady=10)
         CustomTooltipLabel(self.flashcard.flag_mnemonic, text=f"Skojarzenie mnemotechniczne:\n{self.flag.flag_mnemonics}", font=ctk.CTkFont(size=20), hover_delay=200, anchor="e")
@@ -151,7 +166,7 @@ class Flashcards(Util.AppQuizPage):
 
         for i, flag in enumerate(self.flags):
             self.flashcard.flag_mini.grid_columnconfigure(i, weight=1)
-            img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.winfo_width()*0.15/len(self.flags)))
+            img = tksvg.SvgImage(file=Environment.resource_path(flag.img_path), scaletowidth=int(self.flashcard.scale_size*0.2/len(self.flags)))
             label = ctk.CTkLabel(self.flashcard.flag_mini, text='', image=img)
             label.grid(row=0, column=i, padx=5, pady=5, sticky="nsew")
             label.bind("<Button-1>", self.show_flashcard_front)

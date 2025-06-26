@@ -92,7 +92,7 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
         clear_button.grid(row=0, column=0, sticky="w", ipadx=10, ipady=10)
         self.top_menu.dict["clear_button"] = clear_button
 
-        next_button = ctk.CTkButton(self.top_menu, text='', fg_color="transparent")
+        next_button = ctk.CTkButton(self.top_menu, text='', fg_color="transparent", hover=False)
         next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
         self.top_menu.dict["next_button"] = next_button
 
@@ -252,10 +252,10 @@ class Meanings(Util.AppQuizPage, Util.ISkippablePage):
             except AttributeError: pass
 
 
-        next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=next_command)
-        next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
-        self.top_menu.dict["next_button"].destroy()
-        self.top_menu.dict["next_button"] = next_button
+        # next_button = ctk.CTkButton(self.top_menu, text=next_text, font=ctk.CTkFont(size=int(self.master.scale_size*0.03)), command=next_command)
+        # next_button.grid(row=0, column=6, sticky="nse", ipadx=10)
+        # self.top_menu.dict["next_button"].destroy()
+        self.top_menu.dict["next_button"].configure(text=next_text, command=next_command, fg_color=ctk.ThemeManager.theme["CTkButton"]["fg_color"][ctk.AppearanceModeTracker.get_mode()], hover=True)
         self.master.bind("<Return>", lambda event: next_command())
 
     def next_question(self):
